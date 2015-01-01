@@ -2067,7 +2067,7 @@ namespace ClientGUI
                 Players[pId].ColorId = getPlayerColorCMBFromId(pId + 1).SelectedIndex;
                 int sideId = getPlayerSideCMBFromId(pId + 1).SelectedIndex;
 
-                if (!isSideAllowed(sideId) || sideId < 0)
+                if (sideId < 0 || !isSideAllowed(sideId))
                     getPlayerSideCMBFromId(pId + 1).SelectedIndex = Players[pId].SideId;
                 else
                     Players[pId].SideId = sideId;

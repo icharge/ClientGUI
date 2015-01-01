@@ -989,13 +989,13 @@ namespace ClientGUI
                 int aiIndex = AIPlayers.Count - 1;
                 PlayerInfo aiPlayer = AIPlayers[aiIndex];
 
-                if (!isSideAllowed(sideId) || sideId < 0)
-                    getPlayerSideCMBFromId(cmbId + 1).SelectedIndex = aiPlayer.SideId;
+                if (sideId < 0 || !isSideAllowed(sideId))
+                    getPlayerSideCMBFromId(cmbId + 1).SelectedIndex = 0;
                 else
                     aiPlayer.SideId = sideId;
 
                 if (aiPlayer.SideId == -1)
-                    aiPlayer.SideId = sideId;
+                    aiPlayer.SideId = 0;
                 if (aiPlayer.StartingLocation == -1)
                     aiPlayer.StartingLocation = 0;
                 if (aiPlayer.ColorId == -1)
