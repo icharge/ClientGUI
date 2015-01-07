@@ -746,7 +746,7 @@ namespace ClientGUI
         {
             foreach (Map map in CnCNetData.MapList)
             {
-                if (map.MD5 == md5)
+                if (map.SHA1 == md5)
                     return map;
             }
 
@@ -1431,7 +1431,7 @@ namespace ClientGUI
         {
             Logger.Log("Saving Skirmish settings.");
 
-            string mapmd5 = currentMap.MD5;
+            string mapmd5 = currentMap.SHA1;
             string difficulties = String.Empty;
             for (int aiId = 0; aiId < AIPlayers.Count; aiId++)
             {

@@ -1393,7 +1393,7 @@ namespace ClientGUI
         {
             foreach (Map map in CnCNetData.MapList)
             {
-                if (map.MD5 == md5)
+                if (map.SHA1 == md5)
                     return map;
             }
 
@@ -2385,7 +2385,7 @@ namespace ClientGUI
             }
             else
             {
-                sb.Append(currentMap.MD5);
+                sb.Append(currentMap.SHA1);
                 sb.Append(";");
                 sb.Append(currentGameMode);
                 sb.Append(";");
@@ -3135,7 +3135,7 @@ namespace ClientGUI
 
             // 28. 12. 2014 No editing the map after setting for it!
             string mapMD5 = Utilities.calculateMD5ForFile(mapPath);
-            if (mapMD5 != currentMap.MD5)
+            if (mapMD5 != currentMap.SHA1)
             {
                 MessageBox.Show("Map modification detected! Please restart the Client." + Environment.NewLine + mapPath,
                     "Cannot read scenario", MessageBoxButtons.OK, MessageBoxIcon.Error);
