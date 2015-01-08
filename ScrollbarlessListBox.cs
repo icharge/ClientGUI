@@ -18,6 +18,7 @@ namespace ClientGUI
         public ScrollbarlessListBox()
         {
             InitializeComponent();
+            SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.OptimizedDoubleBuffer, true);
         }
 
         private bool mShowScroll = false;
@@ -30,6 +31,32 @@ namespace ClientGUI
                     cp.Style = cp.Style & ~0x200000;
                 return cp;
             }
+        }
+
+        protected override void OnPaintBackground(PaintEventArgs pevent)
+        {
+            base.OnPaintBackground(pevent);
+        }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            for (int Index = 0; Index < this.Items.Count; ++Index)
+            {
+                var rect = GetItemRectangle(Index);
+
+                if (this.SelectedIndex == Index)
+                {
+                    OnDrawItem(new DrawItemEventArgs(e.Graphics, this.Font,
+                        rect, Index, DrawItemState.Selected, this.ForeColor, this.BackColor));
+                }
+                else
+                {
+                    OnDrawItem(new DrawItemEventArgs(e.Graphics, this.Font,
+                        rect, Index, DrawItemState.None, this.ForeColor, this.BackColor));
+                }
+            }
+
+            base.OnPaint(e);
         }
 
         public bool ShowScrollbar

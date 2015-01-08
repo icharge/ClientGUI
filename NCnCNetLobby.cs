@@ -2541,5 +2541,16 @@ namespace ClientGUI
 
             requestWhois = true;
         }
+
+        private void lbGameList_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            e.DrawBackground();
+            e.DrawFocusRectangle();
+            if (e.Index > -1 && e.Index < lbGameList.Items.Count)
+            {
+                Color foreColor = lbGameList.ForeColor;
+                e.Graphics.DrawString(lbGameList.Items[e.Index].ToString(), e.Font, new SolidBrush(foreColor), e.Bounds);
+            }
+        }
     }
 }

@@ -32,10 +32,6 @@
             this.lbGameList = new System.Windows.Forms.ListBox();
             this.lblFollowChannels = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.chkChannelCnCNet = new ClientGUI.UserCheckBox();
-            this.chkChannelTS = new ClientGUI.UserCheckBox();
-            this.chkChannelTI = new ClientGUI.UserCheckBox();
-            this.chkChannelDTA = new ClientGUI.UserCheckBox();
             this.btnReturnToMenu = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
             this.lblGameMode = new System.Windows.Forms.Label();
@@ -63,6 +59,10 @@
             this.cmbMessageColor = new ClientGUI.LimitedComboBox();
             this.cmbCurrentChannel = new ClientGUI.LimitedComboBox();
             this.lbChatMessages = new ClientGUI.ScrollbarlessListBox();
+            this.chkChannelCnCNet = new ClientGUI.UserCheckBox();
+            this.chkChannelTS = new ClientGUI.UserCheckBox();
+            this.chkChannelTI = new ClientGUI.UserCheckBox();
+            this.chkChannelDTA = new ClientGUI.UserCheckBox();
             this.lbPlayerList = new ClientGUI.ScrollbarlessListBox();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -71,11 +71,13 @@
             // lbGameList
             // 
             this.lbGameList.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.lbGameList.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
             this.lbGameList.FormattingEnabled = true;
             this.lbGameList.Location = new System.Drawing.Point(12, 28);
             this.lbGameList.Name = "lbGameList";
             this.lbGameList.Size = new System.Drawing.Size(215, 197);
             this.lbGameList.TabIndex = 0;
+            this.lbGameList.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.lbGameList_DrawItem);
             this.lbGameList.SelectedIndexChanged += new System.EventHandler(this.lbGameList_SelectedIndexChanged);
             this.lbGameList.DoubleClick += new System.EventHandler(this.lbGameList_DoubleClick);
             // 
@@ -103,51 +105,6 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(215, 109);
             this.panel1.TabIndex = 3;
-            // 
-            // chkChannelCnCNet
-            // 
-            this.chkChannelCnCNet.AutoSize = true;
-            this.chkChannelCnCNet.BackColor = System.Drawing.Color.Transparent;
-            this.chkChannelCnCNet.IsEnabled = true;
-            this.chkChannelCnCNet.Location = new System.Drawing.Point(13, 78);
-            this.chkChannelCnCNet.Name = "chkChannelCnCNet";
-            this.chkChannelCnCNet.Size = new System.Drawing.Size(197, 17);
-            this.chkChannelCnCNet.TabIndex = 26;
-            this.chkChannelCnCNet.Tag = "";
-            this.chkChannelCnCNet.CheckedChanged += new ClientGUI.UserCheckBox.OnCheckedChanged(this.chkChannelCnCNet_CheckedChanged);
-            // 
-            // chkChannelTS
-            // 
-            this.chkChannelTS.BackColor = System.Drawing.Color.Transparent;
-            this.chkChannelTS.IsEnabled = true;
-            this.chkChannelTS.Location = new System.Drawing.Point(13, 56);
-            this.chkChannelTS.Name = "chkChannelTS";
-            this.chkChannelTS.Size = new System.Drawing.Size(197, 15);
-            this.chkChannelTS.TabIndex = 25;
-            this.chkChannelTS.Tag = "";
-            this.chkChannelTS.CheckedChanged += new ClientGUI.UserCheckBox.OnCheckedChanged(this.chkChannelTS_CheckedChanged);
-            // 
-            // chkChannelTI
-            // 
-            this.chkChannelTI.BackColor = System.Drawing.Color.Transparent;
-            this.chkChannelTI.IsEnabled = true;
-            this.chkChannelTI.Location = new System.Drawing.Point(13, 35);
-            this.chkChannelTI.Name = "chkChannelTI";
-            this.chkChannelTI.Size = new System.Drawing.Size(194, 15);
-            this.chkChannelTI.TabIndex = 23;
-            this.chkChannelTI.Tag = "";
-            this.chkChannelTI.CheckedChanged += new ClientGUI.UserCheckBox.OnCheckedChanged(this.chkChannelTI_CheckedChanged);
-            // 
-            // chkChannelDTA
-            // 
-            this.chkChannelDTA.BackColor = System.Drawing.Color.Transparent;
-            this.chkChannelDTA.IsEnabled = true;
-            this.chkChannelDTA.Location = new System.Drawing.Point(13, 12);
-            this.chkChannelDTA.Name = "chkChannelDTA";
-            this.chkChannelDTA.Size = new System.Drawing.Size(197, 15);
-            this.chkChannelDTA.TabIndex = 22;
-            this.chkChannelDTA.Tag = "The Dawn of the Tiberium Age";
-            this.chkChannelDTA.CheckedChanged += new ClientGUI.UserCheckBox.OnCheckedChanged(this.chkChannelDTA_CheckedChanged);
             // 
             // btnReturnToMenu
             // 
@@ -513,6 +470,51 @@
             this.lbChatMessages.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.lbChatMessages_DrawItem);
             this.lbChatMessages.MeasureItem += new System.Windows.Forms.MeasureItemEventHandler(this.lbChatMessages_MeasureItem);
             this.lbChatMessages.KeyDown += new System.Windows.Forms.KeyEventHandler(this.lbChatMessages_KeyDown);
+            // 
+            // chkChannelCnCNet
+            // 
+            this.chkChannelCnCNet.AutoSize = true;
+            this.chkChannelCnCNet.BackColor = System.Drawing.Color.Transparent;
+            this.chkChannelCnCNet.IsEnabled = true;
+            this.chkChannelCnCNet.Location = new System.Drawing.Point(13, 78);
+            this.chkChannelCnCNet.Name = "chkChannelCnCNet";
+            this.chkChannelCnCNet.Size = new System.Drawing.Size(197, 17);
+            this.chkChannelCnCNet.TabIndex = 26;
+            this.chkChannelCnCNet.Tag = "";
+            this.chkChannelCnCNet.CheckedChanged += new ClientGUI.UserCheckBox.OnCheckedChanged(this.chkChannelCnCNet_CheckedChanged);
+            // 
+            // chkChannelTS
+            // 
+            this.chkChannelTS.BackColor = System.Drawing.Color.Transparent;
+            this.chkChannelTS.IsEnabled = true;
+            this.chkChannelTS.Location = new System.Drawing.Point(13, 56);
+            this.chkChannelTS.Name = "chkChannelTS";
+            this.chkChannelTS.Size = new System.Drawing.Size(197, 15);
+            this.chkChannelTS.TabIndex = 25;
+            this.chkChannelTS.Tag = "";
+            this.chkChannelTS.CheckedChanged += new ClientGUI.UserCheckBox.OnCheckedChanged(this.chkChannelTS_CheckedChanged);
+            // 
+            // chkChannelTI
+            // 
+            this.chkChannelTI.BackColor = System.Drawing.Color.Transparent;
+            this.chkChannelTI.IsEnabled = true;
+            this.chkChannelTI.Location = new System.Drawing.Point(13, 35);
+            this.chkChannelTI.Name = "chkChannelTI";
+            this.chkChannelTI.Size = new System.Drawing.Size(194, 15);
+            this.chkChannelTI.TabIndex = 23;
+            this.chkChannelTI.Tag = "";
+            this.chkChannelTI.CheckedChanged += new ClientGUI.UserCheckBox.OnCheckedChanged(this.chkChannelTI_CheckedChanged);
+            // 
+            // chkChannelDTA
+            // 
+            this.chkChannelDTA.BackColor = System.Drawing.Color.Transparent;
+            this.chkChannelDTA.IsEnabled = true;
+            this.chkChannelDTA.Location = new System.Drawing.Point(13, 12);
+            this.chkChannelDTA.Name = "chkChannelDTA";
+            this.chkChannelDTA.Size = new System.Drawing.Size(197, 15);
+            this.chkChannelDTA.TabIndex = 22;
+            this.chkChannelDTA.Tag = "The Dawn of the Tiberium Age";
+            this.chkChannelDTA.CheckedChanged += new ClientGUI.UserCheckBox.OnCheckedChanged(this.chkChannelDTA_CheckedChanged);
             // 
             // lbPlayerList
             // 

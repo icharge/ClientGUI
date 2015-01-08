@@ -1754,5 +1754,16 @@ namespace ClientGUI
         {
             pNameTextBox.Focus();
         }
+
+        private void lbMapList_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            e.DrawBackground();
+            e.DrawFocusRectangle();
+            if (e.Index > -1 && e.Index < lbMapList.Items.Count)
+            {
+                Color foreColor = lbMapList.ForeColor;
+                e.Graphics.DrawString(lbMapList.Items[e.Index].ToString(), e.Font, new SolidBrush(foreColor), e.Bounds);
+            }
+        }
     }
 }

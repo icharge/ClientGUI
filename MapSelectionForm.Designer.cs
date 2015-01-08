@@ -69,12 +69,14 @@
             // lbMapList
             // 
             this.lbMapList.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.lbMapList.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
             this.lbMapList.FormattingEnabled = true;
             this.lbMapList.Location = new System.Drawing.Point(12, 37);
             this.lbMapList.Name = "lbMapList";
             this.lbMapList.ShowScrollbar = false;
-            this.lbMapList.Size = new System.Drawing.Size(196, 379);
+            this.lbMapList.Size = new System.Drawing.Size(196, 383);
             this.lbMapList.TabIndex = 2;
+            this.lbMapList.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.lbMapList_DrawItem);
             this.lbMapList.SelectedIndexChanged += new System.EventHandler(this.lbMapList_SelectedIndexChanged);
             // 
             // btnAccept
@@ -141,7 +143,7 @@
             this.customScrollbar1.Minimum = 0;
             this.customScrollbar1.MinimumSize = new System.Drawing.Size(15, 92);
             this.customScrollbar1.Name = "customScrollbar1";
-            this.customScrollbar1.Size = new System.Drawing.Size(16, 379);
+            this.customScrollbar1.Size = new System.Drawing.Size(16, 383);
             this.customScrollbar1.SmallChange = 1;
             this.customScrollbar1.TabIndex = 87;
             this.customScrollbar1.ThumbBottomImage = ((System.Drawing.Image)(resources.GetObject("customScrollbar1.ThumbBottomImage")));

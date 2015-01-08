@@ -203,8 +203,19 @@ namespace ClientGUI
 
             Logger.Log("Randomizing starting locations.");
 
+            int sLocPId = 0;
+
             foreach (PlayerInfo player in players)
             {
+                sLocPId++;
+
+                if (isPlayerSpectator[sLocPId - 1])
+                {
+                    PlayerStartingLocs.Add(9);
+                    sLocPId++;
+                    continue;
+                }
+
                 if (player.StartingLocation == 0)
                 {
                     if (freeStartingLocs.Count > 1)

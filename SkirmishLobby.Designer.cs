@@ -1192,6 +1192,7 @@
             this.lbMapList.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.lbMapList.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.lbMapList.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
             this.lbMapList.FormattingEnabled = true;
             this.lbMapList.IntegralHeight = false;
             this.lbMapList.Location = new System.Drawing.Point(6, 276);
@@ -1200,6 +1201,7 @@
             this.lbMapList.ShowScrollbar = false;
             this.lbMapList.Size = new System.Drawing.Size(369, 522);
             this.lbMapList.TabIndex = 81;
+            this.lbMapList.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.lbMapList_DrawItem);
             this.lbMapList.SelectedIndexChanged += new System.EventHandler(this.lbMapList_SelectedIndexChanged);
             // 
             // lblGameMode
