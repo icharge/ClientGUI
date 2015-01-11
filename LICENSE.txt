@@ -1,4 +1,4 @@
-* License for The Dawn of the Tiberium Age CnCNet Client's source code
+* License for The Dawn of the Tiberium Age CnCNet Client source code
 * Copyright (c) 2015, Rami "Rampastring" Pasanen
 * http://www.moddb.com/members/rampastring
 * All rights reserved.
@@ -14,7 +14,8 @@
 *       must display the following acknowledgement, unless the copyright holder
 *       specifically gives written permission for not displaying the
 *       acknowledgement:
-*       This product includes software developed by the Rampastring.
+*       This product includes software developed by Rampastring for
+*       The Dawn of the Tiberium Age.
 *     * Neither the name Rampastring nor The Dawn of the Tiberium Age
 *       may be used to endorse or promote products derived from this software
 *       without specific prior written permission.
