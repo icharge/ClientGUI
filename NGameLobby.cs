@@ -1,6 +1,6 @@
 ﻿/// @author Rampastring
 /// http://www.moddb.com/members/rampastring
-/// @version 30. 12. 2014
+/// @version 12. 1. 2015
 
 using System;
 using System.Collections.Generic;
@@ -294,6 +294,24 @@ namespace ClientGUI
             btnLockGame.BackgroundImage = btn133px;
             btnLeaveGame.BackgroundImage = btn133px;
             btnChangeMap.BackgroundImage = btn133px;
+
+            string backgroundImageLayout = DomainController.Instance().getGameLobbyBackgroundImageLayout();
+            switch (backgroundImageLayout)
+            {
+                case "Center":
+                    this.BackgroundImageLayout = ImageLayout.Center;
+                    break;
+                case "Stretch":
+                    this.BackgroundImageLayout = ImageLayout.Stretch;
+                    break;
+                case "Zoom":
+                    this.BackgroundImageLayout = ImageLayout.Zoom;
+                    break;
+                default:
+                case "Tile":
+                    this.BackgroundImageLayout = ImageLayout.Tile;
+                    break;
+            }
 
             sndButtonSound = new SoundPlayer(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "button.wav");
             sndJoinSound = new SoundPlayer(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "joingame.wav");

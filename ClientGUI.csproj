@@ -60,6 +60,7 @@
     <Compile Include="LimitedComboBox.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="MainProxy.cs" />
     <Compile Include="MapSelectionForm.cs">
       <SubType>Form</SubType>
     </Compile>

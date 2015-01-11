@@ -1,6 +1,6 @@
 ﻿/// @author Rampastring
-/// @version 30. 12. 2014
 /// http://www.moddb.com/members/rampastring
+/// @version 12. 1. 2015
 
 using System;
 using System.Collections.Generic;
@@ -214,6 +214,24 @@ namespace ClientGUI
 
             this.Icon = Icon.ExtractAssociatedIcon(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "clienticon.ico");
             this.BackgroundImage = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "cncnetlobbybg.png");
+
+            string backgroundImageLayout = DomainController.Instance().getCnCNetLobbyBackgroundImageLayout();
+            switch (backgroundImageLayout)
+            {
+                case "Center":
+                    this.BackgroundImageLayout = ImageLayout.Center;
+                    break;
+                case "Stretch":
+                    this.BackgroundImageLayout = ImageLayout.Stretch;
+                    break;
+                case "Zoom":
+                    this.BackgroundImageLayout = ImageLayout.Zoom;
+                    break;
+                default:
+                case "Tile":
+                    this.BackgroundImageLayout = ImageLayout.Tile;
+                    break;
+            }
 
             string[] adminNameColor = DomainController.Instance().getAdminNameColor().Split(',');
             cAdminNameColor = Color.FromArgb(Convert.ToByte(adminNameColor[0]), Convert.ToByte(adminNameColor[1]), Convert.ToByte(adminNameColor[2]));
@@ -1594,9 +1612,6 @@ namespace ClientGUI
         private void NCnCNetLobby_SizeChanged(object sender, EventArgs e)
         {
             this.SuspendLayout();
-            lbChatMessages.Size = new Size(this.Width - 482, this.Height - 99);
-            tbChatInput.Width = lbChatMessages.Width;
-            lbGameList.Height = this.Height - 385;
 
             if (!panel1.Visible)
             {
@@ -1606,8 +1621,6 @@ namespace ClientGUI
             {
                 lbPlayerList.Height = this.Height - 235;
             }
-
-            sbPlayers.Height = lbPlayerList.Height;
 
             cmbCurrentChannel.Location = new Point(lbChatMessages.Location.X + lbChatMessages.Size.Width - cmbCurrentChannel.Size.Width, 6);
             lblChannel.Location = new Point(cmbCurrentChannel.Location.X - 117, 9);
@@ -1765,8 +1778,8 @@ namespace ClientGUI
         private void lbChatMessages_MeasureItem(object sender, MeasureItemEventArgs e)
         {
             e.ItemHeight = (int)e.Graphics.MeasureString(lbChatMessages.Items[e.Index].ToString(),
-                lbChatMessages.Font, lbChatMessages.Width - 40).Height;
-            e.ItemWidth = lbChatMessages.Width - 40;
+                lbChatMessages.Font, lbChatMessages.Width).Height;
+            e.ItemWidth = lbChatMessages.Width;
         }
 
         /// <summary>
