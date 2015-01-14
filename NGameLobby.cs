@@ -2127,7 +2127,7 @@ namespace ClientGUI
                 int aiIndex = AIPlayers.Count - 1;
                 PlayerInfo aiPlayer = AIPlayers[aiIndex];
 
-                if (!isSideAllowed(sideId) || sideId < 0)
+                if (sideId < 0 || !isSideAllowed(sideId))
                     getPlayerSideCMBFromId(cmbId + 1).SelectedIndex = aiPlayer.SideId;
                 else
                     aiPlayer.SideId = sideId;
@@ -3152,14 +3152,15 @@ namespace ClientGUI
             }
 
             // 28. 12. 2014 No editing the map after setting for it!
-            string mapMD5 = Utilities.calculateMD5ForFile(mapPath);
-            if (mapMD5 != currentMap.SHA1)
+            string mapSHA1 = Utilities.CalculateSHA1ForFile(mapPath);
+            if (mapSHA1 != currentMap.SHA1)
             {
                 MessageBox.Show("Map modification detected! Please restart the Client." + Environment.NewLine + mapPath,
                     "Cannot read scenario", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 string messageToSend = "NOTICE " + ChannelName + " " + CTCPChar1 + CTCPChar2 + "MAPMOD" + CTCPChar2;
                 CnCNetData.ConnectionBridge.SendMessage(messageToSend);
                 btnLeaveGame.PerformClick();
+                return;
             }
 
             string mapCodePath = currentMap.Path.Substring(0, currentMap.Path.Length - 3) + "ini";
