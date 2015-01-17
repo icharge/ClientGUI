@@ -1026,6 +1026,7 @@ namespace ClientGUI
                 // his sucky client only sends the game identifiers around
                 message = message.Replace("new ra game", "new Red Alert game");
                 message = message.Replace("new td game", "new Tiberian Dawn game");
+                message = message.Replace("new d2 game", "new Dune 2000 game");
 
                 for (int chId = 0; chId < ChannelNames.Count; chId++)
                 {
@@ -1158,7 +1159,7 @@ namespace ClientGUI
 
                 MessageInfos[channelIndex].Add(new MessageInfo(Color.White, userName + message));
 
-                if (currentChannelId == channelIndex)
+                //if (currentChannelId == channelIndex)
                     updatePlayerList = true;
             }
         }
@@ -1622,8 +1623,6 @@ namespace ClientGUI
                 lbPlayerList.Height = this.Height - 235;
             }
 
-            cmbCurrentChannel.Location = new Point(lbChatMessages.Location.X + lbChatMessages.Size.Width - cmbCurrentChannel.Size.Width, 6);
-            lblChannel.Location = new Point(cmbCurrentChannel.Location.X - 117, 9);
             lbChatMessages.Refresh();
             this.ResumeLayout();
         }
@@ -2215,12 +2214,6 @@ namespace ClientGUI
                 // check if the other game is installed and if yes, then launch that
                 // game's client; otherwise prompt the user for installation
                 // DTA and TI multiplayer affiliation \ o /
-                if (game.GameIdentifier == "TI")
-                {
-                    MessageInfos[currentChannelId].Add(new MessageInfo(Color.White, "Twisted Insurrection is not yet ready for public games."));
-                    AddChannelMessageToListBox(currentChannelId);
-                    return;
-                }
 
                 string installPath = getInstallPath(game.GameIdentifier);
 

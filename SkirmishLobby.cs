@@ -1321,7 +1321,7 @@ namespace ClientGUI
                 playerSides, isPlayerSpectator, playerColors, playerStartingLocations);
 
             SharedLogic.WriteCoopDataToSpawnIni(currentMap, Players.Count, AIPlayers.Count,
-                coopDifficultyLevel, SideComboboxPrerequisites.Count, mapCodePath);
+                coopDifficultyLevel, SideComboboxPrerequisites.Count, mapCodePath, seed);
 
             List<bool> isCheckBoxChecked = new List<bool>();
 

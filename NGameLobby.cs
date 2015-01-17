@@ -2133,7 +2133,7 @@ namespace ClientGUI
                     aiPlayer.SideId = sideId;
 
                 if (aiPlayer.SideId == -1)
-                    aiPlayer.SideId = sideId;
+                    aiPlayer.SideId = 0;
                 if (aiPlayer.StartingLocation == -1)
                     aiPlayer.StartingLocation = 0;
                 if (aiPlayer.ColorId == -1)
@@ -3182,7 +3182,7 @@ namespace ClientGUI
                 playerSides, isPlayerSpectator, playerColors, playerStartingLocations);
 
             SharedLogic.WriteCoopDataToSpawnIni(currentMap, Players.Count, AIPlayers.Count,
-                coopDifficultyLevel, SideComboboxPrerequisites.Count, mapCodePath);
+                coopDifficultyLevel, SideComboboxPrerequisites.Count, mapCodePath, Seed);
 
             List<bool> isCheckBoxChecked = new List<bool>();
 
