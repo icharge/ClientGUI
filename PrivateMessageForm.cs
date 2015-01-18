@@ -92,6 +92,8 @@ namespace ClientGUI
             CnCNetData.ConnectionBridge.OnAwayMessageReceived += Instance_OnAwayMessageReceived;
             NCnCNetLobby.ConversationOpened += new NCnCNetLobby.ConversationOpenedCallback(NCnCNetLobby_ConversationOpened);
             Flash();
+
+            tbChatMessage.Focus();
         }
 
         void Instance_OnAwayMessageReceived(string userName, string reason)

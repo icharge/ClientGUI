@@ -271,7 +271,8 @@ namespace ClientGUI
             int numberOfLoadingScreens, bool isHost, List<int> playerPorts, string tunnelAddress, int tunnelPort,
             List<LimitedComboBox> ComboBoxes, List<UserCheckBox> CheckBoxes, List<bool> IsCheckBoxReversed, List<string> AssociatedCheckBoxSpawnIniOptions, 
             List<string> AssociatedComboBoxSpawnIniOptions, List<DataWriteMode> ComboBoxDataWriteModes, 
-            List<int> PlayerSides, List<bool> isPlayerSpectator, List<int> PlayerColors, List<int> PlayerStartingLocs)
+            List<int> PlayerSides, List<bool> isPlayerSpectator, List<int> PlayerColors, List<int> PlayerStartingLocs,
+            out List<int> MultiCmbIndexes)
         {
             File.Delete(ProgramConstants.gamepath + ProgramConstants.SPAWNMAP_INI);
             File.Delete(ProgramConstants.gamepath + ProgramConstants.SPAWNER_SETTINGS);
@@ -422,7 +423,7 @@ namespace ClientGUI
             }
 
             // Create the list of MultiX indexes according to color indexes
-            List<int> MultiCmbIndexes = new List<int>();
+            MultiCmbIndexes = new List<int>();
 
             for (int cId = 0; cId < 8; cId++)
             {

@@ -13,6 +13,7 @@ using System.Media;
 using System.Net;
 using System.Diagnostics;
 using System.Threading;
+using System.Linq;
 using ClientCore;
 using ClientCore.cncnet5;
 using WMPLib;
@@ -85,10 +86,16 @@ namespace ClientGUI
         List<string> ChannelNames = new List<string>();
         List<string> ChannelUINames = new List<string>();
 
+        /// <summary>
+        /// List of colors that the current games are displayed in.
+        /// </summary>
+        List<Color> GameColors = new List<Color>();
+
         Color cPlayerNameColor;
         Color cAdminNameColor;
-        Color defaultChatColor;
-        Color pmOtherUserColor;
+        Color cDefaultChatColor;
+        Color cPmOtherUserColor;
+        Color cLockedGameColor;
 
         /// <summary>
         /// The ID of the currently viewed chat channel.
@@ -240,13 +247,16 @@ namespace ClientGUI
             cPlayerNameColor = Color.FromArgb(Convert.ToByte(playerNameColor[0]), Convert.ToByte(playerNameColor[1]), Convert.ToByte(playerNameColor[2]));
 
             string[] defChatColor = DomainController.Instance().getDefaultChatColor().Split(',');
-            defaultChatColor = Color.FromArgb(Convert.ToByte(defChatColor[0]), Convert.ToByte(defChatColor[1]), Convert.ToByte(defChatColor[2]));
+            cDefaultChatColor = Color.FromArgb(Convert.ToByte(defChatColor[0]), Convert.ToByte(defChatColor[1]), Convert.ToByte(defChatColor[2]));
 
             string[] pmOtherUserColorString = DomainController.Instance().getReceivedPMColor().Split(',');
-            pmOtherUserColor = Color.FromArgb(Convert.ToByte(pmOtherUserColorString[0]), Convert.ToByte(pmOtherUserColorString[1]), Convert.ToByte(pmOtherUserColorString[2]));
+            cPmOtherUserColor = Color.FromArgb(Convert.ToByte(pmOtherUserColorString[0]), Convert.ToByte(pmOtherUserColorString[1]), Convert.ToByte(pmOtherUserColorString[2]));
 
-            ChatColors.Add(defaultChatColor);
-            ChatColors.Add(defaultChatColor);
+            string[] lockedGameColor = DomainController.Instance().getLockedGameColor().Split(',');
+            cLockedGameColor = Color.FromArgb(Convert.ToByte(lockedGameColor[0]), Convert.ToByte(lockedGameColor[1]), Convert.ToByte(lockedGameColor[2]));
+
+            ChatColors.Add(cDefaultChatColor);
+            ChatColors.Add(cDefaultChatColor);
             ChatColors.Add(Color.LightBlue);
             ChatColors.Add(Color.LimeGreen);
             ChatColors.Add(Color.IndianRed);
@@ -802,6 +812,7 @@ namespace ClientGUI
         {
             int sIndex = lbGameList.SelectedIndex;
             lbGameList.Items.Clear();
+            GameColors.Clear();
 
             for (int gId = 0; gId < CnCNetData.Games.Count; gId++)
             {
@@ -815,15 +826,46 @@ namespace ClientGUI
                 }
             }
 
+            CnCNetData.Games.OrderBy(g => g.Version == ProgramConstants.GAME_VERSION);
+            CnCNetData.Games.OrderBy(g => g.GameIdentifier == myGame);
+            CnCNetData.Games.OrderBy(g => !g.Started);
+
+            //// Sort games, put locked and incompatible games to the bottom
+            //for (int gId = 0; gId < CnCNetData.Games.Count; gId++)
+            //{
+            //    Game game = CnCNetData.Games[gId];
+
+            //    if (sortedGameCount == CnCNetData.Games.Count)
+            //        break;
+
+            //    if (game.Started || game.Version != ProgramConstants.GAME_VERSION)
+            //    {
+            //        CnCNetData.Games.Add(game);
+            //        CnCNetData.Games.RemoveAt(gId);
+            //        sortedGameCount++;
+            //        gId--;
+            //    }
+            //}
+
             foreach (Game game in CnCNetData.Games)
             {
+                Color foreColor = lbGameList.ForeColor;
+
                 string item = "[" + game.GameIdentifier + "] " + game.RoomName;
                 if (game.Passworded)
                     item = item + " (passworded)";
                 if (game.Started)
+                {
                     item = "(locked) " + item;
+                    foreColor = cLockedGameColor;
+                }
                 else if (game.Version != ProgramConstants.GAME_VERSION && game.GameIdentifier == myGame)
+                {
                     item = "(incompatible) " + item;
+                    foreColor = cLockedGameColor;
+                }
+
+                GameColors.Add(foreColor);
                 lbGameList.Items.Add(item);
             }
 
@@ -925,19 +967,19 @@ namespace ClientGUI
             {
                 PrivateMessageInfo pmInfo = new PrivateMessageInfo();
                 pmInfo.UserName = receiver;
-                pmInfo.Messages.Add(new MessageInfo(defaultChatColor, message));
+                pmInfo.Messages.Add(new MessageInfo(cDefaultChatColor, message));
                 pmInfo.IsSelfSent.Add(true);
                 CnCNetData.PMInfos.Add(pmInfo);
             }
             else
             {
-                CnCNetData.PMInfos[index].Messages.Add(new MessageInfo(defaultChatColor, message));
+                CnCNetData.PMInfos[index].Messages.Add(new MessageInfo(cDefaultChatColor, message));
                 CnCNetData.PMInfos[index].IsSelfSent.Add(true);
             }
 
             if (!CnCNetData.isPMWindowOpen)
             {
-                PrivateMessageForm pmWindow = new PrivateMessageForm(defaultChatColor, receiver);
+                PrivateMessageForm pmWindow = new PrivateMessageForm(cDefaultChatColor, receiver);
                 pmWindow.Show();
                 CnCNetData.isPMWindowOpen = true;
             }
@@ -966,7 +1008,7 @@ namespace ClientGUI
                 // If the isn't in the private conversation list, add the user to it
                 PrivateMessageInfo pmInfo = new PrivateMessageInfo();
                 pmInfo.UserName = sender;
-                pmInfo.Messages.Add(new MessageInfo(pmOtherUserColor, message));
+                pmInfo.Messages.Add(new MessageInfo(cPmOtherUserColor, message));
                 pmInfo.IsSelfSent.Add(false);
                 CnCNetData.PMInfos.Add(pmInfo);
             }
@@ -974,7 +1016,7 @@ namespace ClientGUI
             {
                 // If we've talked with the user before, just add the message itself to the list of messages
                 // we've had with that user
-                CnCNetData.PMInfos[index].Messages.Add(new MessageInfo(pmOtherUserColor, message));
+                CnCNetData.PMInfos[index].Messages.Add(new MessageInfo(cPmOtherUserColor, message));
                 CnCNetData.PMInfos[index].IsSelfSent.Add(false);
             }
 
@@ -991,7 +1033,7 @@ namespace ClientGUI
                 else
                 {
                     // If a game isn't in progress, open the PrivateMessageForm
-                    PrivateMessageForm pmWindow = new PrivateMessageForm(pmOtherUserColor, sender);
+                    PrivateMessageForm pmWindow = new PrivateMessageForm(cPmOtherUserColor, sender);
                     pmWindow.Show();
                     CnCNetData.isPMWindowOpen = true;
                 }
@@ -1032,7 +1074,7 @@ namespace ClientGUI
                 {
                     if (channelName == ChannelNames[chId])
                     {
-                        MessageInfos[chId].Add(new MessageInfo(defaultChatColor, message));
+                        MessageInfos[chId].Add(new MessageInfo(cDefaultChatColor, message));
                         AddChannelMessageToListBox(chId);
                     }
                 }
@@ -1048,7 +1090,7 @@ namespace ClientGUI
                 {
                     if (message.Length < 3)
                     {
-                        foreColor = defaultChatColor;
+                        foreColor = cDefaultChatColor;
                     }
                     else
                     {
@@ -1060,11 +1102,11 @@ namespace ClientGUI
                         if (success && colorIndex < ChatColors.Count && colorIndex > -1)
                             foreColor = ChatColors[colorIndex];
                         else
-                            foreColor = defaultChatColor;
+                            foreColor = cDefaultChatColor;
                     }
                 }
                 else
-                    foreColor = defaultChatColor;
+                    foreColor = cDefaultChatColor;
 
                 int channelIndex = ChannelNames.FindIndex(n => n == channelName);
 
@@ -1288,7 +1330,7 @@ namespace ClientGUI
                     Logger.Log("Joining game " + game.RoomName + "; channel name " + channelName);
                     CnCNetData.IsGameLobbyOpen = true;
                     gameLobbyWindow = new NGameLobby(channelName, false, game.MaxPlayers, game.Admin, game.RoomName, "",
-                        false, ChatColors, defaultChatColor, cmbMessageColor.SelectedIndex + 2);
+                        false, ChatColors, cDefaultChatColor, cmbMessageColor.SelectedIndex + 2);
                     gameLobbyWindow.Show();
                     CnCNetData.ConnectionBridge.SendMessage("AWAY " + weirdChar1 + "In game [" + myGame.ToUpper() + "] " + game.RoomName);
                     this.WindowState = FormWindowState.Minimized;
@@ -1927,7 +1969,7 @@ namespace ClientGUI
             // Let the user send PMs by doubleclicking players in the player list
             if (!CnCNetData.isPMWindowOpen)
             {
-                PrivateMessageForm pmForm = new PrivateMessageForm(defaultChatColor, userName);
+                PrivateMessageForm pmForm = new PrivateMessageForm(cDefaultChatColor, userName);
                 pmForm.Show();
                 CnCNetData.isPMWindowOpen = true;
             }
@@ -2039,7 +2081,7 @@ namespace ClientGUI
                 Logger.Log("Creating a game named " + cgf.rtnGameRoomName + "; channel name " + channelName);
 
                 gameLobbyWindow = new NGameLobby(channelName, true, cgf.rtnMaxPlayers, ProgramConstants.CNCNET_PLAYERNAME, cgf.rtnGameRoomName, password,
-                    customPassword, ChatColors, defaultChatColor, cmbMessageColor.SelectedIndex + 2);
+                    customPassword, ChatColors, cDefaultChatColor, cmbMessageColor.SelectedIndex + 2);
                 gameLobbyWindow.Show();
                 CnCNetData.ConnectionBridge.SendMessage("JOIN " + channelName);
                 gameLobbyWindow.Initialize(cgf.rtnTunnelAddress, cgf.rtnTunnelPort);
@@ -2093,31 +2135,31 @@ namespace ClientGUI
             if (chkChannelDTA.Checked)
             {
                 CnCNetData.ConnectionBridge.SendMessage("PRIVMSG #dta " + weirdChar1 + weirdChar2 + "ACTION has hosted a new " + gameName + " game." + weirdChar2);
-                MessageInfos[0].Add(new MessageInfo(defaultChatColor, "====> " + ProgramConstants.CNCNET_PLAYERNAME + " has hosted a new " + gameName + " game."));
+                MessageInfos[0].Add(new MessageInfo(cDefaultChatColor, "====> " + ProgramConstants.CNCNET_PLAYERNAME + " has hosted a new " + gameName + " game."));
             }
 
             if (chkChannelTI.Checked)
             {
                 CnCNetData.ConnectionBridge.SendMessage("PRIVMSG #ti " + weirdChar1 + weirdChar2 + "ACTION has hosted a new " + gameName + " game." + weirdChar2);
-                MessageInfos[1].Add(new MessageInfo(defaultChatColor, "====> " + ProgramConstants.CNCNET_PLAYERNAME + " has hosted a new " + gameName + " game."));
+                MessageInfos[1].Add(new MessageInfo(cDefaultChatColor, "====> " + ProgramConstants.CNCNET_PLAYERNAME + " has hosted a new " + gameName + " game."));
             }
 
             if (chkChannelTO.Checked)
             {
                 CnCNetData.ConnectionBridge.SendMessage("PRIVMSG #to " + weirdChar1 + weirdChar2 + "ACTION has hosted a new " + gameName + " game." + weirdChar2);
-                MessageInfos[2].Add(new MessageInfo(defaultChatColor, "====> " + ProgramConstants.CNCNET_PLAYERNAME + " has hosted a new " + gameName + " game."));
+                MessageInfos[2].Add(new MessageInfo(cDefaultChatColor, "====> " + ProgramConstants.CNCNET_PLAYERNAME + " has hosted a new " + gameName + " game."));
             }
 
             if (chkChannelTS.Checked)
             {
                 CnCNetData.ConnectionBridge.SendMessage("PRIVMSG #ts " + weirdChar1 + weirdChar2 + "ACTION has hosted a new " + gameName + " game." + weirdChar2);
-                MessageInfos[3].Add(new MessageInfo(defaultChatColor, "====> " + ProgramConstants.CNCNET_PLAYERNAME + " has hosted a new " + gameName + " game."));
+                MessageInfos[3].Add(new MessageInfo(cDefaultChatColor, "====> " + ProgramConstants.CNCNET_PLAYERNAME + " has hosted a new " + gameName + " game."));
             }
 
             if (chkChannelCnCNet.Checked)
             {
                 CnCNetData.ConnectionBridge.SendMessage("PRIVMSG #cncnet " + weirdChar1 + weirdChar2 + "ACTION has hosted a new " + gameName + " game." + weirdChar2);
-                MessageInfos[4].Add(new MessageInfo(defaultChatColor, "====> " + ProgramConstants.CNCNET_PLAYERNAME + " has hosted a new " + gameName + " game."));
+                MessageInfos[4].Add(new MessageInfo(cDefaultChatColor, "====> " + ProgramConstants.CNCNET_PLAYERNAME + " has hosted a new " + gameName + " game."));
             }
 
             AddChannelMessageToListBox(currentChannelId);
@@ -2554,7 +2596,7 @@ namespace ClientGUI
             e.DrawFocusRectangle();
             if (e.Index > -1 && e.Index < lbGameList.Items.Count)
             {
-                Color foreColor = lbGameList.ForeColor;
+                Color foreColor = GameColors[e.Index];
                 e.Graphics.DrawString(lbGameList.Items[e.Index].ToString(), e.Font, new SolidBrush(foreColor), e.Bounds);
             }
         }

@@ -1314,13 +1314,16 @@ namespace ClientGUI
                 SharedUILogic.getAllowedSides(ComboBoxes, SideComboboxPrerequisites),
                 SideComboboxPrerequisites.Count);
 
+            List<int> MultiCmbIndexes;
+
             SharedUILogic.WriteSpawnIni(Players, AIPlayers, currentMap, gameMode, seed,
                 iNumLoadingScreens, true, new List<int>(), String.Empty, 0, ComboBoxes,
                 CheckBoxes, IsCheckBoxReversed, AssociatedCheckBoxSpawnIniOptions,
                 AssociatedComboBoxSpawnIniOptions, ComboBoxDataWriteModes,
-                playerSides, isPlayerSpectator, playerColors, playerStartingLocations);
+                playerSides, isPlayerSpectator, playerColors, playerStartingLocations,
+                out MultiCmbIndexes);
 
-            SharedLogic.WriteCoopDataToSpawnIni(currentMap, Players.Count, AIPlayers.Count,
+            SharedLogic.WriteCoopDataToSpawnIni(currentMap, Players, AIPlayers, MultiCmbIndexes,
                 coopDifficultyLevel, SideComboboxPrerequisites.Count, mapCodePath, seed);
 
             List<bool> isCheckBoxChecked = new List<bool>();

@@ -70,6 +70,8 @@
             // 
             // lbGameList
             // 
+            this.lbGameList.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.lbGameList.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.lbGameList.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
             this.lbGameList.FormattingEnabled = true;
