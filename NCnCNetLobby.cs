@@ -113,6 +113,14 @@ namespace ClientGUI
         Image btnHideChannelsUp;
         Image btnHideChannelsDown;
 
+        Image dtaIcon;
+        Image tiIcon;
+        Image tsIcon;
+        Image lockedGameIcon;
+        Image incompatibleGameIcon;
+
+        const int GAME_ICON_SIZE = 12;
+
         /// <summary>
         /// The ID string of the current game.
         /// </summary>
@@ -366,6 +374,13 @@ namespace ClientGUI
 
             btnHideChannelsUp = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "hideChannels_Up.png");
             btnHideChannelsDown = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "hideChannels_Down.png");
+
+            dtaIcon = Image.FromFile(ProgramConstants.gamepath + "Resources\\dtaicon.png");
+            tiIcon = Image.FromFile(ProgramConstants.gamepath + "Resources\\tiicon.png");
+            tsIcon = Image.FromFile(ProgramConstants.gamepath + "Resources\\tsicon.png");
+
+            lockedGameIcon = Image.FromFile(ProgramConstants.gamepath + "Resources\\lockedgame.png");
+            incompatibleGameIcon = Image.FromFile(ProgramConstants.gamepath + "Resources\\incompatible.png");
 
             btnNewGame.BackgroundImage = btn92px;
             btnJoinGame.BackgroundImage = btn92px;
@@ -830,38 +845,19 @@ namespace ClientGUI
             CnCNetData.Games.OrderBy(g => g.GameIdentifier == myGame);
             CnCNetData.Games.OrderBy(g => !g.Started);
 
-            //// Sort games, put locked and incompatible games to the bottom
-            //for (int gId = 0; gId < CnCNetData.Games.Count; gId++)
-            //{
-            //    Game game = CnCNetData.Games[gId];
-
-            //    if (sortedGameCount == CnCNetData.Games.Count)
-            //        break;
-
-            //    if (game.Started || game.Version != ProgramConstants.GAME_VERSION)
-            //    {
-            //        CnCNetData.Games.Add(game);
-            //        CnCNetData.Games.RemoveAt(gId);
-            //        sortedGameCount++;
-            //        gId--;
-            //    }
-            //}
-
             foreach (Game game in CnCNetData.Games)
             {
                 Color foreColor = lbGameList.ForeColor;
 
-                string item = "[" + game.GameIdentifier + "] " + game.RoomName;
+                string item = game.RoomName;
                 if (game.Passworded)
                     item = item + " (passworded)";
                 if (game.Started)
                 {
-                    item = "(locked) " + item;
                     foreColor = cLockedGameColor;
                 }
                 else if (game.Version != ProgramConstants.GAME_VERSION && game.GameIdentifier == myGame)
                 {
-                    item = "(incompatible) " + item;
                     foreColor = cLockedGameColor;
                 }
 
@@ -2597,7 +2593,44 @@ namespace ClientGUI
             if (e.Index > -1 && e.Index < lbGameList.Items.Count)
             {
                 Color foreColor = GameColors[e.Index];
-                e.Graphics.DrawString(lbGameList.Items[e.Index].ToString(), e.Font, new SolidBrush(foreColor), e.Bounds);
+
+                Game game = CnCNetData.Games[e.Index];
+
+                Rectangle gameIconRect = new Rectangle(e.Bounds.X, e.Bounds.Y, GAME_ICON_SIZE, GAME_ICON_SIZE);
+
+                switch (game.GameIdentifier)
+                {
+                    case "DTA":
+                        e.Graphics.DrawImage(dtaIcon, gameIconRect);
+                        break;
+                    case "TI":
+                        e.Graphics.DrawImage(tiIcon, gameIconRect);
+                        break;
+                    case "TS":
+                        e.Graphics.DrawImage(tsIcon, gameIconRect);
+                        break;
+                }
+
+                int multiplier = 1;
+
+                if (game.Started)
+                {
+                    e.Graphics.DrawImage(lockedGameIcon, new Rectangle(e.Bounds.X + GAME_ICON_SIZE + 1, e.Bounds.Y,
+                        GAME_ICON_SIZE, GAME_ICON_SIZE));
+                    multiplier++;
+                }
+
+                if (game.GameIdentifier == myGame && game.Version != ProgramConstants.GAME_VERSION)
+                {
+                    e.Graphics.DrawImage(incompatibleGameIcon, new Rectangle(e.Bounds.X + (GAME_ICON_SIZE * multiplier) + 1, e.Bounds.Y,
+                        GAME_ICON_SIZE, GAME_ICON_SIZE));
+                    multiplier++;
+                }
+
+                Rectangle rectangle = new Rectangle(e.Bounds.X + GAME_ICON_SIZE * multiplier,
+                    e.Bounds.Y, e.Bounds.Width - GAME_ICON_SIZE * multiplier, e.Bounds.Height);
+
+                e.Graphics.DrawString(lbGameList.Items[e.Index].ToString(), e.Font, new SolidBrush(foreColor), rectangle);
             }
         }
     }
