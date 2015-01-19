@@ -96,6 +96,7 @@ namespace ClientGUI
         Color cDefaultChatColor;
         Color cPmOtherUserColor;
         Color cLockedGameColor;
+        Color cListBoxFocusColor;
 
         /// <summary>
         /// The ID of the currently viewed chat channel.
@@ -118,8 +119,7 @@ namespace ClientGUI
         Image tsIcon;
         Image lockedGameIcon;
         Image incompatibleGameIcon;
-
-        const int GAME_ICON_SIZE = 12;
+        Image passwordedGameIcon;
 
         /// <summary>
         /// The ID string of the current game.
@@ -173,6 +173,12 @@ namespace ClientGUI
             Application.ThreadException += Application_ThreadException;
 
             this.Font = SharedLogic.getCommonFont();
+
+            Font listBoxFont = SharedLogic.getListBoxFont();
+
+            lbChatMessages.Font = listBoxFont;
+            lbGameList.Font = listBoxFont;
+            lbPlayerList.Font = listBoxFont;
 
             MessageInfos.Add(new List<MessageInfo>()); // DTA
             MessageInfos.Add(new List<MessageInfo>()); // TI
@@ -262,6 +268,9 @@ namespace ClientGUI
 
             string[] lockedGameColor = DomainController.Instance().getLockedGameColor().Split(',');
             cLockedGameColor = Color.FromArgb(Convert.ToByte(lockedGameColor[0]), Convert.ToByte(lockedGameColor[1]), Convert.ToByte(lockedGameColor[2]));
+
+            string[] listBoxFocusColor = DomainController.Instance().getListBoxFocusColor().Split(',');
+            cListBoxFocusColor = Color.FromArgb(Convert.ToByte(listBoxFocusColor[0]), Convert.ToByte(listBoxFocusColor[1]), Convert.ToByte(listBoxFocusColor[2]));
 
             ChatColors.Add(cDefaultChatColor);
             ChatColors.Add(cDefaultChatColor);
@@ -381,6 +390,7 @@ namespace ClientGUI
 
             lockedGameIcon = Image.FromFile(ProgramConstants.gamepath + "Resources\\lockedgame.png");
             incompatibleGameIcon = Image.FromFile(ProgramConstants.gamepath + "Resources\\incompatible.png");
+            passwordedGameIcon = Image.FromFile(ProgramConstants.gamepath + "Resources\\passwordedgame.png");
 
             btnNewGame.BackgroundImage = btn92px;
             btnJoinGame.BackgroundImage = btn92px;
@@ -850,8 +860,7 @@ namespace ClientGUI
                 Color foreColor = lbGameList.ForeColor;
 
                 string item = game.RoomName;
-                if (game.Passworded)
-                    item = item + " (passworded)";
+
                 if (game.Started)
                 {
                     foreColor = cLockedGameColor;
@@ -1824,11 +1833,21 @@ namespace ClientGUI
         /// </summary>
         private void lbChatMessages_DrawItem(object sender, DrawItemEventArgs e)
         {
-            e.DrawBackground();
-            e.DrawFocusRectangle();
             if (e.Index > -1 && e.Index < lbChatMessages.Items.Count)
             {
                 Color foreColor;
+
+                if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
+                    e = new DrawItemEventArgs(e.Graphics,
+                                              e.Font,
+                                              e.Bounds,
+                                              e.Index,
+                                              e.State ^ DrawItemState.Selected,
+                                              e.ForeColor,
+                                              cListBoxFocusColor);
+
+                e.DrawBackground();
+                e.DrawFocusRectangle();
 
                 if (MessageInfos[currentChannelId].Count <= e.Index)
                     foreColor = Color.White;
@@ -1865,11 +1884,22 @@ namespace ClientGUI
         {
             int currentChannel = cmbCurrentChannel.SelectedIndex;
 
-            e.DrawBackground();
-            e.DrawFocusRectangle();
             if (e.Index > -1 && e.Index < lbPlayerList.Items.Count)
             {
                 Color foreColor;
+
+                if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
+                    e = new DrawItemEventArgs(e.Graphics,
+                                              e.Font,
+                                              e.Bounds,
+                                              e.Index,
+                                              e.State ^ DrawItemState.Selected,
+                                              e.ForeColor,
+                                              cListBoxFocusColor);
+
+                e.DrawBackground();
+                e.DrawFocusRectangle();
+
                 string nameToDraw = lbPlayerList.Items[e.Index].ToString();
 
                 if (nameToDraw[0] == '@')
@@ -2586,18 +2616,34 @@ namespace ClientGUI
             requestWhois = true;
         }
 
+        /// <summary>
+        /// Draws entries in the list of games.
+        /// </summary>
         private void lbGameList_DrawItem(object sender, DrawItemEventArgs e)
         {
-            e.DrawBackground();
-            e.DrawFocusRectangle();
             if (e.Index > -1 && e.Index < lbGameList.Items.Count)
             {
                 Color foreColor = GameColors[e.Index];
 
+                if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
+                    e = new DrawItemEventArgs(e.Graphics,
+                                              e.Font,
+                                              e.Bounds,
+                                              e.Index,
+                                              e.State ^ DrawItemState.Selected,
+                                              e.ForeColor,
+                                              cListBoxFocusColor);
+
+                e.DrawBackground();
+                e.DrawFocusRectangle();
+
                 Game game = CnCNetData.Games[e.Index];
+
+                int GAME_ICON_SIZE = dtaIcon.Size.Width;
 
                 Rectangle gameIconRect = new Rectangle(e.Bounds.X, e.Bounds.Y, GAME_ICON_SIZE, GAME_ICON_SIZE);
 
+                // Draw game identifier icon
                 switch (game.GameIdentifier)
                 {
                     case "DTA":
@@ -2615,6 +2661,7 @@ namespace ClientGUI
 
                 if (game.Started)
                 {
+                    // Draw game locked icon
                     e.Graphics.DrawImage(lockedGameIcon, new Rectangle(e.Bounds.X + GAME_ICON_SIZE + 1, e.Bounds.Y,
                         GAME_ICON_SIZE, GAME_ICON_SIZE));
                     multiplier++;
@@ -2622,16 +2669,51 @@ namespace ClientGUI
 
                 if (game.GameIdentifier == myGame && game.Version != ProgramConstants.GAME_VERSION)
                 {
+                    // Draw game incompatible icon
                     e.Graphics.DrawImage(incompatibleGameIcon, new Rectangle(e.Bounds.X + (GAME_ICON_SIZE * multiplier) + 1, e.Bounds.Y,
                         GAME_ICON_SIZE, GAME_ICON_SIZE));
                     multiplier++;
                 }
 
                 Rectangle rectangle = new Rectangle(e.Bounds.X + GAME_ICON_SIZE * multiplier,
-                    e.Bounds.Y, e.Bounds.Width - GAME_ICON_SIZE * multiplier, e.Bounds.Height);
+                    e.Bounds.Y, e.Bounds.Width - GAME_ICON_SIZE * multiplier, e.Bounds.Height + 2);
 
-                e.Graphics.DrawString(lbGameList.Items[e.Index].ToString(), e.Font, new SolidBrush(foreColor), rectangle);
+                string text = lbGameList.Items[e.Index].ToString();
+
+                // Draw game name
+                e.Graphics.DrawString(text, e.Font, new SolidBrush(foreColor), rectangle);
+
+                SizeF size = e.Graphics.MeasureString(text, e.Font);
+
+                if (game.Passworded)
+                {
+                    // Draw game passworded icon
+                    int x = e.Bounds.X + (GAME_ICON_SIZE * multiplier) + 1 + Convert.ToInt32(size.Width);
+
+                    if (x < lbGameList.Width - GAME_ICON_SIZE)
+                    {
+                        e.Graphics.DrawImage(passwordedGameIcon,
+                            new Rectangle(e.Bounds.X + (GAME_ICON_SIZE * multiplier) + Convert.ToInt32(size.Width),
+                                e.Bounds.Y,
+                            GAME_ICON_SIZE, GAME_ICON_SIZE));
+                    }
+                    else
+                    {
+                        // If the password icon would go off the listbox's bounds, draw it at the end of the game name
+                        e.Graphics.DrawImage(passwordedGameIcon,
+                            new Rectangle(e.Bounds.X + lbGameList.Width - GAME_ICON_SIZE,
+                            e.Bounds.Y,
+                            GAME_ICON_SIZE, GAME_ICON_SIZE));
+                    }
+                }
             }
+        }
+
+        private void lbGameList_MeasureItem(object sender, MeasureItemEventArgs e)
+        {
+            e.ItemHeight = (int)e.Graphics.MeasureString("@g",
+                lbGameList.Font, lbGameList.Width).Height;
+            e.ItemWidth = lbGameList.Width;
         }
     }
 }

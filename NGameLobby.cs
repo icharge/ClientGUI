@@ -248,6 +248,7 @@ namespace ClientGUI
             CnCNetData.ConnectionBridge.OnUserKicked += new RConnectionBridge.UserKickedEventHandler(Instance_OnUserKicked);
 
             this.Font = SharedLogic.getCommonFont();
+            lbChatBox.Font = SharedLogic.getListBoxFont();
 
             startingLocationIndicators = new Image[8];
             startingLocationIndicators[0] = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "slocindicator1.png");
