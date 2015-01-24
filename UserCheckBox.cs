@@ -52,6 +52,13 @@ namespace ClientGUI
             label1.Click +=new EventHandler(button1_Click);
         }
 
+        public void Initialize()
+        {
+            button1.Size = checkedImage.Size;
+            label1.Location = new Point(checkedImage.Size.Width + 1, (button1.Location.Y + checkedImage.Height - label1.Height) / 2);
+            this.Size = new Size(this.Size.Width, button1.Location.Y + button1.Size.Height);
+        }
+
         private void button1_Click(object sender, EventArgs e)
         {
             if (!_enabled)

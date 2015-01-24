@@ -604,6 +604,8 @@ namespace ClientGUI
 
                         this.Controls.Add(CheckBoxes[CheckBoxes.Count - 1]);
                     }
+
+                    chkBox.Initialize();
                 }
                 else
                     throw new Exception("No data exists for CheckBox " + checkBoxName + "!");

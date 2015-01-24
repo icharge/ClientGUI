@@ -1,6 +1,6 @@
 ﻿/// @author Rampastring
 /// http://www.moddb.com/members/rampastring
-/// @version 12. 1. 2015
+/// @version 23. 1. 2015
 
 using System;
 using System.Collections.Generic;
@@ -230,6 +230,12 @@ namespace ClientGUI
                 wmPlayer.controls.stop();
             }
 
+            chkChannelCnCNet.Initialize();
+            chkChannelDTA.Initialize();
+            chkChannelTI.Initialize();
+            chkChannelTO.Initialize();
+            chkChannelTS.Initialize();
+
             sp = new SoundPlayer(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "button.wav");
             sndGameCreated = new SoundPlayer(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "gamecreated.wav");
 
@@ -319,11 +325,17 @@ namespace ClientGUI
             lblHost.ForeColor = cLabelColor;
             lblMapName.ForeColor = cLabelColor;
             lblGameMode.ForeColor = cLabelColor;
-            lblPassworded.ForeColor = cLabelColor;
             lblPlayerList.ForeColor = cLabelColor;
             lblPlayers.ForeColor = cLabelColor;
-            lblPlayersValue.ForeColor = cLabelColor;
-            lblStarted.ForeColor = cLabelColor;
+            lblPlayer1.ForeColor = cLabelColor;
+            lblPlayer2.ForeColor = cLabelColor;
+            lblPlayer3.ForeColor = cLabelColor;
+            lblPlayer4.ForeColor = cLabelColor;
+            lblPlayer5.ForeColor = cLabelColor;
+            lblPlayer6.ForeColor = cLabelColor;
+            lblPlayer7.ForeColor = cLabelColor;
+            lblPlayer8.ForeColor = cLabelColor;
+
             lblVersion.ForeColor = cLabelColor;
             lblChannel.ForeColor = cLabelColor;
             chkChannelCnCNet.ForeColor = cLabelColor;
@@ -510,16 +522,16 @@ namespace ClientGUI
         /// </summary>
         private static void DisplayUnhandledExceptionMessage(object sender, Exception ex)
         {
+            Logger.Log("Unhandled exception!!!");
+            Logger.Log(ex.Message);
+            Logger.Log(ex.Source);
+            Logger.Log(ex.StackTrace);
             MessageBox.Show("The CnCNet Client has crashed. Error Message: " + Environment.NewLine +
                 ex.Message + Environment.NewLine + Environment.NewLine +
                 "See cncnetclient.log for further info. If you can reproduce this crash, " + Environment.NewLine +
                 "please report about it to your mod's authors or directly to Rampastring " + Environment.NewLine +
                 "(the creator of this client) at " + Environment.NewLine +
                 "http://www.moddb.com/members/rampastring", "KABOOOOOOOM22");
-            Logger.Log("Unhandled exception!!!");
-            Logger.Log(ex.Message);
-            Logger.Log(ex.Source);
-            Logger.Log(ex.StackTrace);
             Environment.Exit(0);
         }
 
@@ -808,6 +820,7 @@ namespace ClientGUI
                     if (CnCNetData.Games[gId].ChannelName == gameRoomChannelName)
                     {
                         gameFound = true;
+
                         CnCNetData.Games.RemoveAt(gId);
                         if (!isClosed)
                             CnCNetData.Games.Insert(gId, game);
@@ -822,7 +835,7 @@ namespace ClientGUI
 
                     if (gameId == myGame && !ProgramConstants.IsInGame)
                         sndGameCreated.Play();
-                    CnCNetData.Games.Add(game);
+                    CnCNetData.Games.Insert(0, game);
                 }
             }
 
@@ -836,6 +849,7 @@ namespace ClientGUI
         private void RefreshGameList(object sender, EventArgs e)
         {
             int sIndex = lbGameList.SelectedIndex;
+            int topIndex = lbGameList.TopIndex;
             lbGameList.Items.Clear();
             GameColors.Clear();
 
@@ -851,9 +865,10 @@ namespace ClientGUI
                 }
             }
 
-            CnCNetData.Games.OrderBy(g => g.Version == ProgramConstants.GAME_VERSION);
-            CnCNetData.Games.OrderBy(g => g.GameIdentifier == myGame);
-            CnCNetData.Games.OrderBy(g => !g.Started);
+            CnCNetData.Games = CnCNetData.Games.OrderBy(g => g.Passworded).ToList();
+            CnCNetData.Games = CnCNetData.Games.OrderBy(g => g.Version != ProgramConstants.GAME_VERSION).ToList();
+            CnCNetData.Games = CnCNetData.Games.OrderBy(g => g.GameIdentifier != myGame).ToList();
+            CnCNetData.Games = CnCNetData.Games.OrderBy(g => g.Started).ToList();
 
             foreach (Game game in CnCNetData.Games)
             {
@@ -879,6 +894,7 @@ namespace ClientGUI
             else
                 lbGameList.SelectedIndex = sIndex;
             lbGameList_SelectedIndexChanged(sender, e);
+            lbGameList.TopIndex = topIndex;
         }
 
         /// <summary>
@@ -2081,7 +2097,6 @@ namespace ClientGUI
             if (dr == System.Windows.Forms.DialogResult.OK)
             {
                 string channelName = randomizeChannelName();
-                CnCNetData.IsGameLobbyOpen = true;
                 AddChannelMessageToListBox(currentChannelId);
 
                 bool customPassword = true;
@@ -2108,6 +2123,7 @@ namespace ClientGUI
 
                 gameLobbyWindow = new NGameLobby(channelName, true, cgf.rtnMaxPlayers, ProgramConstants.CNCNET_PLAYERNAME, cgf.rtnGameRoomName, password,
                     customPassword, ChatColors, cDefaultChatColor, cmbMessageColor.SelectedIndex + 2);
+                CnCNetData.IsGameLobbyOpen = true;
                 gameLobbyWindow.Show();
                 CnCNetData.ConnectionBridge.SendMessage("JOIN " + channelName);
                 gameLobbyWindow.Initialize(cgf.rtnTunnelAddress, cgf.rtnTunnelPort);
@@ -2201,24 +2217,25 @@ namespace ClientGUI
             {
                 // No game selected - clear info
 
-                lblPassworded.Text = "Requires Password: -";
                 lblMapName.Text = "Map: -";
                 lblGameMode.Text = "Game Mode: -";
                 lblVersion.Text = "Game Version: -";
-                lblStarted.Text = "Locked: -";
                 lblHost.Text = "Host: -";
                 lblPlayers.Text = "Players (- / -):";
-                lblPlayersValue.Text = String.Empty;
+                lblPlayer1.Text = String.Empty;
+                lblPlayer2.Text = String.Empty;
+                lblPlayer3.Text = String.Empty;
+                lblPlayer4.Text = String.Empty;
+                lblPlayer5.Text = String.Empty;
+                lblPlayer6.Text = String.Empty;
+                lblPlayer7.Text = String.Empty;
+                lblPlayer8.Text = String.Empty;
             }
             else
             {
                 // Game selected - fill info
 
                 Game game = CnCNetData.Games[lbGameList.SelectedIndex];
-                if (game.Passworded)
-                    lblPassworded.Text = "Requires Password: Yes";
-                else
-                    lblPassworded.Text = "Requires Password: No";
 
                 lblGameMode.Text = "Game Mode: " + game.GameMode;
                 lblMapName.Text = "Map: " + game.MapName;
@@ -2233,17 +2250,46 @@ namespace ClientGUI
                 else
                     lblVersion.Text = "Game Version: " + game.Version;
 
-                if (game.Started)
-                    lblStarted.Text = "Locked: Yes";
-                else
-                    lblStarted.Text = "Locked: No";
 
                 lblHost.Text = "Host: " + game.Admin;
 
                 lblPlayers.Text = "Players (" + game.Players.Count + " / " + game.MaxPlayers + ") :";
-                lblPlayersValue.Text = String.Empty;
-                foreach (string playerName in game.Players)
-                    lblPlayersValue.Text = lblPlayersValue.Text + playerName + Environment.NewLine;
+                for (int pId = 0; pId < game.Players.Count; pId++)
+                {
+                    Label playerLabel = getPlayerLabelFromId(pId);
+                    playerLabel.Text = game.Players[pId];
+                }
+                
+                for (int pId = game.Players.Count; pId < 8; pId++)
+                {
+                    Label playerLabel = getPlayerLabelFromId(pId);
+                    playerLabel.Text = String.Empty;
+                }
+            }
+        }
+
+        private Label getPlayerLabelFromId(int id)
+        {
+            switch (id)
+            {
+                case 0:
+                    return lblPlayer1;
+                case 1:
+                    return lblPlayer2;
+                case 2:
+                    return lblPlayer3;
+                case 3:
+                    return lblPlayer4;
+                case 4:
+                    return lblPlayer5;
+                case 5:
+                    return lblPlayer6;
+                case 6:
+                    return lblPlayer7;
+                case 7:
+                    return lblPlayer8;
+                default:
+                    return null;
             }
         }
 

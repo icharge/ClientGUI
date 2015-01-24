@@ -117,7 +117,7 @@
             this.lblMapName.BackColor = System.Drawing.Color.Transparent;
             this.lblMapName.Location = new System.Drawing.Point(751, 816);
             this.lblMapName.Name = "lblMapName";
-            this.lblMapName.Size = new System.Drawing.Size(114, 13);
+            this.lblMapName.Size = new System.Drawing.Size(131, 15);
             this.lblMapName.TabIndex = 75;
             this.lblMapName.Text = "Map: No map selected";
             // 
@@ -128,7 +128,7 @@
             this.lblMapAuthor.BackColor = System.Drawing.Color.Transparent;
             this.lblMapAuthor.Location = new System.Drawing.Point(1399, 816);
             this.lblMapAuthor.Name = "lblMapAuthor";
-            this.lblMapAuthor.Size = new System.Drawing.Size(102, 13);
+            this.lblMapAuthor.Size = new System.Drawing.Size(113, 15);
             this.lblMapAuthor.TabIndex = 74;
             this.lblMapAuthor.Text = "By Unknown Author";
             // 
@@ -554,7 +554,7 @@
             this.cmbP8Start.Location = new System.Drawing.Point(368, 206);
             this.cmbP8Start.MaxDropDownItems = 9;
             this.cmbP8Start.Name = "cmbP8Start";
-            this.cmbP8Start.Size = new System.Drawing.Size(47, 21);
+            this.cmbP8Start.Size = new System.Drawing.Size(47, 22);
             this.cmbP8Start.TabIndex = 60;
             this.cmbP8Start.UseCustomDrawingCode = true;
             this.cmbP8Start.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.cmbGeneric_DrawItem);
@@ -584,7 +584,7 @@
             this.cmbP7Start.Location = new System.Drawing.Point(368, 180);
             this.cmbP7Start.MaxDropDownItems = 9;
             this.cmbP7Start.Name = "cmbP7Start";
-            this.cmbP7Start.Size = new System.Drawing.Size(47, 21);
+            this.cmbP7Start.Size = new System.Drawing.Size(47, 22);
             this.cmbP7Start.TabIndex = 59;
             this.cmbP7Start.UseCustomDrawingCode = true;
             this.cmbP7Start.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.cmbGeneric_DrawItem);
@@ -614,7 +614,7 @@
             this.cmbP6Start.Location = new System.Drawing.Point(368, 154);
             this.cmbP6Start.MaxDropDownItems = 9;
             this.cmbP6Start.Name = "cmbP6Start";
-            this.cmbP6Start.Size = new System.Drawing.Size(47, 21);
+            this.cmbP6Start.Size = new System.Drawing.Size(47, 22);
             this.cmbP6Start.TabIndex = 58;
             this.cmbP6Start.UseCustomDrawingCode = true;
             this.cmbP6Start.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.cmbGeneric_DrawItem);
@@ -644,7 +644,7 @@
             this.cmbP5Start.Location = new System.Drawing.Point(368, 128);
             this.cmbP5Start.MaxDropDownItems = 9;
             this.cmbP5Start.Name = "cmbP5Start";
-            this.cmbP5Start.Size = new System.Drawing.Size(47, 21);
+            this.cmbP5Start.Size = new System.Drawing.Size(47, 22);
             this.cmbP5Start.TabIndex = 57;
             this.cmbP5Start.UseCustomDrawingCode = true;
             this.cmbP5Start.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.cmbGeneric_DrawItem);
@@ -674,7 +674,7 @@
             this.cmbP4Start.Location = new System.Drawing.Point(368, 102);
             this.cmbP4Start.MaxDropDownItems = 9;
             this.cmbP4Start.Name = "cmbP4Start";
-            this.cmbP4Start.Size = new System.Drawing.Size(47, 21);
+            this.cmbP4Start.Size = new System.Drawing.Size(47, 22);
             this.cmbP4Start.TabIndex = 56;
             this.cmbP4Start.UseCustomDrawingCode = true;
             this.cmbP4Start.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.cmbGeneric_DrawItem);
@@ -704,7 +704,7 @@
             this.cmbP3Start.Location = new System.Drawing.Point(368, 75);
             this.cmbP3Start.MaxDropDownItems = 9;
             this.cmbP3Start.Name = "cmbP3Start";
-            this.cmbP3Start.Size = new System.Drawing.Size(47, 21);
+            this.cmbP3Start.Size = new System.Drawing.Size(47, 22);
             this.cmbP3Start.TabIndex = 55;
             this.cmbP3Start.UseCustomDrawingCode = true;
             this.cmbP3Start.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.cmbGeneric_DrawItem);
@@ -734,7 +734,7 @@
             this.cmbP2Start.Location = new System.Drawing.Point(368, 49);
             this.cmbP2Start.MaxDropDownItems = 9;
             this.cmbP2Start.Name = "cmbP2Start";
-            this.cmbP2Start.Size = new System.Drawing.Size(47, 21);
+            this.cmbP2Start.Size = new System.Drawing.Size(47, 22);
             this.cmbP2Start.TabIndex = 54;
             this.cmbP2Start.UseCustomDrawingCode = true;
             this.cmbP2Start.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.cmbGeneric_DrawItem);
@@ -764,7 +764,7 @@
             this.cmbP1Start.Location = new System.Drawing.Point(368, 23);
             this.cmbP1Start.MaxDropDownItems = 9;
             this.cmbP1Start.Name = "cmbP1Start";
-            this.cmbP1Start.Size = new System.Drawing.Size(47, 21);
+            this.cmbP1Start.Size = new System.Drawing.Size(47, 22);
             this.cmbP1Start.TabIndex = 53;
             this.cmbP1Start.UseCustomDrawingCode = true;
             this.cmbP1Start.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.cmbGeneric_DrawItem);
@@ -778,7 +778,7 @@
             this.lblStart.ForeColor = System.Drawing.SystemColors.ControlText;
             this.lblStart.Location = new System.Drawing.Point(365, 4);
             this.lblStart.Name = "lblStart";
-            this.lblStart.Size = new System.Drawing.Size(29, 13);
+            this.lblStart.Size = new System.Drawing.Size(32, 15);
             this.lblStart.TabIndex = 52;
             this.lblStart.Text = "Start";
             // 
@@ -910,7 +910,7 @@
             this.lblPlayerTeam.ForeColor = System.Drawing.SystemColors.ControlText;
             this.lblPlayerTeam.Location = new System.Drawing.Point(421, 4);
             this.lblPlayerTeam.Name = "lblPlayerTeam";
-            this.lblPlayerTeam.Size = new System.Drawing.Size(34, 13);
+            this.lblPlayerTeam.Size = new System.Drawing.Size(39, 15);
             this.lblPlayerTeam.TabIndex = 43;
             this.lblPlayerTeam.Text = "Team";
             // 
@@ -922,7 +922,7 @@
             this.lblPlayerColor.ForeColor = System.Drawing.SystemColors.ControlText;
             this.lblPlayerColor.Location = new System.Drawing.Point(285, 4);
             this.lblPlayerColor.Name = "lblPlayerColor";
-            this.lblPlayerColor.Size = new System.Drawing.Size(31, 13);
+            this.lblPlayerColor.Size = new System.Drawing.Size(36, 15);
             this.lblPlayerColor.TabIndex = 42;
             this.lblPlayerColor.Text = "Color";
             // 
@@ -934,7 +934,7 @@
             this.lblPlayerSide.ForeColor = System.Drawing.SystemColors.ControlText;
             this.lblPlayerSide.Location = new System.Drawing.Point(199, 4);
             this.lblPlayerSide.Name = "lblPlayerSide";
-            this.lblPlayerSide.Size = new System.Drawing.Size(28, 13);
+            this.lblPlayerSide.Size = new System.Drawing.Size(32, 15);
             this.lblPlayerSide.TabIndex = 41;
             this.lblPlayerSide.Text = "Side";
             // 
@@ -946,7 +946,7 @@
             this.lblPlayerName.ForeColor = System.Drawing.SystemColors.ControlText;
             this.lblPlayerName.Location = new System.Drawing.Point(72, 4);
             this.lblPlayerName.Name = "lblPlayerName";
-            this.lblPlayerName.Size = new System.Drawing.Size(65, 13);
+            this.lblPlayerName.Size = new System.Drawing.Size(76, 15);
             this.lblPlayerName.TabIndex = 40;
             this.lblPlayerName.Text = "Player name";
             // 
@@ -969,7 +969,7 @@
             "Team D"});
             this.cmbP8Team.Location = new System.Drawing.Point(424, 206);
             this.cmbP8Team.Name = "cmbP8Team";
-            this.cmbP8Team.Size = new System.Drawing.Size(69, 21);
+            this.cmbP8Team.Size = new System.Drawing.Size(69, 22);
             this.cmbP8Team.TabIndex = 38;
             this.cmbP8Team.UseCustomDrawingCode = true;
             this.cmbP8Team.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.cmbGeneric_DrawItem);
@@ -1009,7 +1009,7 @@
             this.cmbP8Side.HoveredIndex = -1;
             this.cmbP8Side.Location = new System.Drawing.Point(202, 206);
             this.cmbP8Side.Name = "cmbP8Side";
-            this.cmbP8Side.Size = new System.Drawing.Size(80, 21);
+            this.cmbP8Side.Size = new System.Drawing.Size(80, 22);
             this.cmbP8Side.TabIndex = 36;
             this.cmbP8Side.UseCustomDrawingCode = true;
             this.cmbP8Side.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.cmbGeneric_DrawItem);
@@ -1034,7 +1034,7 @@
             "Team D"});
             this.cmbP7Team.Location = new System.Drawing.Point(424, 180);
             this.cmbP7Team.Name = "cmbP7Team";
-            this.cmbP7Team.Size = new System.Drawing.Size(69, 21);
+            this.cmbP7Team.Size = new System.Drawing.Size(69, 22);
             this.cmbP7Team.TabIndex = 33;
             this.cmbP7Team.UseCustomDrawingCode = true;
             this.cmbP7Team.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.cmbGeneric_DrawItem);
@@ -1074,7 +1074,7 @@
             this.cmbP7Side.HoveredIndex = -1;
             this.cmbP7Side.Location = new System.Drawing.Point(202, 180);
             this.cmbP7Side.Name = "cmbP7Side";
-            this.cmbP7Side.Size = new System.Drawing.Size(80, 21);
+            this.cmbP7Side.Size = new System.Drawing.Size(80, 22);
             this.cmbP7Side.TabIndex = 31;
             this.cmbP7Side.UseCustomDrawingCode = true;
             this.cmbP7Side.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.cmbGeneric_DrawItem);
@@ -1099,7 +1099,7 @@
             "Team D"});
             this.cmbP6Team.Location = new System.Drawing.Point(424, 154);
             this.cmbP6Team.Name = "cmbP6Team";
-            this.cmbP6Team.Size = new System.Drawing.Size(69, 21);
+            this.cmbP6Team.Size = new System.Drawing.Size(69, 22);
             this.cmbP6Team.TabIndex = 28;
             this.cmbP6Team.UseCustomDrawingCode = true;
             this.cmbP6Team.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.cmbGeneric_DrawItem);
@@ -1139,7 +1139,7 @@
             this.cmbP6Side.HoveredIndex = -1;
             this.cmbP6Side.Location = new System.Drawing.Point(202, 154);
             this.cmbP6Side.Name = "cmbP6Side";
-            this.cmbP6Side.Size = new System.Drawing.Size(80, 21);
+            this.cmbP6Side.Size = new System.Drawing.Size(80, 22);
             this.cmbP6Side.TabIndex = 26;
             this.cmbP6Side.UseCustomDrawingCode = true;
             this.cmbP6Side.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.cmbGeneric_DrawItem);
@@ -1164,7 +1164,7 @@
             "Team D"});
             this.cmbP5Team.Location = new System.Drawing.Point(424, 128);
             this.cmbP5Team.Name = "cmbP5Team";
-            this.cmbP5Team.Size = new System.Drawing.Size(69, 21);
+            this.cmbP5Team.Size = new System.Drawing.Size(69, 22);
             this.cmbP5Team.TabIndex = 23;
             this.cmbP5Team.UseCustomDrawingCode = true;
             this.cmbP5Team.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.cmbGeneric_DrawItem);
@@ -1204,7 +1204,7 @@
             this.cmbP5Side.HoveredIndex = -1;
             this.cmbP5Side.Location = new System.Drawing.Point(202, 128);
             this.cmbP5Side.Name = "cmbP5Side";
-            this.cmbP5Side.Size = new System.Drawing.Size(80, 21);
+            this.cmbP5Side.Size = new System.Drawing.Size(80, 22);
             this.cmbP5Side.TabIndex = 21;
             this.cmbP5Side.UseCustomDrawingCode = true;
             this.cmbP5Side.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.cmbGeneric_DrawItem);
@@ -1229,7 +1229,7 @@
             "Team D"});
             this.cmbP4Team.Location = new System.Drawing.Point(424, 102);
             this.cmbP4Team.Name = "cmbP4Team";
-            this.cmbP4Team.Size = new System.Drawing.Size(69, 21);
+            this.cmbP4Team.Size = new System.Drawing.Size(69, 22);
             this.cmbP4Team.TabIndex = 18;
             this.cmbP4Team.UseCustomDrawingCode = true;
             this.cmbP4Team.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.cmbGeneric_DrawItem);
@@ -1269,7 +1269,7 @@
             this.cmbP4Side.HoveredIndex = -1;
             this.cmbP4Side.Location = new System.Drawing.Point(202, 102);
             this.cmbP4Side.Name = "cmbP4Side";
-            this.cmbP4Side.Size = new System.Drawing.Size(80, 21);
+            this.cmbP4Side.Size = new System.Drawing.Size(80, 22);
             this.cmbP4Side.TabIndex = 16;
             this.cmbP4Side.UseCustomDrawingCode = true;
             this.cmbP4Side.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.cmbGeneric_DrawItem);
@@ -1294,7 +1294,7 @@
             "Team D"});
             this.cmbP3Team.Location = new System.Drawing.Point(424, 75);
             this.cmbP3Team.Name = "cmbP3Team";
-            this.cmbP3Team.Size = new System.Drawing.Size(69, 21);
+            this.cmbP3Team.Size = new System.Drawing.Size(69, 22);
             this.cmbP3Team.TabIndex = 13;
             this.cmbP3Team.UseCustomDrawingCode = true;
             this.cmbP3Team.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.cmbGeneric_DrawItem);
@@ -1334,7 +1334,7 @@
             this.cmbP3Side.HoveredIndex = -1;
             this.cmbP3Side.Location = new System.Drawing.Point(202, 75);
             this.cmbP3Side.Name = "cmbP3Side";
-            this.cmbP3Side.Size = new System.Drawing.Size(80, 21);
+            this.cmbP3Side.Size = new System.Drawing.Size(80, 22);
             this.cmbP3Side.TabIndex = 11;
             this.cmbP3Side.UseCustomDrawingCode = true;
             this.cmbP3Side.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.cmbGeneric_DrawItem);
@@ -1359,7 +1359,7 @@
             "Team D"});
             this.cmbP2Team.Location = new System.Drawing.Point(424, 49);
             this.cmbP2Team.Name = "cmbP2Team";
-            this.cmbP2Team.Size = new System.Drawing.Size(69, 21);
+            this.cmbP2Team.Size = new System.Drawing.Size(69, 22);
             this.cmbP2Team.TabIndex = 8;
             this.cmbP2Team.UseCustomDrawingCode = true;
             this.cmbP2Team.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.cmbGeneric_DrawItem);
@@ -1399,7 +1399,7 @@
             this.cmbP2Side.HoveredIndex = -1;
             this.cmbP2Side.Location = new System.Drawing.Point(202, 49);
             this.cmbP2Side.Name = "cmbP2Side";
-            this.cmbP2Side.Size = new System.Drawing.Size(80, 21);
+            this.cmbP2Side.Size = new System.Drawing.Size(80, 22);
             this.cmbP2Side.TabIndex = 6;
             this.cmbP2Side.UseCustomDrawingCode = true;
             this.cmbP2Side.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.cmbGeneric_DrawItem);
@@ -1424,7 +1424,7 @@
             "Team D"});
             this.cmbP1Team.Location = new System.Drawing.Point(424, 23);
             this.cmbP1Team.Name = "cmbP1Team";
-            this.cmbP1Team.Size = new System.Drawing.Size(69, 21);
+            this.cmbP1Team.Size = new System.Drawing.Size(69, 22);
             this.cmbP1Team.TabIndex = 3;
             this.cmbP1Team.UseCustomDrawingCode = true;
             this.cmbP1Team.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.cmbGeneric_DrawItem);
@@ -1464,7 +1464,7 @@
             this.cmbP1Side.HoveredIndex = -1;
             this.cmbP1Side.Location = new System.Drawing.Point(202, 23);
             this.cmbP1Side.Name = "cmbP1Side";
-            this.cmbP1Side.Size = new System.Drawing.Size(80, 21);
+            this.cmbP1Side.Size = new System.Drawing.Size(80, 22);
             this.cmbP1Side.TabIndex = 1;
             this.cmbP1Side.UseCustomDrawingCode = true;
             this.cmbP1Side.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.cmbGeneric_DrawItem);
@@ -1511,7 +1511,7 @@
             this.lblGameMode.BackColor = System.Drawing.Color.Transparent;
             this.lblGameMode.Location = new System.Drawing.Point(600, 816);
             this.lblGameMode.Name = "lblGameMode";
-            this.lblGameMode.Size = new System.Drawing.Size(129, 13);
+            this.lblGameMode.Size = new System.Drawing.Size(149, 15);
             this.lblGameMode.TabIndex = 79;
             this.lblGameMode.Text = "Game Mode: Deathmatch";
             // 
@@ -1541,7 +1541,7 @@
             this.tbChatInputBox.Location = new System.Drawing.Point(1, 814);
             this.tbChatInputBox.MaxLength = 300;
             this.tbChatInputBox.Name = "tbChatInputBox";
-            this.tbChatInputBox.Size = new System.Drawing.Size(436, 20);
+            this.tbChatInputBox.Size = new System.Drawing.Size(436, 21);
             this.tbChatInputBox.TabIndex = 82;
             this.tbChatInputBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.tbChatInputBox_KeyPress);
             this.tbChatInputBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.tbChatInputBox_KeyUp);
@@ -1552,7 +1552,7 @@
             this.lblChat.BackColor = System.Drawing.Color.Transparent;
             this.lblChat.Location = new System.Drawing.Point(3, 244);
             this.lblChat.Name = "lblChat";
-            this.lblChat.Size = new System.Drawing.Size(32, 13);
+            this.lblChat.Size = new System.Drawing.Size(35, 15);
             this.lblChat.TabIndex = 83;
             this.lblChat.Text = "Chat:";
             // 
@@ -1667,6 +1667,7 @@
             this.Controls.Add(this.lblMapName);
             this.Controls.Add(this.lblMapAuthor);
             this.Controls.Add(this.panel1);
+            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
             this.MinimumSize = new System.Drawing.Size(1011, 570);
             this.Name = "NGameLobby";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
