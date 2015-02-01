@@ -65,9 +65,13 @@ namespace ClientGUI
                 return;
 
             if (Checked)
+            {
                 Checked = false;
+            }
             else
+            {
                 Checked = true;
+            }
         }
 
         private bool _checked = false;

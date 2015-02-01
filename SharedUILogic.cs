@@ -805,5 +805,69 @@ namespace ClientGUI
                 }
             }
         }
+
+        /// <summary>
+        /// Parses and applies various theme-related INI keys from DTACnCNetClient.ini.
+        /// Enables editing attributes of individual controls in DTACnCNetClient.ini.
+        /// </summary>
+        public static void ParseClientThemeIni(Form form)
+        {
+            IniFile clientThemeIni = new IniFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "DTACnCNetClient.ini");
+
+            List<string> sections = clientThemeIni.GetSections();
+
+            foreach (string section in sections)
+            {
+                Control[] controls = form.Controls.Find(section, true);
+
+                if (controls.Length == 0)
+                    continue;
+
+                Control control = controls[0];
+
+                List<string> keys = clientThemeIni.GetSectionKeys(section);
+
+                foreach (string key in keys)
+                {
+                    string keyValue = clientThemeIni.GetStringValue(section, key, String.Empty);
+
+                    switch (key)
+                    {
+                        case "Font":
+                            control.Font = SharedLogic.getFont(keyValue);
+                            break;
+                        case "ForeColor":
+                            control.ForeColor = getColorFromString(keyValue);
+                            break;
+                        case "BackColor":
+                            control.BackColor = getColorFromString(keyValue);
+                            break;
+                        case "Size":
+                            string[] sizeArray = keyValue.Split(',');
+                            control.Size = new Size(Convert.ToInt32(sizeArray[0]), Convert.ToInt32(sizeArray[1]));
+                            break;
+                        case "Location":
+                            string[] locationArray = keyValue.Split(',');
+                            control.Location = new Point(Convert.ToInt32(locationArray[0]), Convert.ToInt32(locationArray[1]));
+                            break;
+                        case "Text":
+                            control.Text = keyValue;
+                            break;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets a color from a RGB color string (example: 255,255,255)
+        /// </summary>
+        /// <param name="colorString">The color string.</param>
+        /// <returns>The color.</returns>
+        public static Color getColorFromString(string colorString)
+        {
+            string[] colorArray = colorString.Split(',');
+            Color color = Color.FromArgb(Convert.ToByte(colorArray[0]), Convert.ToByte(colorArray[1]), Convert.ToByte(colorArray[2]));
+            return color;
+        }
     }
 }

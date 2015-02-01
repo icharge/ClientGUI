@@ -93,6 +93,8 @@ namespace ClientGUI
             NCnCNetLobby.ConversationOpened += new NCnCNetLobby.ConversationOpenedCallback(NCnCNetLobby_ConversationOpened);
             Flash();
 
+            SharedUILogic.ParseClientThemeIni(this);
+
             tbChatMessage.Focus();
         }
 

@@ -153,6 +153,8 @@ namespace ClientGUI
             customScrollbar1.Value = 0;
 
             lbMapList.MouseWheel += lbMapList_MouseWheel;
+
+            SharedUILogic.ParseClientThemeIni(this);
         }
 
 

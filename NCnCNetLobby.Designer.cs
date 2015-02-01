@@ -31,8 +31,20 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(NCnCNetLobby));
             this.lblFollowChannels = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.chkChannelCnCNet = new ClientGUI.UserCheckBox();
+            this.chkChannelTS = new ClientGUI.UserCheckBox();
+            this.chkChannelTI = new ClientGUI.UserCheckBox();
+            this.chkChannelDTA = new ClientGUI.UserCheckBox();
             this.btnReturnToMenu = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.lblPlayer8 = new System.Windows.Forms.Label();
+            this.lblPlayer7 = new System.Windows.Forms.Label();
+            this.lblPlayer6 = new System.Windows.Forms.Label();
+            this.lblPlayer5 = new System.Windows.Forms.Label();
+            this.lblPlayer4 = new System.Windows.Forms.Label();
+            this.lblPlayer3 = new System.Windows.Forms.Label();
+            this.lblPlayer2 = new System.Windows.Forms.Label();
+            this.lblPlayer1 = new System.Windows.Forms.Label();
             this.lblGameMode = new System.Windows.Forms.Label();
             this.lblPlayers = new System.Windows.Forms.Label();
             this.lblHost = new System.Windows.Forms.Label();
@@ -51,22 +63,10 @@
             this.btnMusicToggle = new System.Windows.Forms.Button();
             this.sbChat = new CustomControls.CustomScrollbar();
             this.sbPlayers = new CustomControls.CustomScrollbar();
-            this.lblPlayer1 = new System.Windows.Forms.Label();
-            this.lblPlayer2 = new System.Windows.Forms.Label();
-            this.lblPlayer3 = new System.Windows.Forms.Label();
-            this.lblPlayer4 = new System.Windows.Forms.Label();
-            this.lblPlayer8 = new System.Windows.Forms.Label();
-            this.lblPlayer7 = new System.Windows.Forms.Label();
-            this.lblPlayer6 = new System.Windows.Forms.Label();
-            this.lblPlayer5 = new System.Windows.Forms.Label();
             this.chkChannelTO = new ClientGUI.UserCheckBox();
             this.cmbMessageColor = new ClientGUI.LimitedComboBox();
             this.cmbCurrentChannel = new ClientGUI.LimitedComboBox();
             this.lbChatMessages = new ClientGUI.ScrollbarlessListBox();
-            this.chkChannelCnCNet = new ClientGUI.UserCheckBox();
-            this.chkChannelTS = new ClientGUI.UserCheckBox();
-            this.chkChannelTI = new ClientGUI.UserCheckBox();
-            this.chkChannelDTA = new ClientGUI.UserCheckBox();
             this.lbPlayerList = new ClientGUI.ScrollbarlessListBox();
             this.lbGameList = new ClientGUI.ScrollbarlessListBox();
             this.panel1.SuspendLayout();
@@ -97,6 +97,51 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(215, 109);
             this.panel1.TabIndex = 3;
+            // 
+            // chkChannelCnCNet
+            // 
+            this.chkChannelCnCNet.AutoSize = true;
+            this.chkChannelCnCNet.BackColor = System.Drawing.Color.Transparent;
+            this.chkChannelCnCNet.IsEnabled = true;
+            this.chkChannelCnCNet.Location = new System.Drawing.Point(13, 78);
+            this.chkChannelCnCNet.Name = "chkChannelCnCNet";
+            this.chkChannelCnCNet.Size = new System.Drawing.Size(197, 17);
+            this.chkChannelCnCNet.TabIndex = 26;
+            this.chkChannelCnCNet.Tag = "";
+            this.chkChannelCnCNet.CheckedChanged += new ClientGUI.UserCheckBox.OnCheckedChanged(this.chkChannelCnCNet_CheckedChanged);
+            // 
+            // chkChannelTS
+            // 
+            this.chkChannelTS.BackColor = System.Drawing.Color.Transparent;
+            this.chkChannelTS.IsEnabled = true;
+            this.chkChannelTS.Location = new System.Drawing.Point(13, 56);
+            this.chkChannelTS.Name = "chkChannelTS";
+            this.chkChannelTS.Size = new System.Drawing.Size(197, 15);
+            this.chkChannelTS.TabIndex = 25;
+            this.chkChannelTS.Tag = "";
+            this.chkChannelTS.CheckedChanged += new ClientGUI.UserCheckBox.OnCheckedChanged(this.chkChannelTS_CheckedChanged);
+            // 
+            // chkChannelTI
+            // 
+            this.chkChannelTI.BackColor = System.Drawing.Color.Transparent;
+            this.chkChannelTI.IsEnabled = true;
+            this.chkChannelTI.Location = new System.Drawing.Point(13, 35);
+            this.chkChannelTI.Name = "chkChannelTI";
+            this.chkChannelTI.Size = new System.Drawing.Size(194, 15);
+            this.chkChannelTI.TabIndex = 23;
+            this.chkChannelTI.Tag = "";
+            this.chkChannelTI.CheckedChanged += new ClientGUI.UserCheckBox.OnCheckedChanged(this.chkChannelTI_CheckedChanged);
+            // 
+            // chkChannelDTA
+            // 
+            this.chkChannelDTA.BackColor = System.Drawing.Color.Transparent;
+            this.chkChannelDTA.IsEnabled = true;
+            this.chkChannelDTA.Location = new System.Drawing.Point(13, 12);
+            this.chkChannelDTA.Name = "chkChannelDTA";
+            this.chkChannelDTA.Size = new System.Drawing.Size(197, 15);
+            this.chkChannelDTA.TabIndex = 22;
+            this.chkChannelDTA.Tag = "The Dawn of the Tiberium Age";
+            this.chkChannelDTA.CheckedChanged += new ClientGUI.UserCheckBox.OnCheckedChanged(this.chkChannelDTA_CheckedChanged);
             // 
             // btnReturnToMenu
             // 
@@ -135,6 +180,102 @@
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(215, 166);
             this.panel2.TabIndex = 6;
+            // 
+            // lblPlayer8
+            // 
+            this.lblPlayer8.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.lblPlayer8.AutoSize = true;
+            this.lblPlayer8.BackColor = System.Drawing.Color.Transparent;
+            this.lblPlayer8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblPlayer8.Location = new System.Drawing.Point(106, 145);
+            this.lblPlayer8.Name = "lblPlayer8";
+            this.lblPlayer8.Size = new System.Drawing.Size(97, 13);
+            this.lblPlayer8.TabIndex = 35;
+            this.lblPlayer8.Text = "Player 8 XXXXXXX";
+            // 
+            // lblPlayer7
+            // 
+            this.lblPlayer7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.lblPlayer7.AutoSize = true;
+            this.lblPlayer7.BackColor = System.Drawing.Color.Transparent;
+            this.lblPlayer7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblPlayer7.Location = new System.Drawing.Point(106, 132);
+            this.lblPlayer7.Name = "lblPlayer7";
+            this.lblPlayer7.Size = new System.Drawing.Size(97, 13);
+            this.lblPlayer7.TabIndex = 34;
+            this.lblPlayer7.Text = "Player 7 XXXXXXX";
+            // 
+            // lblPlayer6
+            // 
+            this.lblPlayer6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.lblPlayer6.AutoSize = true;
+            this.lblPlayer6.BackColor = System.Drawing.Color.Transparent;
+            this.lblPlayer6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblPlayer6.Location = new System.Drawing.Point(106, 119);
+            this.lblPlayer6.Name = "lblPlayer6";
+            this.lblPlayer6.Size = new System.Drawing.Size(97, 13);
+            this.lblPlayer6.TabIndex = 33;
+            this.lblPlayer6.Text = "Player 6 XXXXXXX";
+            // 
+            // lblPlayer5
+            // 
+            this.lblPlayer5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.lblPlayer5.AutoSize = true;
+            this.lblPlayer5.BackColor = System.Drawing.Color.Transparent;
+            this.lblPlayer5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblPlayer5.Location = new System.Drawing.Point(106, 106);
+            this.lblPlayer5.Name = "lblPlayer5";
+            this.lblPlayer5.Size = new System.Drawing.Size(97, 13);
+            this.lblPlayer5.TabIndex = 32;
+            this.lblPlayer5.Text = "Player 5 XXXXXXX";
+            // 
+            // lblPlayer4
+            // 
+            this.lblPlayer4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.lblPlayer4.AutoSize = true;
+            this.lblPlayer4.BackColor = System.Drawing.Color.Transparent;
+            this.lblPlayer4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblPlayer4.Location = new System.Drawing.Point(3, 145);
+            this.lblPlayer4.Name = "lblPlayer4";
+            this.lblPlayer4.Size = new System.Drawing.Size(97, 13);
+            this.lblPlayer4.TabIndex = 31;
+            this.lblPlayer4.Text = "Player 4 XXXXXXX";
+            // 
+            // lblPlayer3
+            // 
+            this.lblPlayer3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.lblPlayer3.AutoSize = true;
+            this.lblPlayer3.BackColor = System.Drawing.Color.Transparent;
+            this.lblPlayer3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblPlayer3.Location = new System.Drawing.Point(3, 132);
+            this.lblPlayer3.Name = "lblPlayer3";
+            this.lblPlayer3.Size = new System.Drawing.Size(97, 13);
+            this.lblPlayer3.TabIndex = 30;
+            this.lblPlayer3.Text = "Player 3 XXXXXXX";
+            // 
+            // lblPlayer2
+            // 
+            this.lblPlayer2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.lblPlayer2.AutoSize = true;
+            this.lblPlayer2.BackColor = System.Drawing.Color.Transparent;
+            this.lblPlayer2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblPlayer2.Location = new System.Drawing.Point(3, 119);
+            this.lblPlayer2.Name = "lblPlayer2";
+            this.lblPlayer2.Size = new System.Drawing.Size(97, 13);
+            this.lblPlayer2.TabIndex = 29;
+            this.lblPlayer2.Text = "Player 2 XXXXXXX";
+            // 
+            // lblPlayer1
+            // 
+            this.lblPlayer1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.lblPlayer1.AutoSize = true;
+            this.lblPlayer1.BackColor = System.Drawing.Color.Transparent;
+            this.lblPlayer1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblPlayer1.Location = new System.Drawing.Point(3, 106);
+            this.lblPlayer1.Name = "lblPlayer1";
+            this.lblPlayer1.Size = new System.Drawing.Size(97, 13);
+            this.lblPlayer1.TabIndex = 28;
+            this.lblPlayer1.Text = "Player 1 XXXXXXX";
             // 
             // lblGameMode
             // 
@@ -375,102 +516,6 @@
             this.sbPlayers.UpArrowImage = ((System.Drawing.Image)(resources.GetObject("sbPlayers.UpArrowImage")));
             this.sbPlayers.Value = 0;
             // 
-            // lblPlayer1
-            // 
-            this.lblPlayer1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.lblPlayer1.AutoSize = true;
-            this.lblPlayer1.BackColor = System.Drawing.Color.Transparent;
-            this.lblPlayer1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblPlayer1.Location = new System.Drawing.Point(3, 106);
-            this.lblPlayer1.Name = "lblPlayer1";
-            this.lblPlayer1.Size = new System.Drawing.Size(97, 13);
-            this.lblPlayer1.TabIndex = 28;
-            this.lblPlayer1.Text = "Player 1 XXXXXXX";
-            // 
-            // lblPlayer2
-            // 
-            this.lblPlayer2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.lblPlayer2.AutoSize = true;
-            this.lblPlayer2.BackColor = System.Drawing.Color.Transparent;
-            this.lblPlayer2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblPlayer2.Location = new System.Drawing.Point(3, 119);
-            this.lblPlayer2.Name = "lblPlayer2";
-            this.lblPlayer2.Size = new System.Drawing.Size(97, 13);
-            this.lblPlayer2.TabIndex = 29;
-            this.lblPlayer2.Text = "Player 2 XXXXXXX";
-            // 
-            // lblPlayer3
-            // 
-            this.lblPlayer3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.lblPlayer3.AutoSize = true;
-            this.lblPlayer3.BackColor = System.Drawing.Color.Transparent;
-            this.lblPlayer3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblPlayer3.Location = new System.Drawing.Point(3, 132);
-            this.lblPlayer3.Name = "lblPlayer3";
-            this.lblPlayer3.Size = new System.Drawing.Size(97, 13);
-            this.lblPlayer3.TabIndex = 30;
-            this.lblPlayer3.Text = "Player 3 XXXXXXX";
-            // 
-            // lblPlayer4
-            // 
-            this.lblPlayer4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.lblPlayer4.AutoSize = true;
-            this.lblPlayer4.BackColor = System.Drawing.Color.Transparent;
-            this.lblPlayer4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblPlayer4.Location = new System.Drawing.Point(3, 145);
-            this.lblPlayer4.Name = "lblPlayer4";
-            this.lblPlayer4.Size = new System.Drawing.Size(97, 13);
-            this.lblPlayer4.TabIndex = 31;
-            this.lblPlayer4.Text = "Player 4 XXXXXXX";
-            // 
-            // lblPlayer8
-            // 
-            this.lblPlayer8.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.lblPlayer8.AutoSize = true;
-            this.lblPlayer8.BackColor = System.Drawing.Color.Transparent;
-            this.lblPlayer8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblPlayer8.Location = new System.Drawing.Point(106, 145);
-            this.lblPlayer8.Name = "lblPlayer8";
-            this.lblPlayer8.Size = new System.Drawing.Size(97, 13);
-            this.lblPlayer8.TabIndex = 35;
-            this.lblPlayer8.Text = "Player 8 XXXXXXX";
-            // 
-            // lblPlayer7
-            // 
-            this.lblPlayer7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.lblPlayer7.AutoSize = true;
-            this.lblPlayer7.BackColor = System.Drawing.Color.Transparent;
-            this.lblPlayer7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblPlayer7.Location = new System.Drawing.Point(106, 132);
-            this.lblPlayer7.Name = "lblPlayer7";
-            this.lblPlayer7.Size = new System.Drawing.Size(97, 13);
-            this.lblPlayer7.TabIndex = 34;
-            this.lblPlayer7.Text = "Player 7 XXXXXXX";
-            // 
-            // lblPlayer6
-            // 
-            this.lblPlayer6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.lblPlayer6.AutoSize = true;
-            this.lblPlayer6.BackColor = System.Drawing.Color.Transparent;
-            this.lblPlayer6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblPlayer6.Location = new System.Drawing.Point(106, 119);
-            this.lblPlayer6.Name = "lblPlayer6";
-            this.lblPlayer6.Size = new System.Drawing.Size(97, 13);
-            this.lblPlayer6.TabIndex = 33;
-            this.lblPlayer6.Text = "Player 6 XXXXXXX";
-            // 
-            // lblPlayer5
-            // 
-            this.lblPlayer5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.lblPlayer5.AutoSize = true;
-            this.lblPlayer5.BackColor = System.Drawing.Color.Transparent;
-            this.lblPlayer5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblPlayer5.Location = new System.Drawing.Point(106, 106);
-            this.lblPlayer5.Name = "lblPlayer5";
-            this.lblPlayer5.Size = new System.Drawing.Size(97, 13);
-            this.lblPlayer5.TabIndex = 32;
-            this.lblPlayer5.Text = "Player 5 XXXXXXX";
-            // 
             // chkChannelTO
             // 
             this.chkChannelTO.BackColor = System.Drawing.Color.Transparent;
@@ -501,7 +546,7 @@
             // cmbCurrentChannel
             // 
             this.cmbCurrentChannel.CanDropDown = true;
-            this.cmbCurrentChannel.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.cmbCurrentChannel.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbCurrentChannel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbCurrentChannel.FormattingEnabled = true;
             this.cmbCurrentChannel.HoveredIndex = -1;
@@ -536,51 +581,6 @@
             this.lbChatMessages.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.lbChatMessages_DrawItem);
             this.lbChatMessages.MeasureItem += new System.Windows.Forms.MeasureItemEventHandler(this.lbChatMessages_MeasureItem);
             this.lbChatMessages.KeyDown += new System.Windows.Forms.KeyEventHandler(this.lbChatMessages_KeyDown);
-            // 
-            // chkChannelCnCNet
-            // 
-            this.chkChannelCnCNet.AutoSize = true;
-            this.chkChannelCnCNet.BackColor = System.Drawing.Color.Transparent;
-            this.chkChannelCnCNet.IsEnabled = true;
-            this.chkChannelCnCNet.Location = new System.Drawing.Point(13, 78);
-            this.chkChannelCnCNet.Name = "chkChannelCnCNet";
-            this.chkChannelCnCNet.Size = new System.Drawing.Size(197, 17);
-            this.chkChannelCnCNet.TabIndex = 26;
-            this.chkChannelCnCNet.Tag = "";
-            this.chkChannelCnCNet.CheckedChanged += new ClientGUI.UserCheckBox.OnCheckedChanged(this.chkChannelCnCNet_CheckedChanged);
-            // 
-            // chkChannelTS
-            // 
-            this.chkChannelTS.BackColor = System.Drawing.Color.Transparent;
-            this.chkChannelTS.IsEnabled = true;
-            this.chkChannelTS.Location = new System.Drawing.Point(13, 56);
-            this.chkChannelTS.Name = "chkChannelTS";
-            this.chkChannelTS.Size = new System.Drawing.Size(197, 15);
-            this.chkChannelTS.TabIndex = 25;
-            this.chkChannelTS.Tag = "";
-            this.chkChannelTS.CheckedChanged += new ClientGUI.UserCheckBox.OnCheckedChanged(this.chkChannelTS_CheckedChanged);
-            // 
-            // chkChannelTI
-            // 
-            this.chkChannelTI.BackColor = System.Drawing.Color.Transparent;
-            this.chkChannelTI.IsEnabled = true;
-            this.chkChannelTI.Location = new System.Drawing.Point(13, 35);
-            this.chkChannelTI.Name = "chkChannelTI";
-            this.chkChannelTI.Size = new System.Drawing.Size(194, 15);
-            this.chkChannelTI.TabIndex = 23;
-            this.chkChannelTI.Tag = "";
-            this.chkChannelTI.CheckedChanged += new ClientGUI.UserCheckBox.OnCheckedChanged(this.chkChannelTI_CheckedChanged);
-            // 
-            // chkChannelDTA
-            // 
-            this.chkChannelDTA.BackColor = System.Drawing.Color.Transparent;
-            this.chkChannelDTA.IsEnabled = true;
-            this.chkChannelDTA.Location = new System.Drawing.Point(13, 12);
-            this.chkChannelDTA.Name = "chkChannelDTA";
-            this.chkChannelDTA.Size = new System.Drawing.Size(197, 15);
-            this.chkChannelDTA.TabIndex = 22;
-            this.chkChannelDTA.Tag = "The Dawn of the Tiberium Age";
-            this.chkChannelDTA.CheckedChanged += new ClientGUI.UserCheckBox.OnCheckedChanged(this.chkChannelDTA_CheckedChanged);
             // 
             // lbPlayerList
             // 

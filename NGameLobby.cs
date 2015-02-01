@@ -33,6 +33,8 @@ namespace ClientGUI
         private delegate void TripleStringCallback(string str1, string str2, string str3);
         private delegate void UserListCallback(string[] userList, string channelName);
 
+        public delegate void MapCallback(Map map);
+
         /// <summary>
         /// Creates a new instance of the game lobby.
         /// </summary>
@@ -186,7 +188,9 @@ namespace ClientGUI
         UserCheckBox chkP8Ready;
 
         Map currentMap;
+        string currentSHA1 = String.Empty;
         string currentGameMode = String.Empty;
+        List<string> hostUploadedMaps = new List<string>();
 
         int iNumLoadingScreens = 0;
 
@@ -200,6 +204,7 @@ namespace ClientGUI
         List<Color> MessageColors = new List<Color>();
         List<Color> ChatColors;
         Color defaultChatColor;
+        Color cListBoxFocusColor;
 
         int myChatColorId = 0;
 
@@ -246,6 +251,11 @@ namespace ClientGUI
             CnCNetData.ConnectionBridge.PrivmsgParsed += new RConnectionBridge.PrivmsgParsedEventHandler(Instance_PrivmsgParsed);
             CnCNetData.ConnectionBridge.OnCtcpParsed += new RConnectionBridge.CTCPParsedEventHandler(Instance_OnCtcpParsed);
             CnCNetData.ConnectionBridge.OnUserKicked += new RConnectionBridge.UserKickedEventHandler(Instance_OnUserKicked);
+
+            MapSharer.OnMapDownloadFailed += MapSharer_OnMapDownloadFailed;
+            MapSharer.OnMapDownloadComplete += MapSharer_OnMapDownloadComplete;
+            MapSharer.OnMapUploadFailed += MapSharer_OnMapUploadFailed;
+            MapSharer.OnMapUploadComplete += MapSharer_OnMapUploadComplete;
 
             this.Font = SharedLogic.getCommonFont();
             lbChatBox.Font = SharedLogic.getListBoxFont();
@@ -493,6 +503,9 @@ namespace ClientGUI
             coopBriefingForeColor = Color.FromArgb(255, Convert.ToInt32(briefingForeColor[0]),
                 Convert.ToInt32(briefingForeColor[1]), Convert.ToInt32(briefingForeColor[2]));
 
+            string[] listBoxFocusColor = DomainController.Instance().getListBoxFocusColor().Split(',');
+            cListBoxFocusColor = Color.FromArgb(Convert.ToByte(listBoxFocusColor[0]), Convert.ToByte(listBoxFocusColor[1]), Convert.ToByte(listBoxFocusColor[2]));
+
             int displayedItems = lbChatBox.DisplayRectangle.Height / lbChatBox.ItemHeight;
 
             customScrollbar1.ThumbBottomImage = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "sbThumbBottom.png");
@@ -568,6 +581,8 @@ namespace ClientGUI
                     chkBox.Name = checkBoxName;
                     if (defaultValue)
                         chkBox.Checked = true;
+                    else
+                        chkBox.Checked = false;
                     if (!isHost)
                         chkBox.IsEnabled = false;
                     chkBox.CheckedChanged += new UserCheckBox.OnCheckedChanged(GenericChkBox_CheckedChanged);
@@ -831,7 +846,106 @@ namespace ClientGUI
             this.Location = new Point((Screen.PrimaryScreen.Bounds.Width - this.Size.Width) / 2,
                 (Screen.PrimaryScreen.Bounds.Height - this.Size.Height) / 2);
 
+            SharedUILogic.ParseClientThemeIni(this);
+
             tbChatInputBox.Select();
+        }
+
+        private void MapSharer_OnMapUploadComplete(Map map)
+        {
+            if (lbChatBox.InvokeRequired)
+            {
+                MapCallback d = new MapCallback(MapSharer_OnMapUploadFailed);
+                this.BeginInvoke(d, map);
+                return;
+            }
+
+            hostUploadedMaps.Add(map.SHA1);
+
+            AddNotice("Uploading map " + map.Name + " to the CnCNet map database complete.");
+
+            string msgToSend = "NOTICE " + ChannelName + " " + CTCPChar1 + CTCPChar2 + "MAPOK " + map.SHA1 + CTCPChar2;
+            CnCNetData.ConnectionBridge.SendMessage(msgToSend);
+        }
+
+        private void MapSharer_OnMapUploadFailed(Map map)
+        {
+            if (lbChatBox.InvokeRequired)
+            {
+                MapCallback d = new MapCallback(MapSharer_OnMapUploadFailed);
+                this.BeginInvoke(d, map);
+                return;
+            }
+
+            AddNotice("Uploading map " + map.Name + " to the CnCNet map database failed.");
+            AddNotice("You need to change the map or some players won't be able to participate in this match.");
+
+            hostUploadedMaps.Add(map.SHA1);
+
+            string msgToSend = "NOTICE " + ChannelName + " " + CTCPChar1 + CTCPChar2 + "MAPFAIL " + map.SHA1 + CTCPChar2;
+            CnCNetData.ConnectionBridge.SendMessage(msgToSend);
+        }
+
+        private void MapSharer_OnMapDownloadComplete(string sha1, string filePath)
+        {
+            if (lbChatBox.InvokeRequired)
+            {
+                DualStringCallback d = new DualStringCallback(MapSharer_OnMapDownloadComplete);
+                this.BeginInvoke(d, sha1, filePath);
+                return;
+            }
+
+            bool success = SharedLogic.AddMapToMaplist("Maps\\Custom\\" + filePath);
+
+            if (success)
+            {
+                Logger.Log("Map " + sha1 + " succesfully added to the internal map list.");
+                AddNotice("Map succesfully transferred.");
+
+                if (currentSHA1 == sha1)
+                {
+                    currentMap = CnCNetData.MapList[CnCNetData.MapList.Count - 1];
+                    lblMapName.Text = "Map: " + currentMap.Name;
+                    lblMapAuthor.Text = "By " + currentMap.Author;
+                    LoadPreview();
+                }
+            }
+            else
+            {
+                Logger.Log("Adding map " + sha1 + " to the internal map list failed.");
+                AddNotice("Transfer of the custom map failed. The host needs to change the map or you will be unable to participate in this match.");
+
+                string msgToSend = "NOTICE " + ChannelName + " " + CTCPChar1 + CTCPChar2 + "MAPFAIL " + sha1 + CTCPChar2;
+                CnCNetData.ConnectionBridge.SendMessage(msgToSend);
+                return;
+            }
+        }
+
+        private void MapSharer_OnMapDownloadFailed(string sha1)
+        {
+            if (lbChatBox.InvokeRequired)
+            {
+                StringCallback d = new StringCallback(MapSharer_OnMapDownloadFailed);
+                this.BeginInvoke(d, sha1);
+                return;
+            }
+
+            // If the host has already uploaded the map, we shouldn't request them to re-upload it
+            if (hostUploadedMaps.Contains(sha1))
+            {
+                AddNotice("Download of the custom map failed. The host needs to change the map or you will be unable to participate in this match.");
+
+                string msgToSend = "NOTICE " + ChannelName + " " + CTCPChar1 + CTCPChar2 + "MAPFAIL " + sha1 + CTCPChar2;
+                CnCNetData.ConnectionBridge.SendMessage(msgToSend);
+                return;
+            }
+
+            AddNotice("Downloading custom map failed. Requesting the game host to download it to the CnCNet map database.");
+
+            hostUploadedMaps.Add(sha1);
+
+            string messageToSend = "NOTICE " + ChannelName + " " + CTCPChar1 + CTCPChar2 + "MAPREQ " + sha1 + CTCPChar2;
+            CnCNetData.ConnectionBridge.SendMessage(messageToSend);
         }
 
         private void lbChatBox_MouseWheel(object sender, MouseEventArgs e)
@@ -1097,6 +1211,40 @@ namespace ClientGUI
                     CnCNetData.ConnectionBridge.SendMessage(messageToSend);
 
                     AddNotice("Player " + sender + " is using a modified map and can't participate in the match.");
+                    Logger.Log("Player " + sender + " - modified map detected!");
+                }
+                else if (message.StartsWith("MAPREQ"))
+                {
+                    string sha1 = message.Substring(7);
+
+                    if (hostUploadedMaps.Contains(sha1))
+                    {
+                        // We've already succesfully uploaded this map!
+                        AddNotice("Player " + sender + " is unable to download the current map. " +
+                            "You need to change the map or they won't be able to participate in this match.");
+                        return;
+                    }
+
+                    Map map = getMapFromSHA1(sha1);
+
+                    string notice = string.Format("Player {0} doesn't have the map '{1}' on their installation. " + 
+                        "Uploading the map to the CnCNet database so they can download the map.",
+                        sender, map.Name);
+
+                    AddNotice(notice);
+                    Logger.Log(notice);
+
+                    MapSharer.UploadMap(map, defaultGame);
+                }
+                else if (message.StartsWith("MAPFAIL"))
+                {
+                    string sha1 = message.Substring(8);
+
+                    if (sha1 == currentMap.SHA1)
+                    {
+                        AddNotice("Player " + sender + " is unable to download the current map. " +
+                            "You need to change the map or they won't be able to participate in this match.");
+                    }
                 }
             }
             else
@@ -1199,13 +1347,21 @@ namespace ClientGUI
                         ComboBoxes[cmbId].SelectedIndex = index;
                     }
                     initialId = CheckBoxes.Count + ComboBoxes.Count;
-                    string mapMD5 = parts[initialId];
-                    Map map = getMapFromMD5(mapMD5);
+                    string mapSHA1 = parts[initialId];
+                    Map map = getMapFromSHA1(mapSHA1);
                     if (map == null)
                     {
-                        MessageBox.Show("The host has selected a map that isn't located on your installation. " + Environment.NewLine +
-                            "You will be unable to participate in this match.");
-                        btnLeaveGame.PerformClick();
+                        lblMapName.Text = "Map: Unknown";
+                        lblMapAuthor.Text = String.Empty;
+                        currentSHA1 = mapSHA1;
+
+                        AddNotice("The host has a selected a map that doesn't exist on your installation. Attempting to download it from the CnCNet map database.");
+                        Logger.Log("The game host has selected an unknown map! Attempting to download it.");
+
+                        MapSharer.DownloadMap(mapSHA1, defaultGame);
+                        btnLaunchGame.Enabled = false; // Prevent ready
+                        pbPreview.BackgroundImage = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "nopreview.png");
+
                         return;
                     }
                     else
@@ -1214,6 +1370,7 @@ namespace ClientGUI
                         lblMapName.Text = "Map: " + map.Name;
                         lblMapAuthor.Text = "By " + map.Author;
                         LoadPreview();
+                        btnLaunchGame.Enabled = true;
                     }
                     string gameMode = parts[initialId + 1];
                     if (CnCNetData.GameTypes.Contains(gameMode))
@@ -1402,19 +1559,51 @@ namespace ClientGUI
 
                     string offender = message.Substring(7);
                 }
+                else if (message.StartsWith("MAPFAIL"))
+                {
+                    if (message.Length < 9)
+                    {
+                        Logger.Log("Warning: Invalid MAPFAIL message received from the host.");
+                        return;
+                    }
+
+                    string sha1 = message.Substring(8);
+
+                    hostUploadedMaps.Add(sha1);
+
+                    Logger.Log("MAPFAIL received, SHA1: " + sha1);
+
+                    if (currentSHA1 == sha1)
+                    {
+                        AddNotice("The host has failed to upload the map. The host has to select a map published with the game or you will be unable to participate in this match.");
+                    }
+                }
+                else if (message.StartsWith("MAPOK"))
+                {
+                    string sha1 = message.Substring(6);
+
+                    hostUploadedMaps.Add(sha1);
+
+                    if (currentSHA1 == sha1)
+                    {
+                        AddNotice("The game host has uploaded the map to the CnCNet Map database. Re-attempting download.");
+
+                        MapSharer.DownloadMap(sha1, defaultGame);
+                    }
+                }
             }
         }
 
         /// <summary>
-        /// Gets a map from the internal map list based on the map's MD5.
+        /// Gets a map from the internal map list based on the map's SHA1.
         /// </summary>
-        /// <param name="md5">The MD5 of the map to search for.</param>
+        /// <param name="sha1">The MD5 of the map to search for.</param>
         /// <returns>The map if a matching MD5 was found, otherwise null.</returns>
-        private Map getMapFromMD5(string md5)
+        private Map getMapFromSHA1(string sha1)
         {
             foreach (Map map in CnCNetData.MapList)
             {
-                if (map.SHA1 == md5)
+                if (map.SHA1 == sha1)
                     return map;
             }
 
@@ -1814,10 +2003,22 @@ namespace ClientGUI
         /// </summary>
         private void cmbPXColor_DrawItem(object sender, DrawItemEventArgs e)
         {
-            e.DrawBackground();
-            e.DrawFocusRectangle();
             if (e.Index > -1 && e.Index < cmbP1Color.Items.Count)
+            {
+                if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
+                    e = new DrawItemEventArgs(e.Graphics,
+                                              e.Font,
+                                              e.Bounds,
+                                              e.Index,
+                                              e.State ^ DrawItemState.Selected,
+                                              e.ForeColor,
+                                              cListBoxFocusColor);
+
+                e.DrawBackground();
+                e.DrawFocusRectangle();
+
                 e.Graphics.DrawString(cmbP1Color.Items[e.Index].ToString(), e.Font, new SolidBrush(MPColors[e.Index]), e.Bounds);
+            }
         }
 
         /// <summary>
@@ -1826,14 +2027,22 @@ namespace ClientGUI
         private void cmbGeneric_DrawItem(object sender, DrawItemEventArgs e)
         {
             LimitedComboBox comboBox = (LimitedComboBox)sender;
-            e.DrawBackground();
-            e.DrawFocusRectangle();
             if (e.Index > -1 && e.Index < comboBox.Items.Count)
             {
-                if (comboBox.HoveredIndex != e.Index)
-                    e.Graphics.DrawString(comboBox.Items[e.Index].ToString(), e.Font, new SolidBrush(comboBox.ForeColor), e.Bounds);
-                else
-                    e.Graphics.DrawString(comboBox.Items[e.Index].ToString(), e.Font, new SolidBrush(Color.White), e.Bounds);
+                if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
+                    e = new DrawItemEventArgs(e.Graphics,
+                                              e.Font,
+                                              e.Bounds,
+                                              e.Index,
+                                              e.State ^ DrawItemState.Selected,
+                                              e.ForeColor,
+                                              cListBoxFocusColor);
+
+                e.DrawBackground();
+                e.DrawFocusRectangle();
+
+                e.Graphics.DrawString(comboBox.Items[e.Index].ToString(), e.Font,
+                    new SolidBrush(comboBox.ForeColor), e.Bounds);
             }
         }
 
@@ -2842,10 +3051,20 @@ namespace ClientGUI
         /// </summary>
         private void lbChatBox_DrawItem(object sender, DrawItemEventArgs e)
         {
-            e.DrawBackground();
-            e.DrawFocusRectangle();
             if (e.Index > -1 && e.Index < lbChatBox.Items.Count)
             {
+                if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
+                    e = new DrawItemEventArgs(e.Graphics,
+                                              e.Font,
+                                              e.Bounds,
+                                              e.Index,
+                                              e.State ^ DrawItemState.Selected,
+                                              e.ForeColor,
+                                              cListBoxFocusColor);
+
+                e.DrawBackground();
+                e.DrawFocusRectangle();
+
                 Color foreColor = MessageColors[e.Index];
                 e.Graphics.DrawString(lbChatBox.Items[e.Index].ToString(), e.Font, new SolidBrush(foreColor), e.Bounds);
             }
@@ -3154,7 +3373,7 @@ namespace ClientGUI
                 btnLeaveGame.PerformClick();
             }
 
-            // 28. 12. 2014 No editing the map after setting for it!
+            // 28. 12. 2014 No editing the map after accepting on it!
             string mapSHA1 = Utilities.CalculateSHA1ForFile(mapPath);
             if (mapSHA1 != currentMap.SHA1)
             {

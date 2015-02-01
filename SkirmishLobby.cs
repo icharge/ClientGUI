@@ -99,6 +99,8 @@ namespace ClientGUI
         Font coopBriefingFont;
         Color coopBriefingForeColor;
 
+        Color cListBoxFocusColor;
+
         /// <summary>
         /// Sets up the theme of the skirmish lobby and performs initialization.
         /// </summary>
@@ -340,6 +342,9 @@ namespace ClientGUI
             coopBriefingForeColor = Color.FromArgb(255, Convert.ToInt32(briefingForeColor[0]),
                 Convert.ToInt32(briefingForeColor[1]), Convert.ToInt32(briefingForeColor[2]));
 
+            string[] listBoxFocusColor = DomainController.Instance().getListBoxFocusColor().Split(',');
+            cListBoxFocusColor = Color.FromArgb(Convert.ToByte(listBoxFocusColor[0]), Convert.ToByte(listBoxFocusColor[1]), Convert.ToByte(listBoxFocusColor[2]));
+
             int displayedItems = lbMapList.DisplayRectangle.Height / lbMapList.ItemHeight;
 
             customScrollbar1.ThumbBottomImage = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "sbThumbBottom.png");
@@ -413,6 +418,8 @@ namespace ClientGUI
                     chkBox.Name = checkBoxName;
                     if (defaultValue)
                         chkBox.Checked = true;
+                    else
+                        chkBox.Checked = false;
 
                     if (!String.IsNullOrEmpty(toolTip))
                     {
@@ -562,6 +569,8 @@ namespace ClientGUI
             this.ClientSize = new Size(sizeX, sizeY);
             this.Location = new Point((Screen.PrimaryScreen.Bounds.Width - this.Size.Width) / 2,
                 (Screen.PrimaryScreen.Bounds.Height - this.Size.Height) / 2);
+
+            SharedUILogic.ParseClientThemeIni(this);
 
             lbMapList.Select();
         }
@@ -787,10 +796,22 @@ namespace ClientGUI
         /// </summary>
         private void cmbPXColor_DrawItem(object sender, DrawItemEventArgs e)
         {
-            e.DrawBackground();
-            e.DrawFocusRectangle();
             if (e.Index > -1 && e.Index < cmbP1Color.Items.Count)
+            {
+                if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
+                    e = new DrawItemEventArgs(e.Graphics,
+                                              e.Font,
+                                              e.Bounds,
+                                              e.Index,
+                                              e.State ^ DrawItemState.Selected,
+                                              e.ForeColor,
+                                              cListBoxFocusColor);
+
+                e.DrawBackground();
+                e.DrawFocusRectangle();
+
                 e.Graphics.DrawString(cmbP1Color.Items[e.Index].ToString(), e.Font, new SolidBrush(MPColors[e.Index]), e.Bounds);
+            }
         }
 
         /// <summary>
@@ -799,14 +820,22 @@ namespace ClientGUI
         private void cmbGeneric_DrawItem(object sender, DrawItemEventArgs e)
         {
             LimitedComboBox comboBox = (LimitedComboBox)sender;
-            e.DrawBackground();
-            e.DrawFocusRectangle();
             if (e.Index > -1 && e.Index < comboBox.Items.Count)
             {
-                if (comboBox.HoveredIndex != e.Index)
-                    e.Graphics.DrawString(comboBox.Items[e.Index].ToString(), e.Font, new SolidBrush(comboBox.ForeColor), e.Bounds);
-                else
-                    e.Graphics.DrawString(comboBox.Items[e.Index].ToString(), e.Font, new SolidBrush(Color.White), e.Bounds);
+                if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
+                    e = new DrawItemEventArgs(e.Graphics,
+                                              e.Font,
+                                              e.Bounds,
+                                              e.Index,
+                                              e.State ^ DrawItemState.Selected,
+                                              e.ForeColor,
+                                              cListBoxFocusColor);
+
+                e.DrawBackground();
+                e.DrawFocusRectangle();
+
+                e.Graphics.DrawString(comboBox.Items[e.Index].ToString(), e.Font,
+                    new SolidBrush(comboBox.ForeColor), e.Bounds);
             }
         }
 
@@ -1778,10 +1807,20 @@ namespace ClientGUI
 
         private void lbMapList_DrawItem(object sender, DrawItemEventArgs e)
         {
-            e.DrawBackground();
-            e.DrawFocusRectangle();
             if (e.Index > -1 && e.Index < lbMapList.Items.Count)
             {
+                if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
+                    e = new DrawItemEventArgs(e.Graphics,
+                                              e.Font,
+                                              e.Bounds,
+                                              e.Index,
+                                              e.State ^ DrawItemState.Selected,
+                                              e.ForeColor,
+                                              cListBoxFocusColor);
+
+                e.DrawBackground();
+                e.DrawFocusRectangle();
+
                 Color foreColor = lbMapList.ForeColor;
                 e.Graphics.DrawString(lbMapList.Items[e.Index].ToString(), e.Font, new SolidBrush(foreColor), e.Bounds);
             }

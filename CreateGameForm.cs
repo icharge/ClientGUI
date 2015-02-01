@@ -104,6 +104,8 @@ namespace ClientGUI
             cmbMaxPlayers.SelectedIndex = 0;
             tbGameName.Text = ProgramConstants.CNCNET_PLAYERNAME + "'s Game";
 
+            SharedUILogic.ParseClientThemeIni(this);
+
             Tunnels = CnCNetTunnel.GetTunnels();
             bool pingCustomTunnels = DomainController.Instance().getCustomTunnelPingStatus();
             int lowestPingId = -1;

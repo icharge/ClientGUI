@@ -111,6 +111,8 @@ namespace ClientGUI
         Image btn92px_c;
         Image btn121px;
         Image btn121px_c;
+        Image btn142px;
+        Image btn142px_c;
         Image btnHideChannelsUp;
         Image btnHideChannelsDown;
 
@@ -260,23 +262,17 @@ namespace ClientGUI
                     break;
             }
 
-            string[] adminNameColor = DomainController.Instance().getAdminNameColor().Split(',');
-            cAdminNameColor = Color.FromArgb(Convert.ToByte(adminNameColor[0]), Convert.ToByte(adminNameColor[1]), Convert.ToByte(adminNameColor[2]));
+            cAdminNameColor = SharedUILogic.getColorFromString(DomainController.Instance().getAdminNameColor());
 
-            string[] playerNameColor = DomainController.Instance().getPlayerNameColor().Split(',');
-            cPlayerNameColor = Color.FromArgb(Convert.ToByte(playerNameColor[0]), Convert.ToByte(playerNameColor[1]), Convert.ToByte(playerNameColor[2]));
+            cPlayerNameColor = SharedUILogic.getColorFromString(DomainController.Instance().getPlayerNameColor());
 
-            string[] defChatColor = DomainController.Instance().getDefaultChatColor().Split(',');
-            cDefaultChatColor = Color.FromArgb(Convert.ToByte(defChatColor[0]), Convert.ToByte(defChatColor[1]), Convert.ToByte(defChatColor[2]));
+            cDefaultChatColor = SharedUILogic.getColorFromString(DomainController.Instance().getDefaultChatColor());
 
-            string[] pmOtherUserColorString = DomainController.Instance().getReceivedPMColor().Split(',');
-            cPmOtherUserColor = Color.FromArgb(Convert.ToByte(pmOtherUserColorString[0]), Convert.ToByte(pmOtherUserColorString[1]), Convert.ToByte(pmOtherUserColorString[2]));
+            cPmOtherUserColor = SharedUILogic.getColorFromString(DomainController.Instance().getReceivedPMColor());
 
-            string[] lockedGameColor = DomainController.Instance().getLockedGameColor().Split(',');
-            cLockedGameColor = Color.FromArgb(Convert.ToByte(lockedGameColor[0]), Convert.ToByte(lockedGameColor[1]), Convert.ToByte(lockedGameColor[2]));
+            cLockedGameColor = SharedUILogic.getColorFromString(DomainController.Instance().getLockedGameColor());
 
-            string[] listBoxFocusColor = DomainController.Instance().getListBoxFocusColor().Split(',');
-            cListBoxFocusColor = Color.FromArgb(Convert.ToByte(listBoxFocusColor[0]), Convert.ToByte(listBoxFocusColor[1]), Convert.ToByte(listBoxFocusColor[2]));
+            cListBoxFocusColor = SharedUILogic.getColorFromString(DomainController.Instance().getListBoxFocusColor());
 
             ChatColors.Add(cDefaultChatColor);
             ChatColors.Add(cDefaultChatColor);
@@ -316,8 +312,7 @@ namespace ClientGUI
             if (savedChatColor > -1)
                 cmbMessageColor.SelectedIndex = savedChatColor;
 
-            string[] labelColor = DomainController.Instance().getUILabelColor().Split(',');
-            Color cLabelColor = Color.FromArgb(Convert.ToByte(labelColor[0]), Convert.ToByte(labelColor[1]), Convert.ToByte(labelColor[2]));
+            Color cLabelColor = SharedUILogic.getColorFromString(DomainController.Instance().getUILabelColor());
             lblMessageColor.ForeColor = cLabelColor;
             lblFollowChannels.ForeColor = cLabelColor;
             lblGameInfo.ForeColor = cLabelColor;
@@ -349,8 +344,7 @@ namespace ClientGUI
             chkChannelTO.BaseColor = cLabelColor;
             chkChannelTS.BaseColor = cLabelColor;
 
-            string[] altUiColor = DomainController.Instance().getUIAltColor().Split(',');
-            Color cAltUiColor = Color.FromArgb(Convert.ToByte(altUiColor[0]), Convert.ToByte(altUiColor[1]), Convert.ToByte(altUiColor[2]));
+            Color cAltUiColor = SharedUILogic.getColorFromString(DomainController.Instance().getUIAltColor());
             chkChannelCnCNet.HoverColor = cAltUiColor;
             chkChannelDTA.HoverColor = cAltUiColor;
             chkChannelTI.HoverColor = cAltUiColor;
@@ -369,8 +363,7 @@ namespace ClientGUI
             cmbCurrentChannel.ForeColor = cAltUiColor;
             cmbMessageColor.ForeColor = cAltUiColor;
 
-            string[] backgroundColor = DomainController.Instance().getUIAltBackgroundColor().Split(',');
-            Color cBackColor = Color.FromArgb(Convert.ToByte(backgroundColor[0]), Convert.ToByte(backgroundColor[1]), Convert.ToByte(backgroundColor[2]));
+            Color cBackColor = SharedUILogic.getColorFromString(DomainController.Instance().getUIAltBackgroundColor());
             btnJoinGame.BackColor = cBackColor;
             btnNewGame.BackColor = cBackColor;
             btnReturnToMenu.BackColor = cBackColor;
@@ -393,6 +386,9 @@ namespace ClientGUI
             btn121px = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "121pxbtn.png");
             btn121px_c = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "121pxbtn_c.png");
 
+            btn142px = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "142pxbtn.png");
+            btn142px_c = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "142pxbtn_c.png");
+
             btnHideChannelsUp = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "hideChannels_Up.png");
             btnHideChannelsDown = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "hideChannels_Down.png");
 
@@ -408,7 +404,7 @@ namespace ClientGUI
             btnJoinGame.BackgroundImage = btn92px;
             btnMusicToggle.BackgroundImage = btn92px;
 
-            btnReturnToMenu.BackgroundImage = btn121px;
+            btnReturnToMenu.BackgroundImage = btn142px;
 
             btnHideChannels.BackgroundImage = btnHideChannelsUp;
 
@@ -480,6 +476,8 @@ namespace ClientGUI
             timer.Start();
 
             this.Text = string.Format("[{0}] CnCNet Lobby ({1} / {2})", myGame, ProgramConstants.GAME_VERSION, Application.ProductVersion);
+
+            SharedUILogic.ParseClientThemeIni(this);
 
             // Needs to be called once initialization is complete.
             CnCNetData.ConnectionBridge.DoUIInitialized();
@@ -1881,7 +1879,21 @@ namespace ClientGUI
             e.DrawBackground();
             e.DrawFocusRectangle();
             if (e.Index > -1 && e.Index < cmbMessageColor.Items.Count)
+            {
+                if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
+                    e = new DrawItemEventArgs(e.Graphics,
+                                              e.Font,
+                                              e.Bounds,
+                                              e.Index,
+                                              e.State ^ DrawItemState.Selected,
+                                              e.ForeColor,
+                                              cListBoxFocusColor);
+
+                e.DrawBackground();
+                e.DrawFocusRectangle();
+
                 e.Graphics.DrawString(cmbMessageColor.Items[e.Index].ToString(), e.Font, new SolidBrush(ChatColors[e.Index + 2]), e.Bounds);
+            }
         }
 
         /// <summary>
@@ -2067,13 +2079,13 @@ namespace ClientGUI
 
         private void btnReturnToMenu_MouseEnter(object sender, EventArgs e)
         {
-            btnReturnToMenu.BackgroundImage = btn121px_c;
+            btnReturnToMenu.BackgroundImage = btn142px_c;
             sp.Play();
         }
 
         private void btnReturnToMenu_MouseLeave(object sender, EventArgs e)
         {
-            btnReturnToMenu.BackgroundImage = btn121px;
+            btnReturnToMenu.BackgroundImage = btn142px;
         }
 
         /// <summary>
@@ -2604,18 +2616,22 @@ namespace ClientGUI
         /// </summary>
         private void cmbCurrentChannel_DrawItem(object sender, DrawItemEventArgs e)
         {
-            e.DrawBackground();
-            e.DrawFocusRectangle();
             if (e.Index > -1 && e.Index < cmbCurrentChannel.Items.Count)
             {
-                if (cmbCurrentChannel.HoveredIndex != e.Index)
-                {
-                    e.Graphics.DrawString(cmbCurrentChannel.Items[e.Index].ToString(), e.Font,
-                        new SolidBrush(cmbCurrentChannel.ForeColor), e.Bounds);
-                }
-                else
-                    e.Graphics.DrawString(cmbCurrentChannel.Items[e.Index].ToString(), e.Font,
-                        new SolidBrush(Color.White), e.Bounds);
+                if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
+                    e = new DrawItemEventArgs(e.Graphics,
+                                              e.Font,
+                                              e.Bounds,
+                                              e.Index,
+                                              e.State ^ DrawItemState.Selected,
+                                              e.ForeColor,
+                                              cListBoxFocusColor);
+
+                e.DrawBackground();
+                e.DrawFocusRectangle();
+
+                e.Graphics.DrawString(cmbCurrentChannel.Items[e.Index].ToString(), e.Font,
+                    new SolidBrush(cmbCurrentChannel.ForeColor), e.Bounds);
             }
         }
 

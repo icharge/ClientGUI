@@ -447,7 +447,7 @@
             // 
             this.cmbP8Start.BackColor = System.Drawing.Color.Black;
             this.cmbP8Start.CanDropDown = true;
-            this.cmbP8Start.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.cmbP8Start.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbP8Start.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbP8Start.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbP8Start.ForeColor = System.Drawing.Color.LimeGreen;
@@ -476,7 +476,7 @@
             // 
             this.cmbP7Start.BackColor = System.Drawing.Color.Black;
             this.cmbP7Start.CanDropDown = true;
-            this.cmbP7Start.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.cmbP7Start.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbP7Start.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbP7Start.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbP7Start.ForeColor = System.Drawing.Color.LimeGreen;
@@ -506,7 +506,7 @@
             // 
             this.cmbP6Start.BackColor = System.Drawing.Color.Black;
             this.cmbP6Start.CanDropDown = true;
-            this.cmbP6Start.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.cmbP6Start.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbP6Start.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbP6Start.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbP6Start.ForeColor = System.Drawing.Color.LimeGreen;
@@ -535,7 +535,7 @@
             // 
             this.cmbP5Start.BackColor = System.Drawing.Color.Black;
             this.cmbP5Start.CanDropDown = true;
-            this.cmbP5Start.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.cmbP5Start.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbP5Start.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbP5Start.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbP5Start.ForeColor = System.Drawing.Color.LimeGreen;
@@ -565,7 +565,7 @@
             // 
             this.cmbP4Start.BackColor = System.Drawing.Color.Black;
             this.cmbP4Start.CanDropDown = true;
-            this.cmbP4Start.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.cmbP4Start.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbP4Start.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbP4Start.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbP4Start.ForeColor = System.Drawing.Color.LimeGreen;
@@ -594,7 +594,7 @@
             // 
             this.cmbP3Start.BackColor = System.Drawing.Color.Black;
             this.cmbP3Start.CanDropDown = true;
-            this.cmbP3Start.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.cmbP3Start.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbP3Start.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbP3Start.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbP3Start.ForeColor = System.Drawing.Color.LimeGreen;
@@ -624,7 +624,7 @@
             // 
             this.cmbP2Start.BackColor = System.Drawing.Color.Black;
             this.cmbP2Start.CanDropDown = true;
-            this.cmbP2Start.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.cmbP2Start.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbP2Start.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbP2Start.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbP2Start.ForeColor = System.Drawing.Color.LimeGreen;
@@ -653,7 +653,7 @@
             // 
             this.cmbP1Start.BackColor = System.Drawing.Color.Black;
             this.cmbP1Start.CanDropDown = true;
-            this.cmbP1Start.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.cmbP1Start.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbP1Start.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbP1Start.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbP1Start.ForeColor = System.Drawing.Color.LimeGreen;
@@ -683,7 +683,7 @@
             // 
             this.cmbP8Team.BackColor = System.Drawing.Color.Black;
             this.cmbP8Team.CanDropDown = true;
-            this.cmbP8Team.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.cmbP8Team.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbP8Team.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbP8Team.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbP8Team.ForeColor = System.Drawing.Color.LimeGreen;
@@ -707,7 +707,7 @@
             // 
             this.cmbP8Color.BackColor = System.Drawing.Color.Black;
             this.cmbP8Color.CanDropDown = true;
-            this.cmbP8Color.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.cmbP8Color.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbP8Color.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbP8Color.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbP8Color.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
@@ -727,7 +727,7 @@
             // 
             this.cmbP8Side.BackColor = System.Drawing.Color.Black;
             this.cmbP8Side.CanDropDown = true;
-            this.cmbP8Side.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.cmbP8Side.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbP8Side.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbP8Side.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbP8Side.ForeColor = System.Drawing.Color.LimeGreen;
@@ -745,7 +745,7 @@
             // 
             this.cmbP7Team.BackColor = System.Drawing.Color.Black;
             this.cmbP7Team.CanDropDown = true;
-            this.cmbP7Team.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.cmbP7Team.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbP7Team.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbP7Team.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbP7Team.ForeColor = System.Drawing.Color.LimeGreen;
@@ -770,7 +770,7 @@
             // 
             this.cmbP7Color.BackColor = System.Drawing.Color.Black;
             this.cmbP7Color.CanDropDown = true;
-            this.cmbP7Color.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.cmbP7Color.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbP7Color.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbP7Color.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbP7Color.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
@@ -791,7 +791,7 @@
             // 
             this.cmbP7Side.BackColor = System.Drawing.Color.Black;
             this.cmbP7Side.CanDropDown = true;
-            this.cmbP7Side.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.cmbP7Side.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbP7Side.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbP7Side.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbP7Side.ForeColor = System.Drawing.Color.LimeGreen;
@@ -810,7 +810,7 @@
             // 
             this.cmbP6Team.BackColor = System.Drawing.Color.Black;
             this.cmbP6Team.CanDropDown = true;
-            this.cmbP6Team.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.cmbP6Team.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbP6Team.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbP6Team.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbP6Team.ForeColor = System.Drawing.Color.LimeGreen;
@@ -834,7 +834,7 @@
             // 
             this.cmbP6Color.BackColor = System.Drawing.Color.Black;
             this.cmbP6Color.CanDropDown = true;
-            this.cmbP6Color.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.cmbP6Color.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbP6Color.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbP6Color.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbP6Color.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
@@ -854,7 +854,7 @@
             // 
             this.cmbP6Side.BackColor = System.Drawing.Color.Black;
             this.cmbP6Side.CanDropDown = true;
-            this.cmbP6Side.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.cmbP6Side.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbP6Side.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbP6Side.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbP6Side.ForeColor = System.Drawing.Color.LimeGreen;
@@ -872,7 +872,7 @@
             // 
             this.cmbP5Team.BackColor = System.Drawing.Color.Black;
             this.cmbP5Team.CanDropDown = true;
-            this.cmbP5Team.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.cmbP5Team.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbP5Team.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbP5Team.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbP5Team.ForeColor = System.Drawing.Color.LimeGreen;
@@ -897,7 +897,7 @@
             // 
             this.cmbP5Color.BackColor = System.Drawing.Color.Black;
             this.cmbP5Color.CanDropDown = true;
-            this.cmbP5Color.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.cmbP5Color.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbP5Color.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbP5Color.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbP5Color.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
@@ -918,7 +918,7 @@
             // 
             this.cmbP5Side.BackColor = System.Drawing.Color.Black;
             this.cmbP5Side.CanDropDown = true;
-            this.cmbP5Side.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.cmbP5Side.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbP5Side.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbP5Side.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbP5Side.ForeColor = System.Drawing.Color.LimeGreen;
@@ -937,7 +937,7 @@
             // 
             this.cmbP4Team.BackColor = System.Drawing.Color.Black;
             this.cmbP4Team.CanDropDown = true;
-            this.cmbP4Team.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.cmbP4Team.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbP4Team.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbP4Team.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbP4Team.ForeColor = System.Drawing.Color.LimeGreen;
@@ -961,7 +961,7 @@
             // 
             this.cmbP4Color.BackColor = System.Drawing.Color.Black;
             this.cmbP4Color.CanDropDown = true;
-            this.cmbP4Color.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.cmbP4Color.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbP4Color.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbP4Color.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbP4Color.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
@@ -981,7 +981,7 @@
             // 
             this.cmbP4Side.BackColor = System.Drawing.Color.Black;
             this.cmbP4Side.CanDropDown = true;
-            this.cmbP4Side.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.cmbP4Side.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbP4Side.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbP4Side.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbP4Side.ForeColor = System.Drawing.Color.LimeGreen;
@@ -999,7 +999,7 @@
             // 
             this.cmbP3Team.BackColor = System.Drawing.Color.Black;
             this.cmbP3Team.CanDropDown = true;
-            this.cmbP3Team.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.cmbP3Team.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbP3Team.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbP3Team.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbP3Team.ForeColor = System.Drawing.Color.LimeGreen;
@@ -1024,7 +1024,7 @@
             // 
             this.cmbP3Color.BackColor = System.Drawing.Color.Black;
             this.cmbP3Color.CanDropDown = true;
-            this.cmbP3Color.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.cmbP3Color.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbP3Color.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbP3Color.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbP3Color.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
@@ -1045,7 +1045,7 @@
             // 
             this.cmbP3Side.BackColor = System.Drawing.Color.Black;
             this.cmbP3Side.CanDropDown = true;
-            this.cmbP3Side.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.cmbP3Side.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbP3Side.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbP3Side.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbP3Side.ForeColor = System.Drawing.Color.LimeGreen;
@@ -1064,7 +1064,7 @@
             // 
             this.cmbP2Team.BackColor = System.Drawing.Color.Black;
             this.cmbP2Team.CanDropDown = true;
-            this.cmbP2Team.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.cmbP2Team.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbP2Team.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbP2Team.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbP2Team.ForeColor = System.Drawing.Color.LimeGreen;
@@ -1088,7 +1088,7 @@
             // 
             this.cmbP2Color.BackColor = System.Drawing.Color.Black;
             this.cmbP2Color.CanDropDown = true;
-            this.cmbP2Color.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.cmbP2Color.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbP2Color.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbP2Color.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbP2Color.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
@@ -1108,7 +1108,7 @@
             // 
             this.cmbP2Side.BackColor = System.Drawing.Color.Black;
             this.cmbP2Side.CanDropDown = true;
-            this.cmbP2Side.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.cmbP2Side.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbP2Side.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbP2Side.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbP2Side.ForeColor = System.Drawing.Color.LimeGreen;
@@ -1126,7 +1126,7 @@
             // 
             this.cmbP1Team.BackColor = System.Drawing.Color.Black;
             this.cmbP1Team.CanDropDown = true;
-            this.cmbP1Team.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.cmbP1Team.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbP1Team.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbP1Team.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbP1Team.ForeColor = System.Drawing.Color.LimeGreen;
@@ -1151,7 +1151,7 @@
             // 
             this.cmbP1Color.BackColor = System.Drawing.Color.Black;
             this.cmbP1Color.CanDropDown = true;
-            this.cmbP1Color.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.cmbP1Color.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbP1Color.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbP1Color.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbP1Color.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
@@ -1172,7 +1172,7 @@
             // 
             this.cmbP1Side.BackColor = System.Drawing.Color.Black;
             this.cmbP1Side.CanDropDown = true;
-            this.cmbP1Side.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.cmbP1Side.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbP1Side.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbP1Side.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbP1Side.ForeColor = System.Drawing.Color.LimeGreen;
@@ -1228,7 +1228,7 @@
             // cmbCurrGameMode
             // 
             this.cmbCurrGameMode.CanDropDown = true;
-            this.cmbCurrGameMode.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.cmbCurrGameMode.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbCurrGameMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbCurrGameMode.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbCurrGameMode.FormattingEnabled = true;
