@@ -1,5 +1,5 @@
 ﻿/// @author Rampastring
-/// @version 8. 2. 2014
+/// @version 8. 2. 2015
 /// http://www.moddb.com/members/rampastring
 
 using System;
