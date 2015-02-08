@@ -855,7 +855,7 @@ namespace ClientGUI
         {
             if (lbChatBox.InvokeRequired)
             {
-                MapCallback d = new MapCallback(MapSharer_OnMapUploadFailed);
+                MapCallback d = new MapCallback(MapSharer_OnMapUploadComplete);
                 this.BeginInvoke(d, map);
                 return;
             }
@@ -886,6 +886,11 @@ namespace ClientGUI
             CnCNetData.ConnectionBridge.SendMessage(msgToSend);
         }
 
+        /// <summary>
+        /// Run when the map sharer has finished downloading a map.
+        /// </summary>
+        /// <param name="sha1">The SHA1 of the map.</param>
+        /// <param name="filePath">The map's file name.</param>
         private void MapSharer_OnMapDownloadComplete(string sha1, string filePath)
         {
             if (lbChatBox.InvokeRequired)
@@ -1348,7 +1353,12 @@ namespace ClientGUI
                     }
                     initialId = CheckBoxes.Count + ComboBoxes.Count;
                     string mapSHA1 = parts[initialId];
+
                     Map map = getMapFromSHA1(mapSHA1);
+
+                    string gameMode = parts[initialId + 1];
+                    currentGameMode = gameMode;
+
                     if (map == null)
                     {
                         lblMapName.Text = "Map: Unknown";
@@ -1362,6 +1372,8 @@ namespace ClientGUI
                         btnLaunchGame.Enabled = false; // Prevent ready
                         pbPreview.BackgroundImage = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "nopreview.png");
 
+                        lblGameMode.Text = "Game Mode: " + gameMode;
+
                         return;
                     }
                     else
@@ -1372,7 +1384,7 @@ namespace ClientGUI
                         LoadPreview();
                         btnLaunchGame.Enabled = true;
                     }
-                    string gameMode = parts[initialId + 1];
+
                     if (CnCNetData.GameTypes.Contains(gameMode))
                     {
                         if (map.GameModes.Contains(gameMode))
@@ -1385,7 +1397,7 @@ namespace ClientGUI
                             return;
                         }
                     }
-                    currentGameMode = gameMode;
+
                     LockOptions();
                     int seed = Convert.ToInt32(parts[initialId + 2]);
                     Seed = seed;

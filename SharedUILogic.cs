@@ -749,7 +749,7 @@ namespace ClientGUI
             }
 
             // Draw co-op mission briefing if we should do so
-            if (map.IsCoop && !String.IsNullOrEmpty(map.Briefing) && displayCoopBriefing)
+            if (!String.IsNullOrEmpty(map.Briefing) && displayCoopBriefing)
             {
                 int briefingBoxY = (imageRectangle.Height - COOP_BRIEFING_HEIGHT) / 2;
                 int briefingBoxX = (imageRectangle.Width - COOP_BRIEFING_WIDTH) / 2;
