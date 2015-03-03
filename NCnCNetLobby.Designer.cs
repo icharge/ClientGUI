@@ -580,7 +580,9 @@
             this.lbChatMessages.TabIndex = 10;
             this.lbChatMessages.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.lbChatMessages_DrawItem);
             this.lbChatMessages.MeasureItem += new System.Windows.Forms.MeasureItemEventHandler(this.lbChatMessages_MeasureItem);
+            this.lbChatMessages.DoubleClick += new System.EventHandler(this.lbChatMessages_DoubleClick);
             this.lbChatMessages.KeyDown += new System.Windows.Forms.KeyEventHandler(this.lbChatMessages_KeyDown);
+            this.lbChatMessages.MouseMove += new System.Windows.Forms.MouseEventHandler(this.lbChatMessages_MouseMove);
             // 
             // lbPlayerList
             // 

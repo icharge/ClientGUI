@@ -1,6 +1,6 @@
 ﻿/// @author Rampastring
 /// http://www.moddb.com/members/rampastring
-/// @version 23. 1. 2015
+/// @version 3. 3. 2015
 
 using System;
 using System.Collections.Generic;
@@ -42,6 +42,8 @@ namespace ClientGUI
 
         public delegate void ColorChangedEventHandler(int colorId);
         public static event ColorChangedEventHandler OnColorChanged;
+
+        FormWindowState oldWindowState = FormWindowState.Normal;
 
         public static void DoConversationOpened(string userName)
         {
@@ -241,7 +243,7 @@ namespace ClientGUI
             sp = new SoundPlayer(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "button.wav");
             sndGameCreated = new SoundPlayer(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "gamecreated.wav");
 
-            this.Icon = Icon.ExtractAssociatedIcon(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "clienticon.ico");
+            this.Icon = Icon.ExtractAssociatedIcon(ProgramConstants.gamepath + "Resources\\cncnet.ico");
             this.BackgroundImage = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "cncnetlobbybg.png");
 
             string backgroundImageLayout = DomainController.Instance().getCnCNetLobbyBackgroundImageLayout();
@@ -616,7 +618,7 @@ namespace ClientGUI
         private void CnCNetData_OnGameLobbyClosed()
         {
             if (this.WindowState == FormWindowState.Minimized)
-                this.WindowState = FormWindowState.Normal;
+                this.WindowState = oldWindowState;
 
             CnCNetData.ConnectionBridge.SendMessage("AWAY");
 
@@ -1352,6 +1354,7 @@ namespace ClientGUI
                         false, ChatColors, cDefaultChatColor, cmbMessageColor.SelectedIndex + 2);
                     gameLobbyWindow.Show();
                     CnCNetData.ConnectionBridge.SendMessage("AWAY " + weirdChar1 + "In game [" + myGame.ToUpper() + "] " + game.RoomName);
+                    oldWindowState = this.WindowState;
                     this.WindowState = FormWindowState.Minimized;
                     joinGameChannelName = String.Empty;
                 }
@@ -1634,6 +1637,11 @@ namespace ClientGUI
             Logger.Log("Saving settings.");
 
             DomainController.Instance().saveCnCNetColorSetting(cmbMessageColor.SelectedIndex);
+            DomainController.Instance().saveChannelSettings(
+                chkChannelDTA.Checked,
+                chkChannelTI.Checked,
+                chkChannelTS.Enabled,
+                chkChannelCnCNet.Enabled);
         }
 
         /// <summary>
@@ -1838,8 +1846,8 @@ namespace ClientGUI
         private void lbChatMessages_MeasureItem(object sender, MeasureItemEventArgs e)
         {
             e.ItemHeight = (int)e.Graphics.MeasureString(lbChatMessages.Items[e.Index].ToString(),
-                lbChatMessages.Font, lbChatMessages.Width).Height;
-            e.ItemWidth = lbChatMessages.Width;
+                lbChatMessages.Font, lbChatMessages.Width - sbChat.Width).Height;
+            e.ItemWidth = lbChatMessages.Width - sbChat.Width;
         }
 
         /// <summary>
@@ -2141,6 +2149,7 @@ namespace ClientGUI
                 gameLobbyWindow.Initialize(cgf.rtnTunnelAddress, cgf.rtnTunnelPort);
                 CnCNetData.ConnectionBridge.SendMessage("AWAY " + weirdChar1 + "In game [" + myGame.ToUpper() + "] " + cgf.rtnGameRoomName);
                 BroadcastGameCreation();
+                oldWindowState = this.WindowState;
                 this.WindowState = FormWindowState.Minimized;
                 cgf.Dispose();
             }
@@ -2776,6 +2785,57 @@ namespace ClientGUI
             e.ItemHeight = (int)e.Graphics.MeasureString("@g",
                 lbGameList.Font, lbGameList.Width).Height;
             e.ItemWidth = lbGameList.Width;
+        }
+
+        /// <summary>
+        /// Opens a URL from the chat message list box if the double-clicked item contains a URL.
+        /// </summary>
+        private void lbChatMessages_DoubleClick(object sender, EventArgs e)
+        {
+            if (lbChatMessages.SelectedIndex < 0)
+                return;
+
+            string selectedItem = lbChatMessages.SelectedItem.ToString();
+
+            int index = selectedItem.IndexOf("http://");
+            if (index == -1)
+                index = selectedItem.IndexOf("ftp://");
+
+            if (index == -1)
+                return; // No link found
+
+            string link = selectedItem.Substring(index);
+            link = link.Split(' ')[0]; // Nuke any words coming after the link
+
+            Process.Start(link);
+        }
+
+        /// <summary>
+        /// Used for changing the mouse cursor image when it enters a URL
+        /// in the chat message list box.
+        /// </summary>
+        private void lbChatMessages_MouseMove(object sender, MouseEventArgs e)
+        {
+            // Determine hovered item index
+            Point mousePosition = lbChatMessages.PointToClient(ListBox.MousePosition);
+            int hoveredIndex = lbChatMessages.IndexFromPoint(mousePosition);
+
+            if (hoveredIndex == -1)
+            {
+                lbChatMessages.Cursor = Cursors.Default;
+                return;
+            }
+
+            string item = lbChatMessages.Items[hoveredIndex].ToString();
+
+            int urlStartIndex = item.IndexOf("http://");
+            if (urlStartIndex == -1)
+                urlStartIndex = item.IndexOf("ftp://");
+
+            if (urlStartIndex > -1)
+                lbChatMessages.Cursor = Cursors.Hand;
+            else
+                lbChatMessages.Cursor = Cursors.Default;
         }
     }
 }

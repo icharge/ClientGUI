@@ -16,7 +16,8 @@ namespace ClientGUI
         delegate void DualStringDelegate(string message, string sender);
 
         List<Color> MessageColors = new List<Color>();
-        Color receivedPMColor;
+        Color cReceivedPMColor;
+        Color cListBoxFocusColor;
 
         string defRecipient = String.Empty;
 
@@ -29,7 +30,7 @@ namespace ClientGUI
 
         private void PrivateMessageForm_Load(object sender, EventArgs e)
         {
-            this.Icon = Icon.ExtractAssociatedIcon(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "clienticon.ico");
+            this.Icon = Icon.ExtractAssociatedIcon(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "pm.ico");
             this.BackgroundImage = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "privatemessagebg.png");
 
             this.Font = SharedLogic.getCommonFont();
@@ -53,7 +54,10 @@ namespace ClientGUI
             btnSend.BackColor = cBackColor;
 
             string[] receivedColor = DomainController.Instance().getReceivedPMColor().Split(',');
-            receivedPMColor = Color.FromArgb(Convert.ToByte(receivedColor[0]), Convert.ToByte(receivedColor[1]), Convert.ToByte(receivedColor[2]));
+            cReceivedPMColor = Color.FromArgb(Convert.ToByte(receivedColor[0]), Convert.ToByte(receivedColor[1]), Convert.ToByte(receivedColor[2]));
+
+            string[] listBoxFocusColor = DomainController.Instance().getListBoxFocusColor().Split(',');
+            cListBoxFocusColor = Color.FromArgb(Convert.ToByte(listBoxFocusColor[0]), Convert.ToByte(listBoxFocusColor[1]), Convert.ToByte(listBoxFocusColor[2]));
 
             foreach (PrivateMessageInfo pmInfo in CnCNetData.PMInfos)
             {
@@ -98,7 +102,7 @@ namespace ClientGUI
             tbChatMessage.Focus();
         }
 
-        void Instance_OnAwayMessageReceived(string userName, string reason)
+        private void Instance_OnAwayMessageReceived(string userName, string reason)
         {
             if (this.InvokeRequired)
             {
@@ -147,18 +151,30 @@ namespace ClientGUI
             return -1;
         }
 
-        void lbChatMessages_MeasureItem(object sender, MeasureItemEventArgs e)
+        private void lbChatMessages_MeasureItem(object sender, MeasureItemEventArgs e)
         {
             e.ItemHeight = (int)e.Graphics.MeasureString(lbChatMessages.Items[e.Index].ToString(),
                 lbChatMessages.Font, lbChatMessages.Width - 10).Height;
         }
 
-        void lbChatMessages_DrawItem(object sender, DrawItemEventArgs e)
+        private void lbChatMessages_DrawItem(object sender, DrawItemEventArgs e)
         {
-            e.DrawBackground();
-            e.DrawFocusRectangle();
             if (e.Index > -1 && e.Index < lbChatMessages.Items.Count)
+            {
+                if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
+                    e = new DrawItemEventArgs(e.Graphics,
+                                              e.Font,
+                                              e.Bounds,
+                                              e.Index,
+                                              e.State ^ DrawItemState.Selected,
+                                              e.ForeColor,
+                                              cListBoxFocusColor);
+
+                e.DrawBackground();
+                e.DrawFocusRectangle();
+
                 e.Graphics.DrawString(lbChatMessages.Items[e.Index].ToString(), e.Font, new SolidBrush(MessageColors[e.Index]), e.Bounds);
+            }
         }
 
         private void Instance_PrivateMessageParsed(string message, string sender)
@@ -177,7 +193,7 @@ namespace ClientGUI
             {
                 lbChatMessages.Items.Add("[" + DateTime.Now.ToShortTimeString() + "] " +
                     sender + ": " + message);
-                MessageColors.Add(receivedPMColor);
+                MessageColors.Add(cReceivedPMColor);
                 lbChatMessages.SelectedIndex = lbChatMessages.Items.Count - 1;
                 lbChatMessages.SelectedIndex = -1;
                 Flash();

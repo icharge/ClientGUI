@@ -1605,7 +1605,9 @@
             this.lbChatBox.TabIndex = 81;
             this.lbChatBox.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.lbChatBox_DrawItem);
             this.lbChatBox.MeasureItem += new System.Windows.Forms.MeasureItemEventHandler(this.lbChatBox_MeasureItem);
+            this.lbChatBox.DoubleClick += new System.EventHandler(this.lbChatBox_DoubleClick);
             this.lbChatBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.lbChatBox_KeyDown);
+            this.lbChatBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.lbChatBox_MouseMove);
             // 
             // pbPreview
             // 

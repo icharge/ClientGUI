@@ -56,7 +56,7 @@ namespace ClientGUI
         Image comboBoxArrow;
         Image openedComboBoxArrow;
 
-        private List<Color> ItemColors = new List<Color>();
+        public List<Color> ItemColors = new List<Color>();
 
         int yPos = -1;
         int xPos = -1;

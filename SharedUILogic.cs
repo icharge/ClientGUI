@@ -211,7 +211,6 @@ namespace ClientGUI
                 if (isPlayerSpectator[sLocPId - 1])
                 {
                     PlayerStartingLocs.Add(9);
-                    sLocPId++;
                     continue;
                 }
 

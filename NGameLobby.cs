@@ -1,6 +1,6 @@
 ﻿/// @author Rampastring
 /// http://www.moddb.com/members/rampastring
-/// @version 8. 2. 2015
+/// @version 3. 3. 2015
 
 using System;
 using System.Collections.Generic;
@@ -626,6 +626,14 @@ namespace ClientGUI
                     throw new Exception("No data exists for CheckBox " + checkBoxName + "!");
             }
 
+            Color comboBoxNondefaultColor = getColorFromStringArray(
+                DomainController.Instance().getComboBoxNondefaultColor().Split(','));
+
+            if (comboBoxNondefaultColor.R == 0 &&
+                comboBoxNondefaultColor.G == 0 &&
+                comboBoxNondefaultColor.B == 0)
+                comboBoxNondefaultColor = cAltUiColor;
+
             string[] comboBoxes = clIni.GetStringValue("GameLobby", "ComboBoxes", "none").Split(',');
             foreach (string comboBoxName in comboBoxes)
             {
@@ -657,15 +665,20 @@ namespace ClientGUI
                     cmbBox.Name = comboBoxName;
                     cmbBox.BackColor = cBackColor;
                     cmbBox.ForeColor = cAltUiColor;
-                    foreach (string item in items)
-                        cmbBox.Items.Add(item);
+                    for (int itemId = 0; itemId < items.Length; itemId++)
+                    {
+                        if (itemId == defaultIndex || isHost)
+                            cmbBox.AddItem(items[itemId], cAltUiColor);
+                        else
+                            cmbBox.AddItem(items[itemId], comboBoxNondefaultColor);
+                    }
                     cmbBox.SelectedIndex = defaultIndex;
                     cmbBox.Location = pLocation;
                     if (!isHost)
                         cmbBox.CanDropDown = false;
                     cmbBox.SelectedIndexChanged += new EventHandler(GenericGameOptionChanged);
                     cmbBox.Size = sSize;
-                    cmbBox.DrawMode = DrawMode.OwnerDrawVariable;
+                    cmbBox.DrawMode = DrawMode.OwnerDrawFixed;
                     cmbBox.DrawItem += cmbGeneric_DrawItem;
 
                     if (!String.IsNullOrEmpty(toolTip))
@@ -913,6 +926,7 @@ namespace ClientGUI
                     lblMapName.Text = "Map: " + currentMap.Name;
                     lblMapAuthor.Text = "By " + currentMap.Author;
                     LoadPreview();
+                    btnLaunchGame.Enabled = true;
                 }
             }
             else
@@ -1273,14 +1287,14 @@ namespace ClientGUI
                         return;
                     }
 
-                    int secretColorIndex = -1;
+                    string secretColorName = String.Empty;
                     int secretColorId = 0;
                     int i = 0;
                     foreach (PlayerInfo player in Players)
                     {
                         if (player.ForcedColor > 0)
                         {
-                            secretColorIndex = i;
+                            secretColorName = player.Name;
                             secretColorId = player.ForcedColor;
                         }
                         i++;
@@ -1316,8 +1330,12 @@ namespace ClientGUI
                         Players[plId].Ready = false;
                     }
 
-                    if (secretColorIndex > -1)
-                        Players[secretColorIndex].ForcedColor = secretColorId;
+                    if (!String.IsNullOrEmpty(secretColorName))
+                    {
+                        PlayerInfo player = Players.Find(p => p.Name == secretColorName);
+                        if (player != null)
+                            player.ForcedColor = secretColorId;
+                    }
 
                     CopyPlayerDataToUI();
                 }
@@ -1341,14 +1359,29 @@ namespace ClientGUI
                     for (int chkId = 0; chkId < CheckBoxes.Count; chkId++)
                     {
                         if (Convert.ToBoolean(Convert.ToInt32(parts[chkId])))
+                        {
+                            if (!CheckBoxes[chkId].Checked)
+                                AddNotice("The game host has enabled a game option: " + CheckBoxes[chkId].LabelText);
+
                             CheckBoxes[chkId].Checked = true;
+                        }
                         else
+                        {
+                            if (CheckBoxes[chkId].Checked)
+                                AddNotice("The game host has disabled a game option: " + CheckBoxes[chkId].LabelText);
+
                             CheckBoxes[chkId].Checked = false;
+                        }
                     }
                     int initialId = CheckBoxes.Count;
                     for (int cmbId = 0; cmbId < ComboBoxes.Count; cmbId++)
                     {
                         int index = Convert.ToInt32(parts[initialId + cmbId]);
+                        if (ComboBoxes[cmbId].SelectedIndex != index)
+                        {
+                            // TODO do stuff
+                        }
+
                         ComboBoxes[cmbId].SelectedIndex = index;
                     }
                     initialId = CheckBoxes.Count + ComboBoxes.Count;
@@ -2041,20 +2074,25 @@ namespace ClientGUI
             LimitedComboBox comboBox = (LimitedComboBox)sender;
             if (e.Index > -1 && e.Index < comboBox.Items.Count)
             {
+                Color itemColor = e.ForeColor;
+
+                if (comboBox.ItemColors.Count != 0)
+                    itemColor = comboBox.ItemColors[e.Index];
+
                 if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
                     e = new DrawItemEventArgs(e.Graphics,
                                               e.Font,
                                               e.Bounds,
                                               e.Index,
                                               e.State ^ DrawItemState.Selected,
-                                              e.ForeColor,
+                                              itemColor,
                                               cListBoxFocusColor);
 
                 e.DrawBackground();
                 e.DrawFocusRectangle();
 
                 e.Graphics.DrawString(comboBox.Items[e.Index].ToString(), e.Font,
-                    new SolidBrush(comboBox.ForeColor), e.Bounds);
+                    new SolidBrush(itemColor), e.Bounds);
             }
         }
 
@@ -4048,6 +4086,56 @@ namespace ClientGUI
                 AddNotice("The game room has been unlocked.");
             btnLockGame.Text = "Lock Game";
             CnCNetData.ConnectionBridge.SendMessage(string.Format("MODE {0} -i", ChannelName));
+        }
+
+        /// <summary>
+        /// Opens a link if there is one in the selected item index.
+        /// </summary>
+        private void lbChatBox_DoubleClick(object sender, EventArgs e)
+        {
+            if (lbChatBox.SelectedIndex < 0)
+                return;
+
+            string selectedItem = lbChatBox.SelectedItem.ToString();
+
+            int index = selectedItem.IndexOf("http://");
+            if (index == -1)
+                index = selectedItem.IndexOf("ftp://");
+
+            if (index == -1)
+                return; // No link found
+
+            string link = selectedItem.Substring(index);
+            link = link.Split(' ')[0]; // Nuke any words coming after the link
+
+            Process.Start(link);
+        }
+
+        /// <summary>
+        /// Used for changing the mouse cursor image when it enters a link.
+        /// </summary>
+        private void lbChatBox_MouseMove(object sender, MouseEventArgs e)
+        {
+            // Determine hovered item index
+            Point mousePosition = lbChatBox.PointToClient(ListBox.MousePosition);
+            int hoveredIndex = lbChatBox.IndexFromPoint(mousePosition);
+
+            if (hoveredIndex == -1)
+            {
+                lbChatBox.Cursor = Cursors.Default;
+                return;
+            }
+
+            string item = lbChatBox.Items[hoveredIndex].ToString();
+
+            int urlStartIndex = item.IndexOf("http://");
+            if (urlStartIndex == -1)
+                urlStartIndex = item.IndexOf("ftp://");
+
+            if (urlStartIndex > -1)
+                lbChatBox.Cursor = Cursors.Hand;
+            else
+                lbChatBox.Cursor = Cursors.Default;
         }
     }
 }

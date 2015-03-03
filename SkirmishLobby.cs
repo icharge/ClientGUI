@@ -1605,17 +1605,20 @@ namespace ClientGUI
                 }
 
                 string[] settings = DomainController.Instance().getSkirmishSettings().Split(',');
-                for (int chkId = 0; chkId < CheckBoxes.Count; chkId++)
+                if (settings.Length == CheckBoxes.Count + ComboBoxes.Count)
                 {
-                    CheckBoxes[chkId].Checked = Convert.ToBoolean(Convert.ToInt32(settings[chkId]));
-                }
+                    for (int chkId = 0; chkId < CheckBoxes.Count; chkId++)
+                    {
+                        CheckBoxes[chkId].Checked = Convert.ToBoolean(Convert.ToInt32(settings[chkId]));
+                    }
 
-                updatePlayers = false;
-                for (int cmbId = 0; cmbId < ComboBoxes.Count; cmbId++)
-                {
-                    ComboBoxes[cmbId].SelectedIndex = Convert.ToInt32(settings[CheckBoxes.Count + cmbId]);
+                    updatePlayers = false;
+                    for (int cmbId = 0; cmbId < ComboBoxes.Count; cmbId++)
+                    {
+                        ComboBoxes[cmbId].SelectedIndex = Convert.ToInt32(settings[CheckBoxes.Count + cmbId]);
+                    }
+                    updatePlayers = true;
                 }
-                updatePlayers = true;
 
                 CopyPlayerDataToUI();
             }
