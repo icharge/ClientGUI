@@ -9,7 +9,7 @@ using System.IO;
 using System.Windows.Forms;
 using System.Drawing;
 using ClientCore;
-using ClientCore.cncnet5;
+using ClientCore.CnCNet5;
 
 namespace ClientGUI
 {

@@ -19,7 +19,7 @@ using System.Threading;
 using System.Runtime.InteropServices;
 using System.Reflection;
 using ClientCore;
-using ClientCore.cncnet5;
+using ClientCore.CnCNet5;
 
 namespace ClientGUI
 {
@@ -1177,7 +1177,6 @@ namespace ClientGUI
                 LimitedComboBox lcb = getPlayerNameCMBFromId(cmbId);
                 if (cmbId == Players.Count + AIPlayers.Count + 1)
                 {
-
                     lcb.CanDropDown = true;
                     lcb.Enabled = true;
                 }

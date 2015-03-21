@@ -13,7 +13,7 @@ using System.IO;
 using System.Reflection;
 using System.Media;
 using ClientCore;
-using ClientCore.cncnet5;
+using ClientCore.CnCNet5;
 
 namespace ClientGUI
 {

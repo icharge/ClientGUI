@@ -15,7 +15,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Linq;
 using ClientCore;
-using ClientCore.cncnet5;
+using ClientCore.CnCNet5;
 using WMPLib;
 
 namespace ClientGUI
@@ -914,7 +914,7 @@ namespace ClientGUI
             Logger.Log("CnCNet connection lost: " + errorMessage);
             Logger.Log("Setting auto-login to false and saving settings.");
             ProgramConstants.CNCNET_AUTOLOGIN = false;
-            DomainController.Instance().saveCnCNetSettings();
+            SaveSettings();
 
             MessageBox.Show("Your connection to the CnCNet server has been lost. " + Environment.NewLine + Environment.NewLine +
                 "Error message: " + Environment.NewLine + errorMessage + Environment.NewLine + Environment.NewLine +
@@ -962,7 +962,7 @@ namespace ClientGUI
             Logger.Log("CnCNet error received: " + message);
             Logger.Log("Setting auto-login to false and saving settings.");
             ProgramConstants.CNCNET_AUTOLOGIN = false;
-            DomainController.Instance().saveCnCNetSettings();
+            SaveSettings();
 
             MessageBox.Show(message, "Server disconnected", MessageBoxButtons.OK, MessageBoxIcon.Error);
             Environment.Exit(0);
@@ -1489,7 +1489,7 @@ namespace ClientGUI
             btnNewGame.Enabled = true;
             btnSend.Enabled = true;
 
-            DomainController.Instance().saveCnCNetSettings();
+            SaveSettings();
 
             this.TopMost = true;
             this.Focus();
@@ -1636,6 +1636,7 @@ namespace ClientGUI
         {
             Logger.Log("Saving settings.");
 
+            DomainController.Instance().saveCnCNetSettings();
             DomainController.Instance().saveCnCNetColorSetting(cmbMessageColor.SelectedIndex);
             DomainController.Instance().saveChannelSettings(
                 chkChannelDTA.Checked,

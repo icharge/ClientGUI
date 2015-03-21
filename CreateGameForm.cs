@@ -12,7 +12,7 @@ using System.Windows.Forms;
 using System.Threading;
 using System.Media;
 using ClientCore;
-using ClientCore.cncnet5;
+using ClientCore.CnCNet5;
 
 namespace ClientGUI
 {
@@ -106,7 +106,7 @@ namespace ClientGUI
 
             SharedUILogic.ParseClientThemeIni(this);
 
-            Tunnels = CnCNetTunnel.GetTunnels();
+            Tunnels = CnCNetTunnel.GetTunnels(true);
             bool pingCustomTunnels = DomainController.Instance().getCustomTunnelPingStatus();
             int lowestPingId = -1;
             int lowestPing = 99999;

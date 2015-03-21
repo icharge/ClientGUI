@@ -18,7 +18,7 @@ using System.Media;
 using System.Runtime.InteropServices;
 using System.Reflection;
 using ClientCore;
-using ClientCore.cncnet5;
+using ClientCore.CnCNet5;
 
 namespace ClientGUI
 {
@@ -4120,7 +4120,7 @@ namespace ClientGUI
             Point mousePosition = lbChatBox.PointToClient(ListBox.MousePosition);
             int hoveredIndex = lbChatBox.IndexFromPoint(mousePosition);
 
-            if (hoveredIndex == -1)
+            if (hoveredIndex == -1 || hoveredIndex >= lbChatBox.Items.Count)
             {
                 lbChatBox.Cursor = Cursors.Default;
                 return;
