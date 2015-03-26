@@ -54,6 +54,12 @@
     <Compile Include="EnhancedPictureBox.designer.cs">
       <DependentUpon>EnhancedPictureBox.cs</DependentUpon>
     </Compile>
+    <Compile Include="GameSelectionForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GameSelectionForm.Designer.cs">
+      <DependentUpon>GameSelectionForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="LimitedComboBox.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -112,6 +118,9 @@
   <ItemGroup>
     <EmbeddedResource Include="CreateGameForm.resx">
       <DependentUpon>CreateGameForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GameSelectionForm.resx">
+      <DependentUpon>GameSelectionForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MapSelectionForm.resx">
       <DependentUpon>MapSelectionForm.cs</DependentUpon>

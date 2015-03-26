@@ -29,12 +29,6 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(NCnCNetLobby));
-            this.lblFollowChannels = new System.Windows.Forms.Label();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.chkChannelCnCNet = new ClientGUI.UserCheckBox();
-            this.chkChannelTS = new ClientGUI.UserCheckBox();
-            this.chkChannelTI = new ClientGUI.UserCheckBox();
-            this.chkChannelDTA = new ClientGUI.UserCheckBox();
             this.btnReturnToMenu = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
             this.lblPlayer8 = new System.Windows.Forms.Label();
@@ -57,91 +51,19 @@
             this.btnSend = new System.Windows.Forms.Button();
             this.lblGames = new System.Windows.Forms.Label();
             this.lblPlayerList = new System.Windows.Forms.Label();
-            this.btnHideChannels = new System.Windows.Forms.Button();
             this.lblChannel = new System.Windows.Forms.Label();
             this.lblMessageColor = new System.Windows.Forms.Label();
             this.btnMusicToggle = new System.Windows.Forms.Button();
             this.sbChat = new CustomControls.CustomScrollbar();
             this.sbPlayers = new CustomControls.CustomScrollbar();
-            this.chkChannelTO = new ClientGUI.UserCheckBox();
             this.cmbMessageColor = new ClientGUI.LimitedComboBox();
             this.cmbCurrentChannel = new ClientGUI.LimitedComboBox();
             this.lbChatMessages = new ClientGUI.ScrollbarlessListBox();
             this.lbPlayerList = new ClientGUI.ScrollbarlessListBox();
             this.lbGameList = new ClientGUI.ScrollbarlessListBox();
-            this.panel1.SuspendLayout();
+            this.btnConfigure = new System.Windows.Forms.Button();
             this.panel2.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // lblFollowChannels
-            // 
-            this.lblFollowChannels.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.lblFollowChannels.AutoSize = true;
-            this.lblFollowChannels.BackColor = System.Drawing.Color.Transparent;
-            this.lblFollowChannels.Location = new System.Drawing.Point(788, 9);
-            this.lblFollowChannels.Name = "lblFollowChannels";
-            this.lblFollowChannels.Size = new System.Drawing.Size(182, 15);
-            this.lblFollowChannels.TabIndex = 2;
-            this.lblFollowChannels.Text = "Followed Channels and Games:";
-            // 
-            // panel1
-            // 
-            this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel1.Controls.Add(this.chkChannelCnCNet);
-            this.panel1.Controls.Add(this.chkChannelTS);
-            this.panel1.Controls.Add(this.chkChannelTI);
-            this.panel1.Controls.Add(this.chkChannelDTA);
-            this.panel1.Location = new System.Drawing.Point(765, 28);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(215, 109);
-            this.panel1.TabIndex = 3;
-            // 
-            // chkChannelCnCNet
-            // 
-            this.chkChannelCnCNet.AutoSize = true;
-            this.chkChannelCnCNet.BackColor = System.Drawing.Color.Transparent;
-            this.chkChannelCnCNet.IsEnabled = true;
-            this.chkChannelCnCNet.Location = new System.Drawing.Point(13, 78);
-            this.chkChannelCnCNet.Name = "chkChannelCnCNet";
-            this.chkChannelCnCNet.Size = new System.Drawing.Size(197, 17);
-            this.chkChannelCnCNet.TabIndex = 26;
-            this.chkChannelCnCNet.Tag = "";
-            this.chkChannelCnCNet.CheckedChanged += new ClientGUI.UserCheckBox.OnCheckedChanged(this.chkChannelCnCNet_CheckedChanged);
-            // 
-            // chkChannelTS
-            // 
-            this.chkChannelTS.BackColor = System.Drawing.Color.Transparent;
-            this.chkChannelTS.IsEnabled = true;
-            this.chkChannelTS.Location = new System.Drawing.Point(13, 56);
-            this.chkChannelTS.Name = "chkChannelTS";
-            this.chkChannelTS.Size = new System.Drawing.Size(197, 15);
-            this.chkChannelTS.TabIndex = 25;
-            this.chkChannelTS.Tag = "";
-            this.chkChannelTS.CheckedChanged += new ClientGUI.UserCheckBox.OnCheckedChanged(this.chkChannelTS_CheckedChanged);
-            // 
-            // chkChannelTI
-            // 
-            this.chkChannelTI.BackColor = System.Drawing.Color.Transparent;
-            this.chkChannelTI.IsEnabled = true;
-            this.chkChannelTI.Location = new System.Drawing.Point(13, 35);
-            this.chkChannelTI.Name = "chkChannelTI";
-            this.chkChannelTI.Size = new System.Drawing.Size(194, 15);
-            this.chkChannelTI.TabIndex = 23;
-            this.chkChannelTI.Tag = "";
-            this.chkChannelTI.CheckedChanged += new ClientGUI.UserCheckBox.OnCheckedChanged(this.chkChannelTI_CheckedChanged);
-            // 
-            // chkChannelDTA
-            // 
-            this.chkChannelDTA.BackColor = System.Drawing.Color.Transparent;
-            this.chkChannelDTA.IsEnabled = true;
-            this.chkChannelDTA.Location = new System.Drawing.Point(13, 12);
-            this.chkChannelDTA.Name = "chkChannelDTA";
-            this.chkChannelDTA.Size = new System.Drawing.Size(197, 15);
-            this.chkChannelDTA.TabIndex = 22;
-            this.chkChannelDTA.Tag = "The Dawn of the Tiberium Age";
-            this.chkChannelDTA.CheckedChanged += new ClientGUI.UserCheckBox.OnCheckedChanged(this.chkChannelDTA_CheckedChanged);
             // 
             // btnReturnToMenu
             // 
@@ -414,25 +336,11 @@
             this.lblPlayerList.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lblPlayerList.AutoSize = true;
             this.lblPlayerList.BackColor = System.Drawing.Color.Transparent;
-            this.lblPlayerList.Location = new System.Drawing.Point(762, 146);
+            this.lblPlayerList.Location = new System.Drawing.Point(765, 9);
             this.lblPlayerList.Name = "lblPlayerList";
             this.lblPlayerList.Size = new System.Drawing.Size(50, 15);
             this.lblPlayerList.TabIndex = 15;
             this.lblPlayerList.Text = "Players:";
-            // 
-            // btnHideChannels
-            // 
-            this.btnHideChannels.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnHideChannels.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.btnHideChannels.BackColor = System.Drawing.SystemColors.Control;
-            this.btnHideChannels.FlatAppearance.BorderSize = 0;
-            this.btnHideChannels.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnHideChannels.Location = new System.Drawing.Point(765, 8);
-            this.btnHideChannels.Name = "btnHideChannels";
-            this.btnHideChannels.Size = new System.Drawing.Size(16, 16);
-            this.btnHideChannels.TabIndex = 16;
-            this.btnHideChannels.UseVisualStyleBackColor = false;
-            this.btnHideChannels.Click += new System.EventHandler(this.btnHideChannels_Click);
             // 
             // lblChannel
             // 
@@ -500,12 +408,12 @@
             this.sbPlayers.ChannelColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(166)))), ((int)(((byte)(3)))));
             this.sbPlayers.DownArrowImage = ((System.Drawing.Image)(resources.GetObject("sbPlayers.DownArrowImage")));
             this.sbPlayers.LargeChange = 10;
-            this.sbPlayers.Location = new System.Drawing.Point(965, 162);
+            this.sbPlayers.Location = new System.Drawing.Point(965, 34);
             this.sbPlayers.Maximum = 100;
             this.sbPlayers.Minimum = 0;
             this.sbPlayers.MinimumSize = new System.Drawing.Size(15, 92);
             this.sbPlayers.Name = "sbPlayers";
-            this.sbPlayers.Size = new System.Drawing.Size(15, 353);
+            this.sbPlayers.Size = new System.Drawing.Size(15, 481);
             this.sbPlayers.SmallChange = 1;
             this.sbPlayers.TabIndex = 23;
             this.sbPlayers.ThumbBottomImage = ((System.Drawing.Image)(resources.GetObject("sbPlayers.ThumbBottomImage")));
@@ -515,17 +423,6 @@
             this.sbPlayers.ThumbTopSpanImage = ((System.Drawing.Image)(resources.GetObject("sbPlayers.ThumbTopSpanImage")));
             this.sbPlayers.UpArrowImage = ((System.Drawing.Image)(resources.GetObject("sbPlayers.UpArrowImage")));
             this.sbPlayers.Value = 0;
-            // 
-            // chkChannelTO
-            // 
-            this.chkChannelTO.BackColor = System.Drawing.Color.Transparent;
-            this.chkChannelTO.IsEnabled = true;
-            this.chkChannelTO.Location = new System.Drawing.Point(124, 332);
-            this.chkChannelTO.Name = "chkChannelTO";
-            this.chkChannelTO.Size = new System.Drawing.Size(115, 15);
-            this.chkChannelTO.TabIndex = 24;
-            this.chkChannelTO.Tag = "";
-            this.chkChannelTO.Visible = false;
             // 
             // cmbMessageColor
             // 
@@ -550,11 +447,6 @@
             this.cmbCurrentChannel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbCurrentChannel.FormattingEnabled = true;
             this.cmbCurrentChannel.HoveredIndex = -1;
-            this.cmbCurrentChannel.Items.AddRange(new object[] {
-            "Dawn of the Tiberium Age",
-            "Twisted Insurrection",
-            "Tiberian Sun",
-            "General CnCNet Chat"});
             this.cmbCurrentChannel.Location = new System.Drawing.Point(605, 6);
             this.cmbCurrentChannel.MaxDropDownItems = 13;
             this.cmbCurrentChannel.Name = "cmbCurrentChannel";
@@ -591,10 +483,10 @@
             this.lbPlayerList.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
             this.lbPlayerList.FormattingEnabled = true;
             this.lbPlayerList.IntegralHeight = false;
-            this.lbPlayerList.Location = new System.Drawing.Point(765, 162);
+            this.lbPlayerList.Location = new System.Drawing.Point(765, 34);
             this.lbPlayerList.Name = "lbPlayerList";
             this.lbPlayerList.ShowScrollbar = false;
-            this.lbPlayerList.Size = new System.Drawing.Size(203, 353);
+            this.lbPlayerList.Size = new System.Drawing.Size(203, 481);
             this.lbPlayerList.TabIndex = 1;
             this.lbPlayerList.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.lbPlayerList_DrawItem);
             this.lbPlayerList.MeasureItem += new System.Windows.Forms.MeasureItemEventHandler(this.lbPlayerList_MeasureItem);
@@ -619,20 +511,30 @@
             this.lbGameList.SelectedIndexChanged += new System.EventHandler(this.lbGameList_SelectedIndexChanged);
             this.lbGameList.DoubleClick += new System.EventHandler(this.lbGameList_DoubleClick);
             // 
+            // btnConfigure
+            // 
+            this.btnConfigure.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnConfigure.Location = new System.Drawing.Point(838, 5);
+            this.btnConfigure.Name = "btnConfigure";
+            this.btnConfigure.Size = new System.Drawing.Size(142, 23);
+            this.btnConfigure.TabIndex = 24;
+            this.btnConfigure.Text = "Followed Games...";
+            this.btnConfigure.UseVisualStyleBackColor = true;
+            this.btnConfigure.Click += new System.EventHandler(this.btnConfigure_Click);
+            // 
             // NCnCNetLobby
             // 
             this.AcceptButton = this.btnSend;
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(985, 544);
+            this.Controls.Add(this.btnConfigure);
             this.Controls.Add(this.sbPlayers);
             this.Controls.Add(this.sbChat);
-            this.Controls.Add(this.chkChannelTO);
             this.Controls.Add(this.btnMusicToggle);
             this.Controls.Add(this.cmbMessageColor);
             this.Controls.Add(this.lblMessageColor);
             this.Controls.Add(this.cmbCurrentChannel);
             this.Controls.Add(this.lblChannel);
-            this.Controls.Add(this.btnHideChannels);
             this.Controls.Add(this.lblPlayerList);
             this.Controls.Add(this.lblGames);
             this.Controls.Add(this.btnSend);
@@ -643,8 +545,6 @@
             this.Controls.Add(this.lblGameInfo);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.btnReturnToMenu);
-            this.Controls.Add(this.panel1);
-            this.Controls.Add(this.lblFollowChannels);
             this.Controls.Add(this.lbPlayerList);
             this.Controls.Add(this.lbGameList);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
@@ -656,8 +556,6 @@
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.NCnCNetLobby_FormClosed);
             this.Load += new System.EventHandler(this.NCnCNetLobby_Load);
             this.SizeChanged += new System.EventHandler(this.NCnCNetLobby_SizeChanged);
-            this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
             this.ResumeLayout(false);
@@ -669,8 +567,6 @@
 
         private ScrollbarlessListBox lbGameList;
         private ScrollbarlessListBox lbPlayerList;
-        private System.Windows.Forms.Label lblFollowChannels;
-        private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Button btnReturnToMenu;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Label lblPlayers;
@@ -685,17 +581,11 @@
         private System.Windows.Forms.Button btnSend;
         private System.Windows.Forms.Label lblGames;
         private System.Windows.Forms.Label lblPlayerList;
-        private System.Windows.Forms.Button btnHideChannels;
         private System.Windows.Forms.Label lblChannel;
         private LimitedComboBox cmbCurrentChannel;
         private LimitedComboBox cmbMessageColor;
         private System.Windows.Forms.Label lblMessageColor;
         private System.Windows.Forms.Button btnMusicToggle;
-        private UserCheckBox chkChannelDTA;
-        private UserCheckBox chkChannelTI;
-        private UserCheckBox chkChannelCnCNet;
-        private UserCheckBox chkChannelTS;
-        private UserCheckBox chkChannelTO;
         private CustomControls.CustomScrollbar sbChat;
         private CustomControls.CustomScrollbar sbPlayers;
         private System.Windows.Forms.Label lblGameMode;
@@ -707,5 +597,6 @@
         private System.Windows.Forms.Label lblPlayer3;
         private System.Windows.Forms.Label lblPlayer2;
         private System.Windows.Forms.Label lblPlayer1;
+        private System.Windows.Forms.Button btnConfigure;
     }
 }

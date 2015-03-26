@@ -2633,7 +2633,7 @@ namespace ClientGUI
         /// <summary>
         /// Broadcasts game options to all players whenever a check box's Checked status is changed.
         /// </summary>
-        private void GenericChkBox_CheckedChanged()
+        private void GenericChkBox_CheckedChanged(object sender)
         {
             if (updateGameOptions)
                 GenericGameOptionChanged(null, EventArgs.Empty);

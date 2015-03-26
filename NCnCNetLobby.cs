@@ -16,6 +16,7 @@ using System.Threading;
 using System.Linq;
 using ClientCore;
 using ClientCore.CnCNet5;
+using ClientCore.CnCNet5.Games;
 using WMPLib;
 
 namespace ClientGUI
@@ -80,13 +81,13 @@ namespace ClientGUI
         private delegate void AwayMessageCallback(string userName, string reason);
         private delegate void CtcpGameCallback(string sender, string channelName, string ctcpMessage);
         private delegate void UserKickedCallback(string channelName, string userName);
+        private delegate void WhoReplyReceivedCallback(string userName, string extraInfo);
 
-        List<List<MessageInfo>> MessageInfos = new List<List<MessageInfo>>();
-        List<List<string>> UserLists = new List<List<string>>();
-        List<List<Color>> UserColors = new List<List<Color>>();
+        List<MessageInfo>[] MessageInfos;
+        List<IrcUser>[] UserLists;
         List<Color> ChatColors = new List<Color>();
-        List<string> ChannelNames = new List<string>();
-        List<string> ChannelUINames = new List<string>();
+
+        List<int> ChatChannelIndexes = new List<int>();
 
         /// <summary>
         /// List of colors that the current games are displayed in.
@@ -118,12 +119,11 @@ namespace ClientGUI
         Image btnHideChannelsUp;
         Image btnHideChannelsDown;
 
-        Image dtaIcon;
-        Image tiIcon;
-        Image tsIcon;
         Image lockedGameIcon;
         Image incompatibleGameIcon;
         Image passwordedGameIcon;
+
+        Image[] gameIcons;
 
         /// <summary>
         /// The ID string of the current game.
@@ -184,44 +184,24 @@ namespace ClientGUI
             lbGameList.Font = listBoxFont;
             lbPlayerList.Font = listBoxFont;
 
-            MessageInfos.Add(new List<MessageInfo>()); // DTA
-            MessageInfos.Add(new List<MessageInfo>()); // TI
-            MessageInfos.Add(new List<MessageInfo>()); // TO
-            MessageInfos.Add(new List<MessageInfo>()); // TS
-            MessageInfos.Add(new List<MessageInfo>()); // CnCNet
+            MessageInfos = new List<MessageInfo>[GameCollection.Instance.GetGameCount()];
+            UserLists = new List<IrcUser>[GameCollection.Instance.GetGameCount()];
 
-            UserLists.Add(new List<string>()); // DTA
-            UserLists.Add(new List<string>()); // TI
-            UserLists.Add(new List<string>()); // TO
-            UserLists.Add(new List<string>()); // TS
-            UserLists.Add(new List<string>()); // CnCNet
+            for (int i = 0; i < MessageInfos.Length; i++)
+            {
+                MessageInfos[i] = new List<MessageInfo>();
+                UserLists[i] = new List<IrcUser>();
 
-            UserColors.Add(new List<Color>()); // DTA
-            UserColors.Add(new List<Color>()); // TI
-            UserColors.Add(new List<Color>()); // TO
-            UserColors.Add(new List<Color>()); // TS
-            UserColors.Add(new List<Color>()); // CnCNet
+                CnCNetGame game = GameCollection.Instance.GetGameFromIndex(i);
 
-            ChannelNames.Add("#dta");
-            ChannelNames.Add("#ti");
-            ChannelNames.Add("#to");
-            ChannelNames.Add("#ts");
-            ChannelNames.Add("#cncnet");
+                if (game.Supported && !String.IsNullOrEmpty(game.ChatChannel))
+                {
+                    cmbCurrentChannel.Items.Add(game.UIName);
+                    ChatChannelIndexes.Add(i);
+                }
+            }
 
-            ChannelUINames.Add("Dawn of the Tiberium Age");
-            ChannelUINames.Add("Twisted Insurrection");
-            ChannelUINames.Add("Tiberian Odyssey");
-            ChannelUINames.Add("Tiberian Sun");
-            ChannelUINames.Add("General CnCNet Chat");
-
-            chkChannelDTA.LabelText = "The Dawn of the Tiberium Age";
-            chkChannelTI.LabelText = "Twisted Insurrection";
-            chkChannelTO.LabelText = "Tiberian Odyssey";
-            chkChannelTS.LabelText = "Tiberian Sun";
-            chkChannelCnCNet.LabelText = "General CnCNet Chat";
-
-            SetDefaultGame();
-            LoadSettings();
+            gameIcons = GameCollection.Instance.GetGameImages();
 
             wmPlayer = new WindowsMediaPlayer();
             wmPlayer.URL = ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "lobbymusic.wav";
@@ -233,12 +213,6 @@ namespace ClientGUI
                 btnMusicToggle.Text = "Music OFF";
                 wmPlayer.controls.stop();
             }
-
-            chkChannelCnCNet.Initialize();
-            chkChannelDTA.Initialize();
-            chkChannelTI.Initialize();
-            chkChannelTO.Initialize();
-            chkChannelTS.Initialize();
 
             sp = new SoundPlayer(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "button.wav");
             sndGameCreated = new SoundPlayer(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "gamecreated.wav");
@@ -316,7 +290,6 @@ namespace ClientGUI
 
             Color cLabelColor = SharedUILogic.getColorFromString(DomainController.Instance().getUILabelColor());
             lblMessageColor.ForeColor = cLabelColor;
-            lblFollowChannels.ForeColor = cLabelColor;
             lblGameInfo.ForeColor = cLabelColor;
             lblGames.ForeColor = cLabelColor;
             lblHost.ForeColor = cLabelColor;
@@ -335,23 +308,8 @@ namespace ClientGUI
 
             lblVersion.ForeColor = cLabelColor;
             lblChannel.ForeColor = cLabelColor;
-            chkChannelCnCNet.ForeColor = cLabelColor;
-            chkChannelDTA.ForeColor = cLabelColor;
-            chkChannelTI.ForeColor = cLabelColor;
-            chkChannelTO.ForeColor = cLabelColor;
-            chkChannelTS.ForeColor = cLabelColor;
-            chkChannelCnCNet.BaseColor = cLabelColor;
-            chkChannelDTA.BaseColor = cLabelColor;
-            chkChannelTI.BaseColor = cLabelColor;
-            chkChannelTO.BaseColor = cLabelColor;
-            chkChannelTS.BaseColor = cLabelColor;
 
             Color cAltUiColor = SharedUILogic.getColorFromString(DomainController.Instance().getUIAltColor());
-            chkChannelCnCNet.HoverColor = cAltUiColor;
-            chkChannelDTA.HoverColor = cAltUiColor;
-            chkChannelTI.HoverColor = cAltUiColor;
-            chkChannelTO.HoverColor = cAltUiColor;
-            chkChannelTS.HoverColor = cAltUiColor;
             lbPlayerList.ForeColor = cAltUiColor;
             lbChatMessages.ForeColor = cAltUiColor;
             lbGameList.ForeColor = cAltUiColor;
@@ -359,18 +317,18 @@ namespace ClientGUI
             btnNewGame.ForeColor = cAltUiColor;
             btnReturnToMenu.ForeColor = cAltUiColor;
             btnSend.ForeColor = cAltUiColor;
-            btnHideChannels.ForeColor = cAltUiColor;
             btnMusicToggle.ForeColor = cAltUiColor;
+            btnConfigure.ForeColor = cAltUiColor;
             tbChatInput.ForeColor = cAltUiColor;
             cmbCurrentChannel.ForeColor = cAltUiColor;
             cmbMessageColor.ForeColor = cAltUiColor;
 
             Color cBackColor = SharedUILogic.getColorFromString(DomainController.Instance().getUIAltBackgroundColor());
+            btnConfigure.BackColor = cBackColor;
             btnJoinGame.BackColor = cBackColor;
             btnNewGame.BackColor = cBackColor;
             btnReturnToMenu.BackColor = cBackColor;
             btnSend.BackColor = cBackColor;
-            btnHideChannels.BackColor = cBackColor;
             btnMusicToggle.BackColor = cBackColor;
             lbChatMessages.BackColor = cBackColor;
             lbGameList.BackColor = cBackColor;
@@ -379,7 +337,6 @@ namespace ClientGUI
             cmbCurrentChannel.BackColor = cBackColor;
             cmbMessageColor.BackColor = cBackColor;
 
-            panel1.BackgroundImage = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "cncnetlobbypanelbg.png");
             panel2.BackgroundImage = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "cncnetlobbypanelbg.png");
 
             btn92px = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "92pxbtn.png");
@@ -394,10 +351,6 @@ namespace ClientGUI
             btnHideChannelsUp = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "hideChannels_Up.png");
             btnHideChannelsDown = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "hideChannels_Down.png");
 
-            dtaIcon = Image.FromFile(ProgramConstants.gamepath + "Resources\\dtaicon.png");
-            tiIcon = Image.FromFile(ProgramConstants.gamepath + "Resources\\tiicon.png");
-            tsIcon = Image.FromFile(ProgramConstants.gamepath + "Resources\\tsicon.png");
-
             lockedGameIcon = Image.FromFile(ProgramConstants.gamepath + "Resources\\lockedgame.png");
             incompatibleGameIcon = Image.FromFile(ProgramConstants.gamepath + "Resources\\incompatible.png");
             passwordedGameIcon = Image.FromFile(ProgramConstants.gamepath + "Resources\\passwordedgame.png");
@@ -407,8 +360,6 @@ namespace ClientGUI
             btnMusicToggle.BackgroundImage = btn92px;
 
             btnReturnToMenu.BackgroundImage = btn142px;
-
-            btnHideChannels.BackgroundImage = btnHideChannelsUp;
 
             int displayedItems = lbChatMessages.DisplayRectangle.Height / lbChatMessages.ItemHeight;
 
@@ -468,6 +419,7 @@ namespace ClientGUI
             CnCNetData.ConnectionBridge.OnCtcpGameParsed += new RConnectionBridge.CTCPGameParsedEventHandler(Instance_OnCtcpGameParsed);
             CnCNetData.ConnectionBridge.OnIncorrectPassword += new RConnectionBridge.IncorrectPasswordEventHandler(Instance_OnIncorrectPassword);
             CnCNetData.ConnectionBridge.OnUserKicked += new RConnectionBridge.UserKickedEventHandler(Instance_OnUserKicked);
+            CnCNetData.ConnectionBridge.OnWhoReplyReceived += Instance_OnWhoReplyReceived;
             CnCNetData.OnGameStarted += new CnCNetData.GameStartedEventHandler(CnCNetData_OnGameStarted);
             CnCNetData.OnGameStopped += new CnCNetData.GameStoppedEventHandler(CnCNetData_OnGameStopped);
             CnCNetData.OnGameLobbyClosed += new CnCNetData.GameLobbyClosedEventHandler(CnCNetData_OnGameLobbyClosed);
@@ -536,6 +488,48 @@ namespace ClientGUI
         }
 
         /// <summary>
+        /// Handles a WHO reply received from the IRC server.
+        /// Used for assigning game icons to players.
+        /// </summary>
+        /// <param name="userName">The name of the user that we received extra info from.</param>
+        /// <param name="extraInfo">The extra info (client and game version) of the user.</param>
+        private void Instance_OnWhoReplyReceived(string userName, string extraInfo)
+        {
+            if (this.InvokeRequired)
+            {
+                WhoReplyReceivedCallback d = new WhoReplyReceivedCallback(Instance_OnWhoReplyReceived);
+                this.BeginInvoke(d, userName, extraInfo);
+                return;
+            }
+
+            string[] eInfoParts = extraInfo.Split(' ');
+
+            if (eInfoParts.Length < 3)
+                return;
+
+            string gameName = eInfoParts[2];
+
+            int gameIndex = GameCollection.Instance.GetGameIndexFromInternalName(gameName);
+
+            if (gameIndex == -1)
+                return;
+
+            // Search for the user name on the user lists and apply the game index
+            // when the user is found
+            for (int i = 0; i < UserLists.Length; i++)
+            {
+                List<IrcUser> userList = UserLists[i];
+                IrcUser iu = userList.Find(u => u.Name == userName);
+                if (iu != null)
+                {
+                    iu.GameId = gameIndex;
+                    if (i == currentChannelId)
+                        lbPlayerList.Refresh();
+                }
+            }
+        }
+
+        /// <summary>
         /// Executed when an user is kicked from a IRC channel.
         /// </summary>
         /// <param name="channelName">The name of the channel where the user was kicked from.</param>
@@ -551,22 +545,25 @@ namespace ClientGUI
 
             bool updatePlayers = false;
 
-            for (int chId = 0; chId < ChannelNames.Count; chId++)
+            GameCollection gc = GameCollection.Instance;
+
+            for (int chId = 0; chId < gc.GetGameCount(); chId++)
             {
-                if (ChannelNames[chId] == channelName)
+                string gChannelName = gc.GetGameChatChannelNameFromIndex(chId);
+
+                if (gChannelName == channelName)
                 {
-                    int userIndex = UserLists[chId].FindIndex(c => c == userName);
+                    int userIndex = UserLists[chId].FindIndex(c => c.Name == userName);
                     if (userIndex > -1)
                     {
                         UserLists[chId].RemoveAt(userIndex);
-                        UserColors[chId].RemoveAt(userIndex);
                         MessageInfos[chId].Add(new MessageInfo(Color.White,
-                            string.Format("{0} has been kicked from the {1} channel.", userName, ChannelUINames[chId])));
+                            string.Format("{0} has been kicked from the {1} channel.",
+                            userName, gc.GetFullGameNameFromIndex(chId))));
                     }
 
                     if (currentChannelId == chId)
                         updatePlayers = true;
-                    break;
                 }
             }
 
@@ -659,68 +656,6 @@ namespace ClientGUI
         }
 
         /// <summary>
-        /// Sets up settings related to the default game specified in DTACnCNetClient.ini.
-        /// </summary>
-        private void SetDefaultGame()
-        {
-            string defaultGame = DomainController.Instance().getDefaultGame();
-            bool defaultGameSet = false;
-
-            switch (defaultGame)
-            {
-                case "DTA":
-                    chkChannelDTA.Enabled = false;
-                    defaultGameSet = true;
-                    cmbCurrentChannel.SelectedIndex = 0;
-                    currentChannelId = 0;
-                    myGame = "DTA";
-                    break;
-                case "TI":
-                    chkChannelTI.Enabled = false;
-                    defaultGameSet = true;
-                    cmbCurrentChannel.SelectedIndex = 1;
-                    currentChannelId = 1;
-                    myGame = "TI";
-                    break;
-                case "TO":
-                    chkChannelTO.Enabled = false;
-                    defaultGameSet = true;
-                    cmbCurrentChannel.SelectedIndex = 2;
-                    currentChannelId = 2;
-                    myGame = "TO";
-                    break;
-                case "TS":
-                    chkChannelTS.Enabled = false;
-                    chkChannelTS.Checked = true;
-                    defaultGameSet = true;
-                    cmbCurrentChannel.SelectedIndex = 2;
-                    currentChannelId = 3;
-                    myGame = "TS";
-                    break;
-                case "YR":
-                    chkChannelDTA.Enabled = true;
-                    chkChannelTI.Enabled = true;
-                    chkChannelTO.Enabled = true;
-                    chkChannelTS.Enabled = true;
-                    defaultGameSet = true;
-                    cmbCurrentChannel.SelectedIndex = 3;
-                    currentChannelId = 4;
-                    myGame = "YR";
-                    break;
-            }
-
-            // If someone tries using the client for an unsupported game, let's
-            // force them to join all channels used by supported games.
-            if (!defaultGameSet)
-            {
-                chkChannelDTA.Enabled = false;
-                chkChannelTI.Enabled = false;
-                chkChannelTO.Enabled = false;
-                chkChannelTS.Enabled = false;
-            }
-        }
-
-        /// <summary>
         /// Handles the event generated by the CTCP GAME message, which is used for broadcasting.
         /// Forwards the message on to the real handler function; this is for thread-safety.
         /// </summary>
@@ -776,24 +711,7 @@ namespace ClientGUI
 
             string gameId = "unk";
 
-            switch (channelName)
-            {
-                case "#dta-games":
-                    gameId = "DTA";
-                    break;
-                case "#ti-games":
-                    gameId = "TI";
-                    break;
-                case "#to-games":
-                    gameId = "TO";
-                    break;
-                case "#ts-games":
-                    gameId = "TS";
-                    break;
-                case "#yr-games":
-                    gameId = "YR";
-                    break;
-            }
+            gameId = GameCollection.Instance.GetGameIdentifierFromGameBroadcastingChannel(channelName);
 
             if (gameId == "unk")
                 return;
@@ -880,7 +798,7 @@ namespace ClientGUI
                 {
                     foreColor = cLockedGameColor;
                 }
-                else if (game.Version != ProgramConstants.GAME_VERSION && game.GameIdentifier == myGame)
+                else if (game.Version != ProgramConstants.GAME_VERSION && game.GameIdentifier == myGame.ToLower())
                 {
                     foreColor = cLockedGameColor;
                 }
@@ -1085,19 +1003,17 @@ namespace ClientGUI
                 message = "====> " + sender + message;
                 sender = String.Empty;
 
-                // Replace Funky's game identifiers with real game names because
-                // his sucky client only sends the game identifiers around
-                message = message.Replace("new ra game", "new Red Alert game");
-                message = message.Replace("new td game", "new Tiberian Dawn game");
-                message = message.Replace("new d2 game", "new Dune 2000 game");
+                // Replace Funky's game identifiers with real game names
+                for (int i = 0; i < GameCollection.Instance.GetGameCount(); i++)
+                    message = message.Replace("new " + GameCollection.Instance.GetGameIdentifierFromIndex(i) + " game",
+                        "new " + GameCollection.Instance.GetFullGameNameFromIndex(i) + " game");
 
-                for (int chId = 0; chId < ChannelNames.Count; chId++)
+                int chatChannelIndex = GameCollection.Instance.GetGameIndexFromChatChannelName(channelName);
+
+                if (channelName.ToLower() == "#cncnet" || currentChannelId == chatChannelIndex)
                 {
-                    if (channelName == ChannelNames[chId])
-                    {
-                        MessageInfos[chId].Add(new MessageInfo(cDefaultChatColor, message));
-                        AddChannelMessageToListBox(chId);
-                    }
+                    MessageInfos[chatChannelIndex].Add(new MessageInfo(cDefaultChatColor, message));
+                    AddChannelMessageToListBox(chatChannelIndex);
                 }
 
                 return;
@@ -1129,12 +1045,12 @@ namespace ClientGUI
                 else
                     foreColor = cDefaultChatColor;
 
-                int channelIndex = ChannelNames.FindIndex(n => n == channelName);
+                int chatChannelIndex = GameCollection.Instance.GetGameIndexFromChatChannelName(channelName);
 
-                if (channelIndex > -1)
+                if (channelName.ToLower() == "#cncnet" || currentChannelId == chatChannelIndex)
                 {
-                    MessageInfos[channelIndex].Add(new MessageInfo(foreColor, sender + ": " + message));
-                    AddChannelMessageToListBox(channelIndex);
+                    MessageInfos[chatChannelIndex].Add(new MessageInfo(foreColor, sender + ": " + message));
+                    AddChannelMessageToListBox(chatChannelIndex);
                 }
             }
         }
@@ -1153,43 +1069,19 @@ namespace ClientGUI
                 return;
             }
 
-            string userName = message;
+           int userIndex = UserLists[currentChannelId].FindIndex(u => u.Name == message);
 
-            bool updatePlayerList = false;
-
-            if (chkChannelDTA.Checked)
+            if (userIndex > -1)
             {
-                RemoveUserFromChannel(userName, 0, " has quit.", out updatePlayerList);
-            }
+                UserLists[currentChannelId].RemoveAt(userIndex);
 
-            if (chkChannelTI.Checked)
-            {
-                RemoveUserFromChannel(userName, 1, " has quit.", out updatePlayerList);
-            }
-
-            if (chkChannelTO.Checked)
-            {
-                RemoveUserFromChannel(userName, 2, " has quit.", out updatePlayerList);
-            }
-
-            if (chkChannelTS.Checked)
-            {
-                RemoveUserFromChannel(userName, 3, " has quit.", out updatePlayerList);
-            }
-
-            if (chkChannelCnCNet.Checked)
-            {
-                RemoveUserFromChannel(userName, 4, " has quit.", out updatePlayerList);
-            }
-
-            if (updatePlayerList)
-            {
                 UpdatePlayerList();
+
+                AddChannelMessageToListBox(currentChannelId);
             }
 
-            AddChannelMessageToListBox(currentChannelId);
-
-            int index = CnCNetData.PMInfos.FindIndex(c => c.UserName == userName);
+            // Check if we've been in a PM convo with the user
+            int index = CnCNetData.PMInfos.FindIndex(c => c.UserName == message);
             if (index > -1)
             {
                 CnCNetData.PMInfos[index].Messages.Add(new MessageInfo(Color.White, "has quit CnCNet."));
@@ -1209,20 +1101,17 @@ namespace ClientGUI
         {
             updatePlayerList = false;
 
-            int userIndex = UserLists[channelIndex].IndexOf(userName);
-            if (userIndex == -1)
-            {
-                userIndex = UserLists[channelIndex].IndexOf("@" + userName + " (Admin)");
-            }
+            List<IrcUser> userList = UserLists[channelIndex];
+
+            int userIndex = userList.FindIndex(u => u.Name == userName);
 
             if (userIndex > -1)
             {
                 UserLists[channelIndex].RemoveAt(userIndex);
-                UserColors[channelIndex].RemoveAt(userIndex);
 
                 MessageInfos[channelIndex].Add(new MessageInfo(Color.White, userName + message));
 
-                //if (currentChannelId == channelIndex)
+                if (currentChannelId == channelIndex)
                     updatePlayerList = true;
             }
         }
@@ -1242,9 +1131,9 @@ namespace ClientGUI
                 return;
             }
 
-            int channelIndex = ChannelNames.FindIndex(n => n == channelName);
+            int channelIndex = GameCollection.Instance.GetGameIndexFromChatChannelName(channelName);
 
-            if (channelIndex > -1)
+            if (channelName.ToLower() == "#cncnet" || channelIndex == currentChannelId)
             {
                 MessageInfos[channelIndex].Add(new MessageInfo(Color.White, "Current channel topic: " + message));
                 AddChannelMessageToListBox(channelIndex);
@@ -1268,12 +1157,12 @@ namespace ClientGUI
 
             bool updatePlayerList = false;
 
-            int channelIndex = ChannelNames.FindIndex(n => n == channelName);
+            int channelIndex = GameCollection.Instance.GetGameIndexFromChatChannelName(channelName);
 
             if (channelIndex > -1)
             {
                 RemoveUserFromChannel(userName, channelIndex,
-                    string.Format(" has left the {0} lobby.", ChannelUINames[channelIndex]),
+                    string.Format(" has left the {0} lobby.", GameCollection.Instance.GetFullGameNameFromIndex(channelIndex)),
                     out updatePlayerList);
             }
 
@@ -1309,37 +1198,39 @@ namespace ClientGUI
             bool updatePlayerList = false;
             bool channelFound = false;
 
-            for (int chId = 0; chId < ChannelNames.Count; chId++)
+            int gameCount = GameCollection.Instance.GetGameCount();
+
+            int channelIndex = GameCollection.Instance.GetGameIndexFromChatChannelName(channelName);
+
+            if (channelIndex > -1)
             {
-                if (ChannelNames[chId] == channelName)
+                if (userName.StartsWith("@"))
                 {
-                    if (userName.StartsWith("@"))
-                    {
-                        UserLists[chId].Add(name);
-                        UserColors[chId].Add(cAdminNameColor);
-                    }
-                    else
-                    {
-                        if (userName != ProgramConstants.CNCNET_PLAYERNAME)
-                        {
-                            UserLists[chId].Add(userName);
-                            UserColors[chId].Add(cPlayerNameColor);
-                        }
-                    }
-
-                    if (currentChannelId == chId)
-                    {
-                        // Update player list if necessary
-                        updatePlayerList = true;
-                    }
-
-                    MessageInfos[chId].Add(new MessageInfo(Color.White, 
-                        string.Format("{0} has joined the {1} lobby.", userName, ChannelUINames[chId])));
-                    AddChannelMessageToListBox(chId);
-                    channelFound = true;
-
-                    break; // Optimization
+                    IrcUser iu = new IrcUser(name, true);
+                    UserLists[channelIndex].Add(iu);
                 }
+                else
+                {
+                    if (userName != ProgramConstants.CNCNET_PLAYERNAME)
+                    {
+                        IrcUser iu = new IrcUser(userName, false);
+                        UserLists[channelIndex].Add(iu);
+                    }
+                }
+
+                if (currentChannelId == channelIndex)
+                {
+                    // Update player list if necessary
+                    updatePlayerList = true;
+                }
+
+                MessageInfos[channelIndex].Add(new MessageInfo(Color.White,
+                    string.Format("{0} has joined the {1} lobby.", userName, 
+                    GameCollection.Instance.GetFullGameNameFromIndex(channelIndex))));
+                AddChannelMessageToListBox(channelIndex);
+                channelFound = true;
+
+                CnCNetData.ConnectionBridge.SendMessage("WHO " + userName);
             }
 
             // If the channel the user joined to wasn't found, check if we just joined a game channel
@@ -1386,8 +1277,8 @@ namespace ClientGUI
             bool updatePlayerList = false;
             bool channelFound = false;
 
-            int channelIndex = ChannelNames.FindIndex(n => n == channelName);
-            
+            int channelIndex = GameCollection.Instance.GetGameIndexFromChatChannelName(channelName);
+
             if (channelIndex > -1)
             {
                 foreach (string userName in userNames)
@@ -1397,15 +1288,13 @@ namespace ClientGUI
 
                     if (userName.StartsWith("@"))
                     {
-                        string name = userName;
-                        name = name + " (Admin)";
-                        UserLists[channelIndex].Add(name);
-                        UserColors[channelIndex].Add(cAdminNameColor);
+                        IrcUser iu = new IrcUser(userName.Substring(1), true);
+                        UserLists[channelIndex].Add(iu);
                     }
                     else
                     {
-                        UserLists[channelIndex].Add(userName);
-                        UserColors[channelIndex].Add(cPlayerNameColor);
+                        IrcUser iu = new IrcUser(userName, false);
+                        UserLists[channelIndex].Add(iu);
                     }
                 }
 
@@ -1430,15 +1319,21 @@ namespace ClientGUI
         /// </summary>
         private void UpdatePlayerList()
         {
-            List<string> Players = UserLists[currentChannelId];
-            Players.Sort();
+            List<IrcUser> players = UserLists[currentChannelId];
+            players = players.OrderBy(f => f.Name).ToList();
+            players = players.OrderBy(p => !p.IsAdmin).ToList();
+            UserLists[currentChannelId] = players;
+            int topIndex = lbPlayerList.TopIndex;
             lbPlayerList.Items.Clear();
 
-            foreach (string playerName in Players)
+            foreach (IrcUser user in players)
             {
-                if (!String.IsNullOrEmpty(playerName))
-                    lbPlayerList.Items.Add(playerName);
+                //if (!String.IsNullOrEmpty(user.Name))
+                    lbPlayerList.Items.Add(user.Name);
             }
+
+            if (topIndex < lbPlayerList.Items.Count)
+                lbPlayerList.TopIndex = topIndex;
 
             ScrollPlayersListbox();
         }
@@ -1502,33 +1397,43 @@ namespace ClientGUI
         /// </summary>
         private void JoinInitialChannels()
         {
-            if (chkChannelDTA.Checked)
-            {
-                CnCNetData.ConnectionBridge.SendMessage("JOIN #dta");
-                CnCNetData.ConnectionBridge.SendMessage("JOIN #dta-games");
-            }
-            if (chkChannelTI.Checked)
-            {
-                CnCNetData.ConnectionBridge.SendMessage("JOIN #ti");
-                CnCNetData.ConnectionBridge.SendMessage("JOIN #ti-games");
-            }
-            if (chkChannelTO.Checked)
-            {
-                CnCNetData.ConnectionBridge.SendMessage("JOIN #to");
-                CnCNetData.ConnectionBridge.SendMessage("JOIN #to-games");
-            }
-            if (chkChannelTS.Checked)
-            {
-                CnCNetData.ConnectionBridge.SendMessage("JOIN #ts");
-                CnCNetData.ConnectionBridge.SendMessage("JOIN #ts-games");
-            }
-            if (chkChannelCnCNet.Checked)
-            {
-                CnCNetData.ConnectionBridge.SendMessage("JOIN #cncnet");
-            }
+            GameCollection gc = GameCollection.Instance;
 
-            if (myGame == "YR")
-                CnCNetData.ConnectionBridge.SendMessage("JOIN #yr-games");
+            string myGameChatChannel = gc.GetGameChatChannelNameFromIdentifier(myGame);
+
+            CnCNetData.ConnectionBridge.SendMessage("JOIN " + myGameChatChannel);
+            CnCNetData.ConnectionBridge.SendMessage("JOIN #cncnet");
+            CnCNetData.ConnectionBridge.SendMessage("WHO " + myGameChatChannel);
+            CnCNetData.ConnectionBridge.SendMessage("WHO #cncnet");
+
+            string myGameBroadcastChannel = gc.GetGameBroadcastingChannelNameFromIdentifier(myGame);
+
+            cmbCurrentChannel.SelectedIndex = ChatChannelIndexes.FindIndex(i => i == gc.GetGameIndexFromInternalName(myGame));
+
+            CnCNetData.ConnectionBridge.SendMessage("JOIN " + myGameBroadcastChannel);
+            gc.FollowGame(gc.GetGameIndexFromInternalName(myGame));
+
+            for (int i = 0; i < gc.GetGameCount(); i++)
+            {
+                if (!gc.IsGameSupported(i))
+                    continue;
+
+                string gameIdentifier = gc.GetGameIdentifierFromIndex(i);
+
+                if (gameIdentifier == myGame.ToLower())
+                    continue;
+
+                string gameBroadcastChannel = gc.GetGameBroadcastingChannelNameFromIndex(i);
+
+                if (String.IsNullOrEmpty(gameBroadcastChannel))
+                    continue;
+
+                if (DomainController.Instance().getGameEnabledStatus(gameIdentifier))
+                {
+                    CnCNetData.ConnectionBridge.SendMessage("JOIN " + gameBroadcastChannel);
+                    gc.FollowGame(i);
+                }
+            }
         }
 
         /// <summary>
@@ -1551,7 +1456,7 @@ namespace ClientGUI
             MessageInfos[3].Add(new MessageInfo(Color.White, message));
             MessageInfos[4].Add(new MessageInfo(Color.White, message));
 
-            AddChannelMessageToListBox(cmbCurrentChannel.SelectedIndex);
+            AddChannelMessageToListBox(currentChannelId);
         }
 
         /// <summary>
@@ -1579,45 +1484,6 @@ namespace ClientGUI
         }
 
         /// <summary>
-        /// Loads user settings (subscribed channels).
-        /// </summary>
-        private void LoadSettings()
-        {
-            if (myGame == "YR")
-            {
-                chkChannelDTA.Checked = false;
-                chkChannelTI.Checked = false;
-                chkChannelTO.Checked = false;
-                chkChannelTS.Checked = false;
-                chkChannelCnCNet.Checked = true;
-                return;
-            }
-
-            if (chkChannelDTA.Enabled)
-            {
-                chkChannelDTA.Checked = DomainController.Instance().getChannelDTAEnabledStatus();
-            }
-
-            if (chkChannelTI.Enabled)
-            {
-                chkChannelTI.Checked = DomainController.Instance().getChannelTIEnabledStatus();
-            }
-
-            //if (chkChannelTO.Enabled)
-            //{
-            //    if (DomainController.Instance().getChannelTOEnabledStatus())
-            //        chkChannelTO.Checked = true;
-            //}
-
-            if (chkChannelTS.Enabled)
-            {
-                chkChannelTS.Checked = DomainController.Instance().getChannelTSEnabledStatus();
-            }
-
-            chkChannelCnCNet.Checked = DomainController.Instance().getChannelCnCNetEnabledStatus();
-        }
-
-        /// <summary>
         /// Executed when the user clicks the "Return to Main Menu" button.
         /// </summary>
         private void btnReturnToMenu_Click(object sender, EventArgs e)
@@ -1636,44 +1502,9 @@ namespace ClientGUI
         {
             Logger.Log("Saving settings.");
 
-            DomainController.Instance().saveCnCNetSettings();
-            DomainController.Instance().saveCnCNetColorSetting(cmbMessageColor.SelectedIndex);
-            DomainController.Instance().saveChannelSettings(
-                chkChannelDTA.Checked,
-                chkChannelTI.Checked,
-                chkChannelTS.Enabled,
-                chkChannelCnCNet.Enabled);
-        }
-
-        /// <summary>
-        /// Executed when the "Hide Followed Channels and Games" "toggle-button" is pressed.
-        /// </summary>
-        private void btnHideChannels_Click(object sender, EventArgs e)
-        {
-            sp.Play();
-
-            this.SuspendLayout();
-            if (panel1.Visible)
-            {
-                panel1.Visible = false;
-                lbPlayerList.Height = lbChatMessages.Height - 20;
-                lbPlayerList.Location = new Point(lbPlayerList.Location.X, lbChatMessages.Location.Y + 20);
-                lblPlayerList.Location = new Point(lbPlayerList.Location.X, lbChatMessages.Location.Y);
-                btnHideChannels.BackgroundImage = btnHideChannelsDown;
-            }
-            else
-            {
-                lbPlayerList.Height = this.Height - 255;
-                lbPlayerList.Location = new Point(lbPlayerList.Location.X, panel1.Location.Y + panel1.Size.Height + 27);
-                lblPlayerList.Location = new Point(lbPlayerList.Location.X, lbPlayerList.Location.Y - 20);
-                panel1.Visible = true;
-                btnHideChannels.BackgroundImage = btnHideChannelsUp;
-            }
-
-            sbPlayers.Height = lbPlayerList.Height;
-            sbPlayers.Location = new Point(sbPlayers.Location.X, lbPlayerList.Location.Y);
-
-            this.ResumeLayout();
+            DomainController.Instance().SaveChannelSettings();
+            DomainController.Instance().SaveCnCNetSettings();
+            DomainController.Instance().SaveCnCNetColorSetting(cmbMessageColor.SelectedIndex);
         }
 
         /// <summary>
@@ -1682,109 +1513,7 @@ namespace ClientGUI
         /// </summary>
         private void NCnCNetLobby_SizeChanged(object sender, EventArgs e)
         {
-            this.SuspendLayout();
-
-            if (!panel1.Visible)
-            {
-                lbPlayerList.Height = lbChatMessages.Height - 20;
-            }
-            else
-            {
-                lbPlayerList.Height = this.Height - 235;
-            }
-
             lbChatMessages.Refresh();
-            this.ResumeLayout();
-        }
-
-        /// <summary>
-        /// Executed when the "Dawn of the Tiberium Age" channel checkbox is (un)checked.
-        /// </summary>
-        private void chkChannelDTA_CheckedChanged()
-        {
-            if (!welcomeMessageReceived)
-                return;
-
-            if (chkChannelDTA.Checked)
-            {
-                CnCNetData.ConnectionBridge.SendMessage("JOIN #dta");
-                CnCNetData.ConnectionBridge.SendMessage("JOIN #dta-games");
-                AddChannelMessageToListBox(0);
-            }
-            else
-            {
-                CnCNetData.ConnectionBridge.SendMessage("PART #dta");
-                CnCNetData.ConnectionBridge.SendMessage("PART #dta-games");
-                UserLists[0].Clear();
-                UserColors[0].Clear();
-            }
-        }
-
-        /// <summary>
-        /// Executed when the "Twisted Insurrection" channel checkbox is (un)checked.
-        /// </summary>
-        private void chkChannelTI_CheckedChanged()
-        {
-            if (!welcomeMessageReceived)
-                return;
-
-            if (chkChannelTI.Checked)
-            {
-                CnCNetData.ConnectionBridge.SendMessage("JOIN #ti");
-                CnCNetData.ConnectionBridge.SendMessage("JOIN #ti-games");
-                AddChannelMessageToListBox(1);
-            }
-            else
-            {
-                CnCNetData.ConnectionBridge.SendMessage("PART #ti");
-                CnCNetData.ConnectionBridge.SendMessage("PART #ti-games");
-                UserLists[1].Clear();
-                UserColors[1].Clear();
-            }
-        }
-
-        /// <summary>
-        /// Executed when the "Tiberian Sun" channel checkbox is (un)checked.
-        /// </summary>
-        private void chkChannelTS_CheckedChanged()
-        {
-            if (!welcomeMessageReceived)
-                return;
-
-            if (chkChannelTS.Checked)
-            {
-                CnCNetData.ConnectionBridge.SendMessage("JOIN #ts");
-                CnCNetData.ConnectionBridge.SendMessage("JOIN #ts-games");
-                AddChannelMessageToListBox(3);
-            }
-            else
-            {
-                CnCNetData.ConnectionBridge.SendMessage("PART #ts");
-                CnCNetData.ConnectionBridge.SendMessage("PART #ts-games");
-                UserLists[3].Clear();
-                UserColors[3].Clear();
-            }
-        }
-
-        /// <summary>
-        /// Executed when the "General CnCNet Chat" channel checkbox is (un)checked.
-        /// </summary>
-        private void chkChannelCnCNet_CheckedChanged()
-        {
-            if (!welcomeMessageReceived)
-                return;
-
-            if (chkChannelCnCNet.Checked)
-            {
-                CnCNetData.ConnectionBridge.SendMessage("JOIN #cncnet");
-                AddChannelMessageToListBox(4);
-            }
-            else
-            {
-                CnCNetData.ConnectionBridge.SendMessage("PART #cncnet");
-                UserLists[4].Clear();
-                UserColors[4].Clear();
-            }
         }
 
         /// <summary>
@@ -1792,50 +1521,27 @@ namespace ClientGUI
         /// </summary>
         private void cmbCurrentChannel_SelectedIndexChanged(object sender, EventArgs e)
         {
-            switch (cmbCurrentChannel.SelectedIndex)
+            GameCollection gc = GameCollection.Instance;
+
+            string currentChannelName = gc.GetGameChatChannelNameFromIndex(currentChannelId);
+
+            if (currentChannelName != "#cncnet" &&
+                currentChannelName != gc.GetGameChatChannelNameFromIdentifier(myGame))
             {
-                case 0:
-                    if (!chkChannelDTA.Checked)
-                    {
-                        chkChannelDTA.Checked = true;
-                        MessageInfos[0].Add(new MessageInfo(Color.White, "Attempting to join The Dawn of the Tiberium Age's channel..."));
-                    }
-                    break;
-                case 1:
-                    if (!chkChannelTI.Checked)
-                    {
-                        chkChannelTI.Checked = true;
-                        MessageInfos[1].Add(new MessageInfo(Color.White, "Attempting to join Twisted Insurrection's channel..."));
-                    }
-                    break;
-                //case 2:
-                //    if (!chkChannelTO.Checked)
-                //    {
-                //        chkChannelTO.Checked = true;
-                //        MessageInfos[2].Add(new MessageInfo(Color.White, "Attempting to join Tiberian Odyssey's channel..."));
-                //    }
-                //    break;
-                case 2:
-                    if (!chkChannelTS.Checked)
-                    {
-                        chkChannelTS.Checked = true;
-                        MessageInfos[3].Add(new MessageInfo(Color.White, "Attempting to join Tiberian Sun's channel..."));
-                    }
-                    break;
-                case 3:
-                    if (!chkChannelCnCNet.Checked)
-                    {
-                        chkChannelCnCNet.Checked = true;
-                        MessageInfos[4].Add(new MessageInfo(Color.White, "Attempting to join the General CnCNet Chat channel..."));
-                    }
-                    break;
+                CnCNetData.ConnectionBridge.SendMessage("PART " + currentChannelName);
+                UserLists[currentChannelId].Clear();
             }
 
-            // Hack to hide TO
-            if (cmbCurrentChannel.SelectedIndex > 1)
-                currentChannelId = cmbCurrentChannel.SelectedIndex + 1;
-            else
-                currentChannelId = cmbCurrentChannel.SelectedIndex;
+            currentChannelId = ChatChannelIndexes[cmbCurrentChannel.SelectedIndex];
+
+            string newChannelName = gc.GetGameChatChannelNameFromIndex(currentChannelId);
+
+            if (newChannelName != "#cncnet" && 
+                newChannelName != gc.GetGameChatChannelNameFromIdentifier(myGame))
+            {
+                CnCNetData.ConnectionBridge.SendMessage("JOIN " + newChannelName);
+                CnCNetData.ConnectionBridge.SendMessage("WHO " + newChannelName);
+            }
 
             UpdatePlayerList();
             UpdateMessages();
@@ -1919,11 +1625,9 @@ namespace ClientGUI
         /// </summary>
         private void lbPlayerList_DrawItem(object sender, DrawItemEventArgs e)
         {
-            int currentChannel = cmbCurrentChannel.SelectedIndex;
-
             if (e.Index > -1 && e.Index < lbPlayerList.Items.Count)
             {
-                Color foreColor;
+                Color foreColor = cPlayerNameColor;
 
                 if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
                     e = new DrawItemEventArgs(e.Graphics,
@@ -1937,14 +1641,31 @@ namespace ClientGUI
                 e.DrawBackground();
                 e.DrawFocusRectangle();
 
+                int GAME_ICON_SIZE = gameIcons[0].Size.Width;
+
+                Rectangle gameIconRect = new Rectangle(e.Bounds.X, e.Bounds.Y, GAME_ICON_SIZE, GAME_ICON_SIZE);
+
+                int gameIconIndex = 0;
+
                 string nameToDraw = lbPlayerList.Items[e.Index].ToString();
 
-                if (nameToDraw[0] == '@')
-                    foreColor = cAdminNameColor;
-                else
-                    foreColor = cPlayerNameColor;
+                if (e.Index > -1 && e.Index < UserLists[currentChannelId].Count)
+                {
+                    IrcUser iu = UserLists[currentChannelId][e.Index];
 
-                e.Graphics.DrawString(lbPlayerList.Items[e.Index].ToString(), e.Font, new SolidBrush(foreColor), e.Bounds);
+                    gameIconIndex = iu.GameId;
+
+                    if (iu.IsAdmin)
+                    {
+                        foreColor = cAdminNameColor;
+                        nameToDraw = nameToDraw + " (Admin)";
+                    }
+                }
+
+                e.Graphics.DrawImage(gameIcons[gameIconIndex], gameIconRect);
+                e.Graphics.DrawString(nameToDraw, e.Font, new SolidBrush(foreColor), 
+                    new Rectangle(e.Bounds.X + gameIconRect.Width + 1,
+                        e.Bounds.Y, e.Bounds.Width - gameIconRect.Width - 1, e.Bounds.Height));
             }
         }
 
@@ -1997,7 +1718,7 @@ namespace ClientGUI
             }
             else
             {
-                string channel = ChannelNames[currentChannelId];
+                string channel = GameCollection.Instance.GetGameChatChannelNameFromIndex(currentChannelId);
                 int colorId = cmbMessageColor.SelectedIndex + 2;
                 string colorString = Convert.ToString((char)03);
                 if (colorId < 10)
@@ -2176,54 +1897,18 @@ namespace ClientGUI
         /// </summary>
         private void BroadcastGameCreation()
         {
-            string gameName = "The Dawn of the Tiberium Age";
-            switch (myGame)
-            {
-                case "DTA":
-                    gameName = "The Dawn of the Tiberium Age";
-                    break;
-                case "TI":
-                    gameName = "Twisted Insurrection";
-                    break;
-                case "TO":
-                    gameName = "Tiberian Odyssey";
-                    break;
-                case "TS":
-                    gameName = "Tiberian Sun";
-                    break;
-                case "YR":
-                    gameName = "Yuri's Revenge";
-                    break;
-            }
+            string gameName = GameCollection.Instance.GetGameNameFromInternalName(myGame);
 
-            if (chkChannelDTA.Checked)
-            {
-                CnCNetData.ConnectionBridge.SendMessage("PRIVMSG #dta " + weirdChar1 + weirdChar2 + "ACTION has hosted a new " + gameName + " game." + weirdChar2);
-                MessageInfos[0].Add(new MessageInfo(cDefaultChatColor, "====> " + ProgramConstants.CNCNET_PLAYERNAME + " has hosted a new " + gameName + " game."));
-            }
+            GameCollection gc = GameCollection.Instance;
 
-            if (chkChannelTI.Checked)
-            {
-                CnCNetData.ConnectionBridge.SendMessage("PRIVMSG #ti " + weirdChar1 + weirdChar2 + "ACTION has hosted a new " + gameName + " game." + weirdChar2);
-                MessageInfos[1].Add(new MessageInfo(cDefaultChatColor, "====> " + ProgramConstants.CNCNET_PLAYERNAME + " has hosted a new " + gameName + " game."));
-            }
+            CnCNetData.ConnectionBridge.SendMessage("PRIVMSG " + gc.GetGameChatChannelNameFromIndex(currentChannelId) + " " + weirdChar1 + weirdChar2 + "ACTION has hosted a new " + gameName + " game." + weirdChar2);
+            MessageInfos[currentChannelId].Add(new MessageInfo(cDefaultChatColor, "====> " + ProgramConstants.CNCNET_PLAYERNAME + " has hosted a new " + gameName + " game."));
 
-            if (chkChannelTO.Checked)
+            if (gc.GetGameChatChannelNameFromIndex(currentChannelId) != "#cncnet")
             {
-                CnCNetData.ConnectionBridge.SendMessage("PRIVMSG #to " + weirdChar1 + weirdChar2 + "ACTION has hosted a new " + gameName + " game." + weirdChar2);
-                MessageInfos[2].Add(new MessageInfo(cDefaultChatColor, "====> " + ProgramConstants.CNCNET_PLAYERNAME + " has hosted a new " + gameName + " game."));
-            }
-
-            if (chkChannelTS.Checked)
-            {
-                CnCNetData.ConnectionBridge.SendMessage("PRIVMSG #ts " + weirdChar1 + weirdChar2 + "ACTION has hosted a new " + gameName + " game." + weirdChar2);
-                MessageInfos[3].Add(new MessageInfo(cDefaultChatColor, "====> " + ProgramConstants.CNCNET_PLAYERNAME + " has hosted a new " + gameName + " game."));
-            }
-
-            if (chkChannelCnCNet.Checked)
-            {
-                CnCNetData.ConnectionBridge.SendMessage("PRIVMSG #cncnet " + weirdChar1 + weirdChar2 + "ACTION has hosted a new " + gameName + " game." + weirdChar2);
-                MessageInfos[4].Add(new MessageInfo(cDefaultChatColor, "====> " + ProgramConstants.CNCNET_PLAYERNAME + " has hosted a new " + gameName + " game."));
+                // Broadcast to #cncnet as well if we're not looking there right now
+                CnCNetData.ConnectionBridge.SendMessage("PRIVMSG " + gc.GetGameChatChannelNameFromIndex(currentChannelId) + " " + weirdChar1 + weirdChar2 + "ACTION has hosted a new " + gameName + " game." + weirdChar2);
+                MessageInfos[gc.GetGameIndexFromChatChannelName("#cncnet")].Add(new MessageInfo(cDefaultChatColor, "====> " + ProgramConstants.CNCNET_PLAYERNAME + " has hosted a new " + gameName + " game."));
             }
 
             AddChannelMessageToListBox(currentChannelId);
@@ -2596,7 +2281,7 @@ namespace ClientGUI
             if (wmPlayer.playState == WMPPlayState.wmppsPlaying)
             {
                 wmPlayer.controls.stop();
-                DomainController.Instance().saveLobbyMusicSettings(false);
+                DomainController.Instance().SaveLobbyMusicSettings(false);
                 btnMusicToggle.Text = "Music OFF";
             }
             else
@@ -2604,7 +2289,7 @@ namespace ClientGUI
                 wmPlayer.URL = ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "lobbymusic.wav";
                 wmPlayer.settings.setMode("loop", true);
                 wmPlayer.controls.play();
-                DomainController.Instance().saveLobbyMusicSettings(true);
+                DomainController.Instance().SaveLobbyMusicSettings(true);
                 btnMusicToggle.Text = "Music ON";
             }
         }
@@ -2711,23 +2396,13 @@ namespace ClientGUI
 
                 Game game = CnCNetData.Games[e.Index];
 
-                int GAME_ICON_SIZE = dtaIcon.Size.Width;
+                int GAME_ICON_SIZE = gameIcons[0].Size.Width;
 
                 Rectangle gameIconRect = new Rectangle(e.Bounds.X, e.Bounds.Y, GAME_ICON_SIZE, GAME_ICON_SIZE);
 
-                // Draw game identifier icon
-                switch (game.GameIdentifier)
-                {
-                    case "DTA":
-                        e.Graphics.DrawImage(dtaIcon, gameIconRect);
-                        break;
-                    case "TI":
-                        e.Graphics.DrawImage(tiIcon, gameIconRect);
-                        break;
-                    case "TS":
-                        e.Graphics.DrawImage(tsIcon, gameIconRect);
-                        break;
-                }
+                int gameIndex = GameCollection.Instance.GetGameIndexFromInternalName(game.GameIdentifier);
+
+                e.Graphics.DrawImage(gameIcons[gameIndex], gameIconRect);
 
                 int multiplier = 1;
 
@@ -2821,7 +2496,7 @@ namespace ClientGUI
             Point mousePosition = lbChatMessages.PointToClient(ListBox.MousePosition);
             int hoveredIndex = lbChatMessages.IndexFromPoint(mousePosition);
 
-            if (hoveredIndex == -1)
+            if (hoveredIndex == -1 || hoveredIndex >= lbChatMessages.Items.Count)
             {
                 lbChatMessages.Cursor = Cursors.Default;
                 return;
@@ -2837,6 +2512,17 @@ namespace ClientGUI
                 lbChatMessages.Cursor = Cursors.Hand;
             else
                 lbChatMessages.Cursor = Cursors.Default;
+        }
+
+        /// <summary>
+        /// Called when the user clicks on the "Followed Games..." button.
+        /// Shows the Followed Games dialog.
+        /// </summary>
+        private void btnConfigure_Click(object sender, EventArgs e)
+        {
+            GameSelectionForm gsf = new GameSelectionForm();
+            gsf.ShowDialog();
+            gsf.Dispose();
         }
     }
 }

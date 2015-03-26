@@ -75,7 +75,7 @@ namespace ClientGUI
         }
 
         private bool _checked = false;
-        public delegate void OnCheckedChanged();
+        public delegate void OnCheckedChanged(object sender);
         public event OnCheckedChanged CheckedChanged;
 
         [Browsable(true)]
@@ -130,7 +130,7 @@ namespace ClientGUI
                 }
 
                 if (CheckedChanged != null)
-                    CheckedChanged();
+                    CheckedChanged(this);
             }
         }
 
