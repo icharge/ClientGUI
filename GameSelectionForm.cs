@@ -38,9 +38,9 @@ namespace ClientGUI
 
         private void GameSelectionForm_Load(object sender, EventArgs e)
         {
-            cLabelColor = SharedUILogic.getColorFromString(DomainController.Instance().getUILabelColor());
-            cAltUIColor = SharedUILogic.getColorFromString(DomainController.Instance().getUIAltColor());
-            cBackColor = SharedUILogic.getColorFromString(DomainController.Instance().getUIAltBackgroundColor());
+            cLabelColor = SharedUILogic.GetColorFromString(DomainController.Instance().getUILabelColor());
+            cAltUIColor = SharedUILogic.GetColorFromString(DomainController.Instance().getUIAltColor());
+            cBackColor = SharedUILogic.GetColorFromString(DomainController.Instance().getUIAltBackgroundColor());
 
             this.BackgroundImage = Image.FromFile(ProgramConstants.RESOURCES_DIR + "followedgamesbg.png");
 

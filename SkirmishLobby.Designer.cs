@@ -80,13 +80,13 @@
             this.cmbP1Team = new ClientGUI.LimitedComboBox();
             this.cmbP1Color = new ClientGUI.LimitedComboBox();
             this.cmbP1Side = new ClientGUI.LimitedComboBox();
-            this.lbMapList = new ClientGUI.ScrollbarlessListBox();
             this.lblGameMode = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.cmbCurrGameMode = new ClientGUI.LimitedComboBox();
-            this.pbPreview = new ClientGUI.EnhancedPictureBox();
             this.customScrollbar1 = new CustomControls.CustomScrollbar();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.cmbCurrGameMode = new ClientGUI.LimitedComboBox();
+            this.lbMapList = new ClientGUI.ScrollbarlessListBox();
+            this.pbPreview = new ClientGUI.EnhancedPictureBox();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbPreview)).BeginInit();
             this.SuspendLayout();
@@ -406,7 +406,7 @@
             // 
             this.cmbP2Name.BackColor = System.Drawing.Color.Black;
             this.cmbP2Name.CanDropDown = true;
-            this.cmbP2Name.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.cmbP2Name.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbP2Name.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbP2Name.ForeColor = System.Drawing.Color.LimeGreen;
             this.cmbP2Name.FormattingEnabled = true;
@@ -1184,25 +1184,7 @@
             this.cmbP1Side.Size = new System.Drawing.Size(80, 21);
             this.cmbP1Side.TabIndex = 1;
             this.cmbP1Side.UseCustomDrawingCode = true;
-            this.cmbP1Side.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.cmbGeneric_DrawItem);
             this.cmbP1Side.SelectedIndexChanged += new System.EventHandler(this.CopyPlayerDataFromUI);
-            // 
-            // lbMapList
-            // 
-            this.lbMapList.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this.lbMapList.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.lbMapList.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
-            this.lbMapList.FormattingEnabled = true;
-            this.lbMapList.IntegralHeight = false;
-            this.lbMapList.Location = new System.Drawing.Point(6, 276);
-            this.lbMapList.Margin = new System.Windows.Forms.Padding(4);
-            this.lbMapList.Name = "lbMapList";
-            this.lbMapList.ShowScrollbar = false;
-            this.lbMapList.Size = new System.Drawing.Size(369, 522);
-            this.lbMapList.TabIndex = 81;
-            this.lbMapList.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.lbMapList_DrawItem);
-            this.lbMapList.SelectedIndexChanged += new System.EventHandler(this.lbMapList_SelectedIndexChanged);
             // 
             // lblGameMode
             // 
@@ -1224,44 +1206,6 @@
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(433, 235);
             this.panel2.TabIndex = 86;
-            // 
-            // cmbCurrGameMode
-            // 
-            this.cmbCurrGameMode.CanDropDown = true;
-            this.cmbCurrGameMode.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
-            this.cmbCurrGameMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmbCurrGameMode.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.cmbCurrGameMode.FormattingEnabled = true;
-            this.cmbCurrGameMode.HoveredIndex = -1;
-            this.cmbCurrGameMode.ItemHeight = 15;
-            this.cmbCurrGameMode.Location = new System.Drawing.Point(237, 249);
-            this.cmbCurrGameMode.Margin = new System.Windows.Forms.Padding(0);
-            this.cmbCurrGameMode.MaxDropDownItems = 20;
-            this.cmbCurrGameMode.Name = "cmbCurrGameMode";
-            this.cmbCurrGameMode.Size = new System.Drawing.Size(150, 21);
-            this.cmbCurrGameMode.TabIndex = 83;
-            this.cmbCurrGameMode.UseCustomDrawingCode = true;
-            this.cmbCurrGameMode.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.cmbGeneric_DrawItem);
-            this.cmbCurrGameMode.SelectedIndexChanged += new System.EventHandler(this.cmbCurrGameMode_SelectedIndexChanged);
-            // 
-            // pbPreview
-            // 
-            this.pbPreview.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.pbPreview.BackColor = System.Drawing.Color.Black;
-            this.pbPreview.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pbPreview.Location = new System.Drawing.Point(396, 244);
-            this.pbPreview.Margin = new System.Windows.Forms.Padding(4);
-            this.pbPreview.Name = "pbPreview";
-            this.pbPreview.Size = new System.Drawing.Size(1190, 543);
-            this.pbPreview.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pbPreview.TabIndex = 76;
-            this.pbPreview.TabStop = false;
-            this.pbPreview.SizeChanged += new System.EventHandler(this.pbPreview_SizeChanged);
-            this.pbPreview.Paint += new System.Windows.Forms.PaintEventHandler(this.pbPreview_Paint);
-            this.pbPreview.MouseEnter += new System.EventHandler(this.pbPreview_MouseEnter);
-            this.pbPreview.MouseLeave += new System.EventHandler(this.pbPreview_MouseLeave);
             // 
             // customScrollbar1
             // 
@@ -1291,6 +1235,61 @@
             this.toolTip1.AutoPopDelay = 20000;
             this.toolTip1.InitialDelay = 500;
             this.toolTip1.ReshowDelay = 100;
+            // 
+            // cmbCurrGameMode
+            // 
+            this.cmbCurrGameMode.CanDropDown = true;
+            this.cmbCurrGameMode.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.cmbCurrGameMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbCurrGameMode.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cmbCurrGameMode.FormattingEnabled = true;
+            this.cmbCurrGameMode.HoveredIndex = -1;
+            this.cmbCurrGameMode.ItemHeight = 15;
+            this.cmbCurrGameMode.Location = new System.Drawing.Point(237, 249);
+            this.cmbCurrGameMode.Margin = new System.Windows.Forms.Padding(0);
+            this.cmbCurrGameMode.MaxDropDownItems = 20;
+            this.cmbCurrGameMode.Name = "cmbCurrGameMode";
+            this.cmbCurrGameMode.Size = new System.Drawing.Size(150, 21);
+            this.cmbCurrGameMode.TabIndex = 83;
+            this.cmbCurrGameMode.UseCustomDrawingCode = true;
+            this.cmbCurrGameMode.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.cmbGeneric_DrawItem);
+            this.cmbCurrGameMode.SelectedIndexChanged += new System.EventHandler(this.cmbCurrGameMode_SelectedIndexChanged);
+            // 
+            // lbMapList
+            // 
+            this.lbMapList.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.lbMapList.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.lbMapList.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.lbMapList.FormattingEnabled = true;
+            this.lbMapList.IntegralHeight = false;
+            this.lbMapList.Location = new System.Drawing.Point(6, 276);
+            this.lbMapList.Margin = new System.Windows.Forms.Padding(4);
+            this.lbMapList.Name = "lbMapList";
+            this.lbMapList.ShowScrollbar = false;
+            this.lbMapList.Size = new System.Drawing.Size(369, 522);
+            this.lbMapList.TabIndex = 81;
+            this.lbMapList.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.lbMapList_DrawItem);
+            this.lbMapList.SelectedIndexChanged += new System.EventHandler(this.lbMapList_SelectedIndexChanged);
+            // 
+            // pbPreview
+            // 
+            this.pbPreview.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.pbPreview.BackColor = System.Drawing.Color.Black;
+            this.pbPreview.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.pbPreview.Location = new System.Drawing.Point(396, 244);
+            this.pbPreview.Margin = new System.Windows.Forms.Padding(4);
+            this.pbPreview.Name = "pbPreview";
+            this.pbPreview.Size = new System.Drawing.Size(1190, 543);
+            this.pbPreview.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pbPreview.TabIndex = 76;
+            this.pbPreview.TabStop = false;
+            this.pbPreview.SizeChanged += new System.EventHandler(this.pbPreview_SizeChanged);
+            this.pbPreview.Paint += new System.Windows.Forms.PaintEventHandler(this.pbPreview_Paint);
+            this.pbPreview.MouseEnter += new System.EventHandler(this.pbPreview_MouseEnter);
+            this.pbPreview.MouseLeave += new System.EventHandler(this.pbPreview_MouseLeave);
             // 
             // SkirmishLobby
             // 

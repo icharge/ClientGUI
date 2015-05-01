@@ -1,5 +1,5 @@
 ﻿/// @author Rampastring
-/// @version 8. 2. 2015
+/// @version 17. 4. 2015
 /// http://www.moddb.com/members/rampastring
 
 using System;
@@ -8,6 +8,7 @@ using System.Text;
 using System.IO;
 using System.Windows.Forms;
 using System.Drawing;
+using System.Diagnostics;
 using ClientCore;
 using ClientCore.CnCNet5;
 
@@ -18,6 +19,9 @@ namespace ClientGUI
     /// </summary>
     static class SharedUILogic
     {
+        public delegate void GameProcessExitedEventHandler();
+        public static event GameProcessExitedEventHandler GameProcessExited; 
+
         const int COOP_BRIEFING_WIDTH = 488;
         const int COOP_BRIEFING_HEIGHT = 200;
 
@@ -836,10 +840,10 @@ namespace ClientGUI
                             control.Font = SharedLogic.getFont(keyValue);
                             break;
                         case "ForeColor":
-                            control.ForeColor = getColorFromString(keyValue);
+                            control.ForeColor = GetColorFromString(keyValue);
                             break;
                         case "BackColor":
-                            control.BackColor = getColorFromString(keyValue);
+                            control.BackColor = GetColorFromString(keyValue);
                             break;
                         case "Size":
                             string[] sizeArray = keyValue.Split(',');
@@ -862,11 +866,244 @@ namespace ClientGUI
         /// </summary>
         /// <param name="colorString">The color string.</param>
         /// <returns>The color.</returns>
-        public static Color getColorFromString(string colorString)
+        public static Color GetColorFromString(string colorString)
         {
             string[] colorArray = colorString.Split(',');
             Color color = Color.FromArgb(Convert.ToByte(colorArray[0]), Convert.ToByte(colorArray[1]), Convert.ToByte(colorArray[2]));
             return color;
+        }
+
+        /// <summary>
+        /// Starts the main game process.
+        /// </summary>
+        /// <param name="processId">The index of the game process to start (for RA2 support;
+        /// GameOptions.ini -> GameExecutableNames= allows multiple names).</param>
+        public static void StartGameProcess(int processId)
+        {
+            string gameExecutableName = DomainController.Instance().getGameExecutableName(processId);
+
+            if (DomainController.Instance().getWindowedStatus())
+            {
+                Logger.Log("Windowed mode is enabled - using QRes.");
+                Process QResProcess = new Process();
+                QResProcess.StartInfo.FileName = ProgramConstants.QRES_EXECUTABLE;
+                QResProcess.StartInfo.UseShellExecute = false;
+                QResProcess.StartInfo.Arguments = "c=16 /R " + "\"" + ProgramConstants.gamepath + gameExecutableName + "\"" + " -SPAWN";
+                QResProcess.EnableRaisingEvents = true;
+                QResProcess.Exited += new EventHandler(QResProcess_Exited);
+                QResProcess.Start();
+
+                if (Environment.ProcessorCount > 1)
+                    QResProcess.ProcessorAffinity = (IntPtr)2;
+            }
+            else
+            {
+                Process DtaProcess = new Process();
+                DtaProcess.StartInfo.FileName = gameExecutableName;
+                DtaProcess.StartInfo.UseShellExecute = false;
+                DtaProcess.StartInfo.Arguments = "-SPAWN";
+                DtaProcess.EnableRaisingEvents = true;
+                DtaProcess.Exited += new EventHandler(DtaProcess_Exited);
+                DtaProcess.Start();
+
+                if (Environment.ProcessorCount > 1)
+                    DtaProcess.ProcessorAffinity = (System.IntPtr)2;
+            }
+
+            Logger.Log("Waiting for qres.dat or " + gameExecutableName + " to exit.");
+        }
+
+        static void DtaProcess_Exited(object sender, EventArgs e)
+        {
+            GameProcessExited();
+        }
+
+        static void QResProcess_Exited(object sender, EventArgs e)
+        {
+            GameProcessExited();
+        }
+
+        /// <summary>
+        /// Loads icons used for displaying sides in the game lobby.
+        /// </summary>
+        /// <returns>An array of side images.</returns>
+        public static Image[] LoadSideImages()
+        {
+            string[] sides = DomainController.Instance().getSides().Split(',');
+            Image[] returnValue = new Image[sides.Length + 2];
+
+            returnValue[0] = Image.FromFile(ProgramConstants.gamepath + "Resources\\randomicon.png");
+
+            for (int i = 1; i <= sides.Length; i++)
+            {
+                returnValue[i] = Image.FromFile(ProgramConstants.gamepath + "Resources\\" + sides[i - 1] + "icon.png");
+            }
+
+            returnValue[sides.Length + 1] = Image.FromFile(ProgramConstants.gamepath + "Resources\\spectatoricon.png");
+
+            return returnValue;
+        }
+
+        /// <summary>
+        /// Loads starting location indicator icons for the game lobby.
+        /// </summary>
+        /// <returns>An array of starting location indicator images.</returns>
+        public static Image[] LoadStartingLocationIndicators()
+        {
+            Image[] startingLocationIndicators = new Image[8];
+            startingLocationIndicators[0] = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "slocindicator1.png");
+            startingLocationIndicators[1] = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "slocindicator2.png");
+            startingLocationIndicators[2] = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "slocindicator3.png");
+            startingLocationIndicators[3] = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "slocindicator4.png");
+            startingLocationIndicators[4] = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "slocindicator5.png");
+            startingLocationIndicators[5] = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "slocindicator6.png");
+            startingLocationIndicators[6] = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "slocindicator7.png");
+            startingLocationIndicators[7] = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "slocindicator8.png");
+
+            return startingLocationIndicators;
+        }
+
+        /// <summary>
+        /// Sets the background image layout of a form based on the client's settings.
+        /// </summary>
+        /// <param name="form">The form.</param>
+        public static void SetBackgroundImageLayout(Form form)
+        {
+            string backgroundImageLayout = DomainController.Instance().getGameLobbyBackgroundImageLayout();
+            switch (backgroundImageLayout)
+            {
+                case "Center":
+                    form.BackgroundImageLayout = ImageLayout.Center;
+                    break;
+                case "Stretch":
+                    form.BackgroundImageLayout = ImageLayout.Stretch;
+                    break;
+                case "Zoom":
+                    form.BackgroundImageLayout = ImageLayout.Zoom;
+                    break;
+                default:
+                case "Tile":
+                    form.BackgroundImageLayout = ImageLayout.Tile;
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Sets the colors of a specific control and (recursively) all of its child controls.
+        /// </summary>
+        /// <param name="cLabelColor">The color of labels in the UI.</param>
+        /// <param name="cBackColor">The background color of list boxes and combo boxes in the UI.</param>
+        /// <param name="cAltUiColor">The foreground color of list boxes, buttons and combo boxes in the UI.</param>
+        /// <param name="cListBoxFocusColor">The background color of highlighted list box and combo box items.</param>
+        /// <param name="control">The control. Usually you'll want to have a form in this parameter.</param>
+        public static void SetControlColor(Color cLabelColor, Color cBackColor, Color cAltUiColor,
+            Color cListBoxFocusColor, Control control)
+        {
+            SetControlColors(cLabelColor, cBackColor, cAltUiColor, cListBoxFocusColor, control);
+
+            foreach (Control child in control.Controls)
+                SetControlColor(cLabelColor, cBackColor, cAltUiColor, cListBoxFocusColor, child);
+        }
+
+        /// <summary>
+        /// Sets the colors of a single control.
+        /// </summary>
+        /// <param name="cLabelColor">The color of labels in the UI.</param>
+        /// <param name="cBackColor">The background color of list boxes and combo boxes in the UI.</param>
+        /// <param name="cAltUiColor">The foreground color of list boxes, buttons and combo boxes in the UI.</param>
+        /// <param name="cListBoxFocusColor">The background color of highlighted list box and combo box items.</param>
+        /// <param name="control">The control.</param>
+        private static void SetControlColors(Color cLabelColor, Color cBackColor, Color cAltUiColor,
+            Color cListBoxFocusColor, Control control)
+        {
+            if (control is LimitedComboBox)
+            {
+                control.ForeColor = cAltUiColor;
+                control.BackColor = cBackColor;
+
+                ((LimitedComboBox)control).FocusColor = cListBoxFocusColor;
+            }
+            else if (control is ScrollbarlessListBox || control is Button || control is TextBox)
+            {
+                control.ForeColor = cAltUiColor;
+                control.BackColor = cBackColor;
+            }
+            else if (control is Label)
+            {
+                control.ForeColor = cLabelColor;
+            }
+        }
+
+        /// <summary>
+        /// Gathers and returns a list of usable multiplayer colors.
+        /// </summary>
+        /// <returns>A list of usable multiplayer colors.</returns>
+        public static List<Color> GetMPColors()
+        {
+            List<Color> MPColors = new List<Color>();
+            MPColors.Add(Color.White);
+            MPColors.Add(GetColorFromString(DomainController.Instance().getMPColorOne()));
+            MPColors.Add(GetColorFromString(DomainController.Instance().getMPColorTwo()));
+            MPColors.Add(GetColorFromString(DomainController.Instance().getMPColorThree()));
+            MPColors.Add(GetColorFromString(DomainController.Instance().getMPColorFour()));
+            MPColors.Add(GetColorFromString(DomainController.Instance().getMPColorFive()));
+            MPColors.Add(GetColorFromString(DomainController.Instance().getMPColorSix()));
+            MPColors.Add(GetColorFromString(DomainController.Instance().getMPColorSeven()));
+            MPColors.Add(GetColorFromString(DomainController.Instance().getMPColorEight()));
+
+            return MPColors;
+        }
+
+        public static string[] GetTeamIdentifiers()
+        {
+            return new string[] { "[A] ", "[B] ", "[C] ", "[D] " }; 
+        }
+
+        public static LimitedComboBox SetUpComboBoxFromIni(string comboBoxName, IniFile gameOptionsIni, ToolTip toolTip,
+            Font font, Color defaultOptionColor, Color nonDefaultOptionColor)
+        {
+            string[] items = gameOptionsIni.GetStringValue(comboBoxName, "Items", "give me items, noob!").Split(',');
+            int defaultIndex = gameOptionsIni.GetIntValue(comboBoxName, "DefaultIndex", 0);
+            string _dataWriteMode = gameOptionsIni.GetStringValue(comboBoxName, "DataWriteMode", "Boolean");
+            DataWriteMode dwMode;
+            if (_dataWriteMode == "Boolean")
+                dwMode = DataWriteMode.BOOLEAN;
+            else if (_dataWriteMode == "Index")
+                dwMode = DataWriteMode.INDEX;
+            else
+                dwMode = DataWriteMode.STRING;
+            string[] location = gameOptionsIni.GetStringValue(comboBoxName, "Location", "0,0").Split(',');
+            Point pLocation = new Point(Convert.ToInt32(location[0]), Convert.ToInt32(location[1]));
+            string[] size = gameOptionsIni.GetStringValue(comboBoxName, "Size", "83,21").Split(',');
+            Size sSize = new Size(Convert.ToInt32(size[0]), Convert.ToInt32(size[1]));
+            string sToolTip = gameOptionsIni.GetStringValue(comboBoxName, "ToolTip", String.Empty);
+
+            LimitedComboBox cmbBox = new LimitedComboBox();
+            cmbBox.Anchor = AnchorStyles.Top | AnchorStyles.Left;
+            cmbBox.FlatStyle = FlatStyle.Flat;
+            cmbBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbBox.Font = font;
+            cmbBox.Name = comboBoxName;
+            for (int itemId = 0; itemId < items.Length; itemId++)
+            {
+                if (itemId == defaultIndex)
+                    cmbBox.AddItem(items[itemId], defaultOptionColor);
+                else
+                    cmbBox.AddItem(items[itemId], nonDefaultOptionColor);
+            }
+            cmbBox.SelectedIndex = defaultIndex;
+            cmbBox.Location = pLocation;
+            cmbBox.Size = sSize;
+            cmbBox.DrawMode = DrawMode.OwnerDrawVariable;
+            cmbBox.MaxDropDownItems = cmbBox.Items.Count;
+            cmbBox.Tag = dwMode;
+
+            if (!String.IsNullOrEmpty(sToolTip))
+            {
+                toolTip.SetToolTip(cmbBox, sToolTip);
+            }
+
+            return cmbBox;
         }
     }
 }

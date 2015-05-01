@@ -54,6 +54,8 @@ namespace ClientGUI
         bool displayCoopBriefing = true;
         Color coopBriefingForeColor;
 
+        Color cListBoxFocusColor;
+
         /// <summary>
         /// Initializes the map selection screen.
         /// </summary>
@@ -89,27 +91,18 @@ namespace ClientGUI
 
             coopBriefingFont = new System.Drawing.Font("Segoe UI", 11.25f, FontStyle.Regular);
 
-            string[] labelColor = DomainController.Instance().getUILabelColor().Split(',');
-            Color cLabelColor = Color.FromArgb(Convert.ToByte(labelColor[0]), Convert.ToByte(labelColor[1]), Convert.ToByte(labelColor[2]));
-            lblGameMode.ForeColor = cLabelColor;
-            lblMapAuthor.ForeColor = cLabelColor;
+            Color cLabelColor = SharedUILogic.GetColorFromString(DomainController.Instance().getUILabelColor());
 
-            string[] altUiColor = DomainController.Instance().getUIAltColor().Split(',');
-            Color cAltUiColor = Color.FromArgb(Convert.ToByte(altUiColor[0]), Convert.ToByte(altUiColor[1]), Convert.ToByte(altUiColor[2]));
-            cmbGameMode.ForeColor = cAltUiColor;
-            lbMapList.ForeColor = cAltUiColor;
-            btnAccept.ForeColor = cAltUiColor;
-            btnCancel.ForeColor = cAltUiColor;
+            Color cAltUiColor = SharedUILogic.GetColorFromString(DomainController.Instance().getUIAltColor());
+
+            Color cBackColor = SharedUILogic.GetColorFromString(DomainController.Instance().getUIAltBackgroundColor());
 
             coopBriefingForeColor = cAltUiColor;
-
-            string[] backgroundColor = DomainController.Instance().getUIAltBackgroundColor().Split(',');
-            Color cBackColor = Color.FromArgb(Convert.ToByte(backgroundColor[0]), Convert.ToByte(backgroundColor[1]), Convert.ToByte(backgroundColor[2]));
-            cmbGameMode.BackColor = cBackColor;
-            lbMapList.BackColor = cBackColor;
             pbMapPreview.BackColor = cBackColor;
-            btnAccept.BackColor = cBackColor;
-            btnCancel.BackColor = cBackColor;
+
+            cListBoxFocusColor = SharedUILogic.GetColorFromString(DomainController.Instance().getListBoxFocusColor());
+
+            SharedUILogic.SetControlColor(cLabelColor, cBackColor, cAltUiColor, cListBoxFocusColor, this);
 
             missingPreviewImage = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "nopreview.png");
 
@@ -389,10 +382,20 @@ namespace ClientGUI
 
         private void lbMapList_DrawItem(object sender, DrawItemEventArgs e)
         {
-            e.DrawBackground();
-            e.DrawFocusRectangle();
             if (e.Index > -1 && e.Index < lbMapList.Items.Count)
             {
+                if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
+                    e = new DrawItemEventArgs(e.Graphics,
+                                              e.Font,
+                                              e.Bounds,
+                                              e.Index,
+                                              e.State ^ DrawItemState.Selected,
+                                              e.ForeColor,
+                                              cListBoxFocusColor);
+
+                e.DrawBackground();
+                e.DrawFocusRectangle();
+
                 Color foreColor = lbMapList.ForeColor;
                 e.Graphics.DrawString(lbMapList.Items[e.Index].ToString(), e.Font, new SolidBrush(foreColor), e.Bounds);
             }

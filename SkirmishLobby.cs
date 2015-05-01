@@ -20,6 +20,7 @@ using System.Runtime.InteropServices;
 using System.Reflection;
 using ClientCore;
 using ClientCore.CnCNet5;
+using ClientCore.Statistics;
 
 namespace ClientGUI
 {
@@ -53,7 +54,7 @@ namespace ClientGUI
         List<PlayerInfo> Players = new List<PlayerInfo>();
         List<PlayerInfo> AIPlayers = new List<PlayerInfo>();
 
-        List<Color> MPColors = new List<Color>();
+        List<Color> MPColors;
         List<UserCheckBox> CheckBoxes = new List<UserCheckBox>();
         List<string> AssociatedCheckBoxSpawnIniOptions = new List<string>();
         List<string> AssociatedCheckBoxCustomInis = new List<string>();
@@ -101,11 +102,15 @@ namespace ClientGUI
 
         Color cListBoxFocusColor;
 
+        MatchStatistics ms;
+
         /// <summary>
         /// Sets up the theme of the skirmish lobby and performs initialization.
         /// </summary>
         private void NGameLobby_Load(object sender, EventArgs e)
         {
+            SharedUILogic.GameProcessExited += GameProcessExited;
+
             foreach (string gameMode in CnCNetData.GameTypes)
                 cmbCurrGameMode.Items.Add(gameMode);
 
@@ -113,15 +118,7 @@ namespace ClientGUI
 
             this.Font = SharedLogic.getCommonFont();
 
-            startingLocationIndicators = new Image[8];
-            startingLocationIndicators[0] = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "slocindicator1.png");
-            startingLocationIndicators[1] = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "slocindicator2.png");
-            startingLocationIndicators[2] = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "slocindicator3.png");
-            startingLocationIndicators[3] = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "slocindicator4.png");
-            startingLocationIndicators[4] = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "slocindicator5.png");
-            startingLocationIndicators[5] = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "slocindicator6.png");
-            startingLocationIndicators[6] = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "slocindicator7.png");
-            startingLocationIndicators[7] = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "slocindicator8.png");
+            startingLocationIndicators = SharedUILogic.LoadStartingLocationIndicators();
 
             enemyStartingLocationIndicator = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "enemyslocindicator.png");
 
@@ -135,11 +132,7 @@ namespace ClientGUI
 
             coopBriefingFont = new System.Drawing.Font("Segoe UI", 11.25f, FontStyle.Regular);
             playerNameOnPlayerLocationFont = new Font("Segoe UI", 8.25f, FontStyle.Regular);
-            TeamIdentifiers = new string[4];
-            TeamIdentifiers[0] = "[A] ";
-            TeamIdentifiers[1] = "[B] ";
-            TeamIdentifiers[2] = "[C] ";
-            TeamIdentifiers[3] = "[D] ";
+            TeamIdentifiers = SharedUILogic.GetTeamIdentifiers();
 
             missingPreviewImage = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "nopreview.png");
 
@@ -154,23 +147,7 @@ namespace ClientGUI
             btnLaunchGame.BackgroundImage = btn133px;
             btnLeaveGame.BackgroundImage = btn133px;
 
-            string backgroundImageLayout = DomainController.Instance().getGameLobbyBackgroundImageLayout();
-            switch (backgroundImageLayout)
-            {
-                case "Center":
-                    this.BackgroundImageLayout = ImageLayout.Center;
-                    break;
-                case "Stretch":
-                    this.BackgroundImageLayout = ImageLayout.Stretch;
-                    break;
-                case "Zoom":
-                    this.BackgroundImageLayout = ImageLayout.Zoom;
-                    break;
-                default:
-                case "Tile":
-                    this.BackgroundImageLayout = ImageLayout.Tile;
-                    break;
-            }
+            SharedUILogic.SetBackgroundImageLayout(this);
 
             sndButtonSound = new SoundPlayer(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "button.wav");
 
@@ -182,15 +159,7 @@ namespace ClientGUI
                 getPlayerColorCMBFromId(cmbId).AddItem("Random", Color.White);
             }
 
-            MPColors.Add(Color.White);
-            MPColors.Add(getColorFromStringArray(DomainController.Instance().getMPColorOne().Split(',')));
-            MPColors.Add(getColorFromStringArray(DomainController.Instance().getMPColorTwo().Split(',')));
-            MPColors.Add(getColorFromStringArray(DomainController.Instance().getMPColorThree().Split(',')));
-            MPColors.Add(getColorFromStringArray(DomainController.Instance().getMPColorFour().Split(',')));
-            MPColors.Add(getColorFromStringArray(DomainController.Instance().getMPColorFive().Split(',')));
-            MPColors.Add(getColorFromStringArray(DomainController.Instance().getMPColorSix().Split(',')));
-            MPColors.Add(getColorFromStringArray(DomainController.Instance().getMPColorSeven().Split(',')));
-            MPColors.Add(getColorFromStringArray(DomainController.Instance().getMPColorEight().Split(',')));
+            MPColors = SharedUILogic.GetMPColors();
 
             for (int colorId = 1; colorId < 9; colorId++)
             {
@@ -200,6 +169,8 @@ namespace ClientGUI
                 }
             }
 
+            cListBoxFocusColor = SharedUILogic.GetColorFromString(DomainController.Instance().getListBoxFocusColor());
+
             iNumLoadingScreens = DomainController.Instance().getLoadScreenCount();
 
             string[] sides = DomainController.Instance().getSides().Split(',');
@@ -207,143 +178,57 @@ namespace ClientGUI
             for (int sideId = 0; sideId < sides.Length; sideId++)
                 SideComboboxPrerequisites.Add(new SideComboboxPrerequisite());
 
+            Image[] sideImages = SharedUILogic.LoadSideImages();
+
             for (int pId = 1; pId < 9; pId++)
             {
-                getPlayerSideCMBFromId(pId).Items.Add("Random");
+                LimitedComboBox cmb = getPlayerSideCMBFromId(pId);
+                cmb.Items.Add(new DropDownItem("Random", sideImages[0]));
+                cmb.FocusColor = cListBoxFocusColor;
             }
+
+            int i = 1;
             foreach (string sideName in sides)
             {
                 for (int pId = 1; pId < 9; pId++)
                 {
-                    getPlayerSideCMBFromId(pId).Items.Add(sideName);
+                    getPlayerSideCMBFromId(pId).Items.Add(new DropDownItem(sideName, sideImages[i]));
                 }
+
+                i++;
             }
 
-            cmbP1Side.Items.Add("Spectator");
+            cmbP1Side.Items.Add(new DropDownItem("Spectator", sideImages[sides.Length + 1]));
 
             string panelBorderStyle = DomainController.Instance().getPanelBorderStyle();
             if (panelBorderStyle == "FixedSingle")
+            {
                 panel1.BorderStyle = BorderStyle.FixedSingle;
-            else if (panelBorderStyle == "Fixed3D")
-                panel1.BorderStyle = BorderStyle.Fixed3D;
-            else
-                panel1.BorderStyle = BorderStyle.None;
-
-            string optionsPanelBorderStyle = DomainController.Instance().getPanelBorderStyle();
-            if (optionsPanelBorderStyle == "FixedSingle")
                 panel2.BorderStyle = BorderStyle.FixedSingle;
-            else if (optionsPanelBorderStyle == "Fixed3D")
+            }
+            else if (panelBorderStyle == "Fixed3D")
+            {
+                panel1.BorderStyle = BorderStyle.Fixed3D;
                 panel2.BorderStyle = BorderStyle.Fixed3D;
+            }
             else
+            {
+                panel1.BorderStyle = BorderStyle.None;
                 panel2.BorderStyle = BorderStyle.None;
+            }
 
             IniFile clIni = new IniFile(ProgramConstants.gamepath + "Resources\\GameOptions.ini");
 
-            string[] labelColor = DomainController.Instance().getUILabelColor().Split(',');
-            Color cLabelColor = Color.FromArgb(Convert.ToByte(labelColor[0]), Convert.ToByte(labelColor[1]), Convert.ToByte(labelColor[2]));
-            lblGameMode.ForeColor = cLabelColor;
-            lblMapAuthor.ForeColor = cLabelColor;
-            lblMapName.ForeColor = cLabelColor;
-            lblPlayerColor.ForeColor = cLabelColor;
-            lblPlayerName.ForeColor = cLabelColor;
-            lblPlayerSide.ForeColor = cLabelColor;
-            lblPlayerTeam.ForeColor = cLabelColor;
-            lblStart.ForeColor = cLabelColor;
+            Color cLabelColor = SharedUILogic.GetColorFromString(DomainController.Instance().getUILabelColor());
+
+            Color cAltUiColor = SharedUILogic.GetColorFromString(DomainController.Instance().getUIAltColor());
+
+            Color cBackColor = SharedUILogic.GetColorFromString(DomainController.Instance().getUIAltBackgroundColor());
+
+            toolTip1.BackColor = cBackColor;
             toolTip1.ForeColor = cLabelColor;
 
-            string[] altUiColor = DomainController.Instance().getUIAltColor().Split(',');
-            Color cAltUiColor = Color.FromArgb(Convert.ToByte(altUiColor[0]), Convert.ToByte(altUiColor[1]), Convert.ToByte(altUiColor[2]));
-            cmbP1Name.ForeColor = cAltUiColor;
-            cmbP1Side.ForeColor = cAltUiColor;
-            cmbP1Start.ForeColor = cAltUiColor;
-            cmbP1Team.ForeColor = cAltUiColor;
-            cmbP2Name.ForeColor = cAltUiColor;
-            cmbP2Side.ForeColor = cAltUiColor;
-            cmbP2Start.ForeColor = cAltUiColor;
-            cmbP2Team.ForeColor = cAltUiColor;
-            cmbP3Name.ForeColor = cAltUiColor;
-            cmbP3Side.ForeColor = cAltUiColor;
-            cmbP3Start.ForeColor = cAltUiColor;
-            cmbP3Team.ForeColor = cAltUiColor;
-            cmbP4Name.ForeColor = cAltUiColor;
-            cmbP4Side.ForeColor = cAltUiColor;
-            cmbP4Start.ForeColor = cAltUiColor;
-            cmbP4Team.ForeColor = cAltUiColor;
-            cmbP5Name.ForeColor = cAltUiColor;
-            cmbP5Side.ForeColor = cAltUiColor;
-            cmbP5Start.ForeColor = cAltUiColor;
-            cmbP5Team.ForeColor = cAltUiColor;
-            cmbP6Name.ForeColor = cAltUiColor;
-            cmbP6Side.ForeColor = cAltUiColor;
-            cmbP6Start.ForeColor = cAltUiColor;
-            cmbP6Team.ForeColor = cAltUiColor;
-            cmbP7Name.ForeColor = cAltUiColor;
-            cmbP7Side.ForeColor = cAltUiColor;
-            cmbP7Start.ForeColor = cAltUiColor;
-            cmbP7Team.ForeColor = cAltUiColor;
-            cmbP8Name.ForeColor = cAltUiColor;
-            cmbP8Side.ForeColor = cAltUiColor;
-            cmbP8Start.ForeColor = cAltUiColor;
-            cmbP8Team.ForeColor = cAltUiColor;
-            lbMapList.ForeColor = cAltUiColor;
-            cmbCurrGameMode.ForeColor = cAltUiColor;
-            btnLaunchGame.ForeColor = cAltUiColor;
-            btnLeaveGame.ForeColor = cAltUiColor;
-
-            string[] backgroundColor = DomainController.Instance().getUIAltBackgroundColor().Split(',');
-            Color cBackColor = Color.FromArgb(Convert.ToByte(backgroundColor[0]), Convert.ToByte(backgroundColor[1]), Convert.ToByte(backgroundColor[2]));
-            cmbP1Name.BackColor = cBackColor;
-            cmbP1Side.BackColor = cBackColor;
-            cmbP1Start.BackColor = cBackColor;
-            cmbP1Team.BackColor = cBackColor;
-            cmbP1Color.BackColor = cBackColor;
-            cmbP2Name.BackColor = cBackColor;
-            cmbP2Side.BackColor = cBackColor;
-            cmbP2Start.BackColor = cBackColor;
-            cmbP2Team.BackColor = cBackColor;
-            cmbP2Color.BackColor = cBackColor;
-            cmbP3Name.BackColor = cBackColor;
-            cmbP3Side.BackColor = cBackColor;
-            cmbP3Start.BackColor = cBackColor;
-            cmbP3Team.BackColor = cBackColor;
-            cmbP3Color.BackColor = cBackColor;
-            cmbP4Name.BackColor = cBackColor;
-            cmbP4Side.BackColor = cBackColor;
-            cmbP4Start.BackColor = cBackColor;
-            cmbP4Team.BackColor = cBackColor;
-            cmbP4Color.BackColor = cBackColor;
-            cmbP5Name.BackColor = cBackColor;
-            cmbP5Side.BackColor = cBackColor;
-            cmbP5Start.BackColor = cBackColor;
-            cmbP5Team.BackColor = cBackColor;
-            cmbP5Color.BackColor = cBackColor;
-            cmbP6Name.BackColor = cBackColor;
-            cmbP6Side.BackColor = cBackColor;
-            cmbP6Start.BackColor = cBackColor;
-            cmbP6Team.BackColor = cBackColor;
-            cmbP6Color.BackColor = cBackColor;
-            cmbP7Name.BackColor = cBackColor;
-            cmbP7Side.BackColor = cBackColor;
-            cmbP7Start.BackColor = cBackColor;
-            cmbP7Team.BackColor = cBackColor;
-            cmbP7Color.BackColor = cBackColor;
-            cmbP8Name.BackColor = cBackColor;
-            cmbP8Side.BackColor = cBackColor;
-            cmbP8Start.BackColor = cBackColor;
-            cmbP8Team.BackColor = cBackColor;
-            cmbP8Color.BackColor = cBackColor;
-            lbMapList.BackColor = cBackColor;
-            cmbCurrGameMode.BackColor = cBackColor;
-            btnLaunchGame.BackColor = cBackColor;
-            btnLeaveGame.BackColor = cBackColor;
-            toolTip1.BackColor = cBackColor;
-
-            string[] briefingForeColor = DomainController.Instance().getBriefingForeColor().Split(',');
-            coopBriefingForeColor = Color.FromArgb(255, Convert.ToInt32(briefingForeColor[0]),
-                Convert.ToInt32(briefingForeColor[1]), Convert.ToInt32(briefingForeColor[2]));
-
-            string[] listBoxFocusColor = DomainController.Instance().getListBoxFocusColor().Split(',');
-            cListBoxFocusColor = Color.FromArgb(Convert.ToByte(listBoxFocusColor[0]), Convert.ToByte(listBoxFocusColor[1]), Convert.ToByte(listBoxFocusColor[2]));
+            coopBriefingForeColor = SharedUILogic.GetColorFromString(DomainController.Instance().getBriefingForeColor());
 
             int displayedItems = lbMapList.DisplayRectangle.Height / lbMapList.ItemHeight;
 
@@ -442,54 +327,20 @@ namespace ClientGUI
             {
                 if (clIni.SectionExists(comboBoxName))
                 {
-                    string sideErrorSetDescr = clIni.GetStringValue(comboBoxName, "SideErrorSetDescr", "none");
-                    string[] items = clIni.GetStringValue(comboBoxName, "Items", "give me items, noob!").Split(',');
-                    int defaultIndex = clIni.GetIntValue(comboBoxName, "DefaultIndex", 0);
-                    string associateSpawnIniOption = clIni.GetStringValue(comboBoxName, "AssociateSpawnIniOption", "none");
-                    string _dataWriteMode = clIni.GetStringValue(comboBoxName, "DataWriteMode", "Boolean");
-                    DataWriteMode dwMode;
-                    if (_dataWriteMode == "Boolean")
-                        dwMode = DataWriteMode.BOOLEAN;
-                    else if (_dataWriteMode == "Index")
-                        dwMode = DataWriteMode.INDEX;
-                    else
-                        dwMode = DataWriteMode.STRING;
-                    string[] location = clIni.GetStringValue(comboBoxName, "Location", "0,0").Split(',');
-                    Point pLocation = new Point(Convert.ToInt32(location[0]), Convert.ToInt32(location[1]));
-                    string[] size = clIni.GetStringValue(comboBoxName, "Size", "83,21").Split(',');
-                    Size sSize = new Size(Convert.ToInt32(size[0]), Convert.ToInt32(size[1]));
-                    string toolTip = clIni.GetStringValue(comboBoxName, "ToolTip", String.Empty);
-
-                    LimitedComboBox cmbBox = new LimitedComboBox();
-                    cmbBox.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-                    cmbBox.FlatStyle = FlatStyle.Flat;
-                    cmbBox.DropDownStyle = ComboBoxStyle.DropDownList;
-                    cmbBox.Font = cmbP1Name.Font;
-                    cmbBox.Name = comboBoxName;
-                    cmbBox.BackColor = cBackColor;
-                    cmbBox.ForeColor = cAltUiColor;
-                    foreach (string item in items)
-                        cmbBox.Items.Add(item);
-                    cmbBox.SelectedIndex = defaultIndex;
-                    cmbBox.Location = pLocation;
-                    cmbBox.Size = sSize;
-                    cmbBox.DrawMode = DrawMode.OwnerDrawVariable;
+                    LimitedComboBox cmbBox = SharedUILogic.SetUpComboBoxFromIni(comboBoxName, clIni,
+                        toolTip1, cmbP1Name.Font, cAltUiColor, cAltUiColor);
                     cmbBox.DrawItem += cmbGeneric_DrawItem;
-                    // 25. 10. 2014: prevent the player from making AI players Allied / Soviet and 
-                    // then choosing Classic mode to play Classic with Red Alert AIs
+                    string sideErrorSetDescr = clIni.GetStringValue(comboBoxName, "SideErrorSetDescr", "none");
+                    string associateSpawnIniOption = clIni.GetStringValue(comboBoxName, "AssociateSpawnIniOption", "none");
+
                     if (sideErrorSetDescr != "none")
                         cmbBox.SelectedIndexChanged += CopyPlayerDataFromUI;
 
-                    if (!String.IsNullOrEmpty(toolTip))
-                    {
-                        toolTip1.SetToolTip(cmbBox, toolTip);
-                    }
-
                     ComboBoxes.Add(cmbBox);
-                    this.panel2.Controls.Add(ComboBoxes[ComboBoxes.Count - 1]);
+                    this.panel2.Controls.Add(cmbBox);
                     AssociatedComboBoxSpawnIniOptions.Add(associateSpawnIniOption);
                     ComboBoxSidePrereqErrorDescriptions.Add(sideErrorSetDescr);
-                    ComboBoxDataWriteModes.Add(dwMode);
+                    ComboBoxDataWriteModes.Add((DataWriteMode)cmbBox.Tag);
                 }
                 else
                     throw new Exception("No data exists for ComboBox " + comboBoxName + "!");
@@ -548,6 +399,8 @@ namespace ClientGUI
                 else
                     throw new Exception("No data exists for label " + labelName + "!");
             }
+
+            SharedUILogic.SetControlColor(cLabelColor, cBackColor, cAltUiColor, cListBoxFocusColor, this);
 
             LoadDefaultMap();
             LoadSettings();
@@ -623,7 +476,6 @@ namespace ClientGUI
             cmbCurrGameMode.SelectedIndex = 0;
             ListMaps();
             lbMapList.SelectedIndex = 0;
-            lbMapList_SelectedIndexChanged(null, EventArgs.Empty);
         }
 
         /// <summary>
@@ -798,15 +650,6 @@ namespace ClientGUI
         {
             if (e.Index > -1 && e.Index < cmbP1Color.Items.Count)
             {
-                if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
-                    e = new DrawItemEventArgs(e.Graphics,
-                                              e.Font,
-                                              e.Bounds,
-                                              e.Index,
-                                              e.State ^ DrawItemState.Selected,
-                                              e.ForeColor,
-                                              cListBoxFocusColor);
-
                 e.DrawBackground();
                 e.DrawFocusRectangle();
 
@@ -822,15 +665,6 @@ namespace ClientGUI
             LimitedComboBox comboBox = (LimitedComboBox)sender;
             if (e.Index > -1 && e.Index < comboBox.Items.Count)
             {
-                if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
-                    e = new DrawItemEventArgs(e.Graphics,
-                                              e.Font,
-                                              e.Bounds,
-                                              e.Index,
-                                              e.State ^ DrawItemState.Selected,
-                                              e.ForeColor,
-                                              cListBoxFocusColor);
-
                 e.DrawBackground();
                 e.DrawFocusRectangle();
 
@@ -1365,73 +1199,50 @@ namespace ClientGUI
 
             SharedLogic.WriteMap(gameMode, isCheckBoxChecked, IsCheckBoxReversed, AssociatedCheckBoxCustomInis, mapIni);
 
-            this.Enabled = false;
-            this.WindowState = FormWindowState.Minimized;
+            if (DomainController.Instance().getWindowMinimizingStatus())
+            {
+                this.Enabled = false;
+                this.WindowState = FormWindowState.Minimized;
+            }
 
             Logger.Log("About to launch main executable.");
 
-            StartGameProcess();
-        }
+            ms = new MatchStatistics(ProgramConstants.GAME_VERSION, currentMap.Name, gameMode, 1);
+            ms.AddPlayer(Players[0].Name, true, false, Players[0].SideId == SideComboboxPrerequisites.Count + 1,
+                playerSides[0], Players[0].TeamId, 10);
 
-        /// <summary>
-        /// Starts the main game process.
-        /// </summary>
-        private void StartGameProcess()
-        {
-            if (DomainController.Instance().getWindowedStatus())
+            int id = 1;
+
+            foreach (PlayerInfo ai in AIPlayers)
             {
-                Logger.Log("Windowed mode is enabled - using QRes.");
-                Process QResProcess = new Process();
-                QResProcess.StartInfo.FileName = ProgramConstants.QRES_EXECUTABLE;
-                QResProcess.StartInfo.UseShellExecute = false;
-                QResProcess.StartInfo.Arguments = "c=16 /R " + "\"" + ProgramConstants.gamepath + ProgramConstants.MAIN_EXECUTABLE + "\"" + " -SPAWN";
-                QResProcess.EnableRaisingEvents = true;
-                QResProcess.Exited += new EventHandler(QResProcess_Exited);
-                QResProcess.Start();
-
-                if (Environment.ProcessorCount > 1)
-                    QResProcess.ProcessorAffinity = (IntPtr)2;
-            }
-            else
-            {
-                Process DtaProcess = new Process();
-                DtaProcess.StartInfo.FileName = ProgramConstants.MAIN_EXECUTABLE;
-                DtaProcess.StartInfo.UseShellExecute = false;
-                DtaProcess.StartInfo.Arguments = "-SPAWN";
-                DtaProcess.EnableRaisingEvents = true;
-                DtaProcess.Exited += new EventHandler(DtaProcess_Exited);
-                DtaProcess.Start();
-
-                if (Environment.ProcessorCount > 1)
-                    DtaProcess.ProcessorAffinity = (System.IntPtr)2;
+                ms.AddPlayer("Computer", false, true, false, playerSides[id], ai.TeamId, GetAILevel(ai));
+                id++;
             }
 
-            Logger.Log("Waiting for qres.dat or " + ProgramConstants.MAIN_EXECUTABLE + " to exit.");
+            SharedUILogic.StartGameProcess(0);
         }
 
-        private void DtaProcess_Exited(object sender, EventArgs e)
+        private int GetAILevel(PlayerInfo aiInfo)
         {
-            Generic_GameProcessExited();
+            if (aiInfo.Name == "Hard AI")
+                return 2;
+            if (aiInfo.Name == "Medium AI")
+                return 1;
+
+            return 0;
         }
 
-        private void QResProcess_Exited(object sender, EventArgs e)
+        private void GameProcessExited()
         {
-            Generic_GameProcessExited();
-        }
+            ms.ParseStatistics(ProgramConstants.gamepath, DomainController.Instance().getDefaultGame());
+            StatisticsManager.Instance.AddMatchAndSaveDatabase(ms);
 
-        private void Generic_GameProcessExited()
-        {
             Logger.Log("The game process has exited; displaying game lobby.");
 
             DomainController.Instance().ReloadSettings();
 
             this.Enabled = true;
             this.WindowState = FormWindowState.Normal;
-        }
-
-        private void btnChangeMap_MouseEnter(object sender, EventArgs e)
-        {
-            sndButtonSound.Play();
         }
 
         private void btnLeaveGame_MouseEnter(object sender, EventArgs e)
@@ -1481,32 +1292,38 @@ namespace ClientGUI
             Logger.Log("Saving Skirmish settings.");
 
             string mapmd5 = currentMap.SHA1;
+
             string difficulties = String.Empty;
             for (int aiId = 0; aiId < AIPlayers.Count; aiId++)
             {
                 int difficulty = getPlayerNameCMBFromId(aiId + 2).SelectedIndex - 1;
                 difficulties = difficulties + difficulty;
             }
+
             string sides = Convert.ToString(Players[0].SideId);
             for (int aiId = 0; aiId < AIPlayers.Count; aiId++)
             {
                 sides = sides + getPlayerSideCMBFromId(aiId + 2).SelectedIndex;
             }
+
             string colors = Convert.ToString(Players[0].ColorId);
             for (int aiId = 0; aiId < AIPlayers.Count; aiId++)
             {
                 colors = colors + getPlayerColorCMBFromId(aiId + 2).SelectedIndex;
             }
+
             string startLocs = Convert.ToString(Players[0].StartingLocation);
             for (int aiId = 0; aiId < AIPlayers.Count; aiId++)
             {
                 startLocs = startLocs + getPlayerStartCMBFromId(aiId + 2).SelectedIndex;
             }
+
             string teams = Convert.ToString(Players[0].TeamId);
             for (int aiId = 0; aiId < AIPlayers.Count; aiId++)
             {
                 teams = teams + getPlayerTeamCMBFromId(aiId + 2).SelectedIndex;
             }
+
             string settings = String.Empty;
             foreach (UserCheckBox chkBox in CheckBoxes)
             {
@@ -1546,7 +1363,7 @@ namespace ClientGUI
                             if (index > -1)
                             {
                                 lbMapList.SelectedIndex = index;
-                                lbMapList_SelectedIndexChanged(null, EventArgs.Empty);
+                                //lbMapList_SelectedIndexChanged(null, EventArgs.Empty);
                             }
                         }
                     }

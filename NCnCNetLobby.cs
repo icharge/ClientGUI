@@ -106,10 +106,10 @@ namespace ClientGUI
         /// </summary>
         int currentChannelId = 0;
 
-        WindowsMediaPlayer wmPlayer;
         SoundPlayer sp;
         SoundPlayer sndGameCreated;
 
+        MusicPlayer musicPlayer;
         Image btn92px;
         Image btn92px_c;
         Image btn121px;
@@ -151,12 +151,6 @@ namespace ClientGUI
         bool gameInProgress = false;
 
         /// <summary>
-        /// Used for blocking some UI functions until a welcome message
-        /// from the server has been received.
-        /// </summary>
-        bool welcomeMessageReceived = false;
-
-        /// <summary>
         /// The game lobby window.
         /// </summary>
         NGameLobby gameLobbyWindow;
@@ -175,6 +169,19 @@ namespace ClientGUI
         {
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             Application.ThreadException += Application_ThreadException;
+
+            myGame = DomainController.Instance().getDefaultGame();
+
+            int locY = DomainController.Instance().GetLobbyLocationY();
+            int locX = DomainController.Instance().GetLobbyLocationX();
+
+            Point location = new Point(locX, locY);
+
+            // Check so we don't move the window outside of the screen
+            // (could happen if the user has for example changed their monitor or resolution from the last run)
+            Screen screen = Screen.FromPoint(location);
+            if (screen.Bounds.Contains(location))
+                this.Location = location;
 
             this.Font = SharedLogic.getCommonFont();
 
@@ -203,16 +210,11 @@ namespace ClientGUI
 
             gameIcons = GameCollection.Instance.GetGameImages();
 
-            wmPlayer = new WindowsMediaPlayer();
-            wmPlayer.URL = ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "lobbymusic.wav";
-            wmPlayer.settings.setMode("loop", true);
-            if (DomainController.Instance().getMainMenuMusicStatus())
-                wmPlayer.controls.play();
-            else
-            {
-                btnMusicToggle.Text = "Music OFF";
-                wmPlayer.controls.stop();
-            }
+            musicPlayer = new MusicPlayer();
+            btnMusicToggle.Text = musicPlayer.Initialize();
+
+            if (btnMusicToggle.Text == "WMP Missing")
+                btnMusicToggle.Enabled = false;
 
             sp = new SoundPlayer(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "button.wav");
             sndGameCreated = new SoundPlayer(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "gamecreated.wav");
@@ -238,17 +240,17 @@ namespace ClientGUI
                     break;
             }
 
-            cAdminNameColor = SharedUILogic.getColorFromString(DomainController.Instance().getAdminNameColor());
+            cAdminNameColor = SharedUILogic.GetColorFromString(DomainController.Instance().getAdminNameColor());
 
-            cPlayerNameColor = SharedUILogic.getColorFromString(DomainController.Instance().getPlayerNameColor());
+            cPlayerNameColor = SharedUILogic.GetColorFromString(DomainController.Instance().getPlayerNameColor());
 
-            cDefaultChatColor = SharedUILogic.getColorFromString(DomainController.Instance().getDefaultChatColor());
+            cDefaultChatColor = SharedUILogic.GetColorFromString(DomainController.Instance().getDefaultChatColor());
 
-            cPmOtherUserColor = SharedUILogic.getColorFromString(DomainController.Instance().getReceivedPMColor());
+            cPmOtherUserColor = SharedUILogic.GetColorFromString(DomainController.Instance().getReceivedPMColor());
 
-            cLockedGameColor = SharedUILogic.getColorFromString(DomainController.Instance().getLockedGameColor());
+            cLockedGameColor = SharedUILogic.GetColorFromString(DomainController.Instance().getLockedGameColor());
 
-            cListBoxFocusColor = SharedUILogic.getColorFromString(DomainController.Instance().getListBoxFocusColor());
+            cListBoxFocusColor = SharedUILogic.GetColorFromString(DomainController.Instance().getListBoxFocusColor());
 
             ChatColors.Add(cDefaultChatColor);
             ChatColors.Add(cDefaultChatColor);
@@ -288,54 +290,13 @@ namespace ClientGUI
             if (savedChatColor > -1)
                 cmbMessageColor.SelectedIndex = savedChatColor;
 
-            Color cLabelColor = SharedUILogic.getColorFromString(DomainController.Instance().getUILabelColor());
-            lblMessageColor.ForeColor = cLabelColor;
-            lblGameInfo.ForeColor = cLabelColor;
-            lblGames.ForeColor = cLabelColor;
-            lblHost.ForeColor = cLabelColor;
-            lblMapName.ForeColor = cLabelColor;
-            lblGameMode.ForeColor = cLabelColor;
-            lblPlayerList.ForeColor = cLabelColor;
-            lblPlayers.ForeColor = cLabelColor;
-            lblPlayer1.ForeColor = cLabelColor;
-            lblPlayer2.ForeColor = cLabelColor;
-            lblPlayer3.ForeColor = cLabelColor;
-            lblPlayer4.ForeColor = cLabelColor;
-            lblPlayer5.ForeColor = cLabelColor;
-            lblPlayer6.ForeColor = cLabelColor;
-            lblPlayer7.ForeColor = cLabelColor;
-            lblPlayer8.ForeColor = cLabelColor;
+            Color cLabelColor = SharedUILogic.GetColorFromString(DomainController.Instance().getUILabelColor());
 
-            lblVersion.ForeColor = cLabelColor;
-            lblChannel.ForeColor = cLabelColor;
+            Color cAltUiColor = SharedUILogic.GetColorFromString(DomainController.Instance().getUIAltColor());
 
-            Color cAltUiColor = SharedUILogic.getColorFromString(DomainController.Instance().getUIAltColor());
-            lbPlayerList.ForeColor = cAltUiColor;
-            lbChatMessages.ForeColor = cAltUiColor;
-            lbGameList.ForeColor = cAltUiColor;
-            btnJoinGame.ForeColor = cAltUiColor;
-            btnNewGame.ForeColor = cAltUiColor;
-            btnReturnToMenu.ForeColor = cAltUiColor;
-            btnSend.ForeColor = cAltUiColor;
-            btnMusicToggle.ForeColor = cAltUiColor;
-            btnConfigure.ForeColor = cAltUiColor;
-            tbChatInput.ForeColor = cAltUiColor;
-            cmbCurrentChannel.ForeColor = cAltUiColor;
-            cmbMessageColor.ForeColor = cAltUiColor;
+            Color cBackColor = SharedUILogic.GetColorFromString(DomainController.Instance().getUIAltBackgroundColor());
 
-            Color cBackColor = SharedUILogic.getColorFromString(DomainController.Instance().getUIAltBackgroundColor());
-            btnConfigure.BackColor = cBackColor;
-            btnJoinGame.BackColor = cBackColor;
-            btnNewGame.BackColor = cBackColor;
-            btnReturnToMenu.BackColor = cBackColor;
-            btnSend.BackColor = cBackColor;
-            btnMusicToggle.BackColor = cBackColor;
-            lbChatMessages.BackColor = cBackColor;
-            lbGameList.BackColor = cBackColor;
-            lbPlayerList.BackColor = cBackColor;
-            tbChatInput.BackColor = cBackColor;
-            cmbCurrentChannel.BackColor = cBackColor;
-            cmbMessageColor.BackColor = cBackColor;
+            SharedUILogic.SetControlColor(cLabelColor, cBackColor, cAltUiColor, cListBoxFocusColor, this);
 
             panel2.BackgroundImage = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "cncnetlobbypanelbg.png");
 
@@ -358,7 +319,7 @@ namespace ClientGUI
             btnNewGame.BackgroundImage = btn92px;
             btnJoinGame.BackgroundImage = btn92px;
             btnMusicToggle.BackgroundImage = btn92px;
-
+            btnFollowedGames.BackgroundImage = btn142px;
             btnReturnToMenu.BackgroundImage = btn142px;
 
             int displayedItems = lbChatMessages.DisplayRectangle.Height / lbChatMessages.ItemHeight;
@@ -627,21 +588,13 @@ namespace ClientGUI
         /// </summary>
         private void CnCNetData_OnGameStopped()
         {
-            try
-            {
-                wmPlayer.URL = ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "lobbymusic.wav";
-                wmPlayer.settings.setMode("loop", true);
-                if (DomainController.Instance().getMainMenuMusicStatus())
-                    wmPlayer.controls.play();
-                else
-                    wmPlayer.controls.stop();
-            }
-            catch
-            {
+            musicPlayer.StartMusic();
 
+            if (DomainController.Instance().getWindowMinimizingStatus())
+            {
+                gameLobbyWindow.Show();
             }
 
-            gameLobbyWindow.Show();
             gameInProgress = false;
         }
 
@@ -650,8 +603,13 @@ namespace ClientGUI
         /// </summary>
         private void CnCNetData_OnGameStarted()
         {
-            wmPlayer.controls.stop();
-            gameLobbyWindow.Hide();
+            musicPlayer.StopMusic();
+
+            if (DomainController.Instance().getWindowMinimizingStatus())
+            {
+                gameLobbyWindow.Hide();
+            }
+
             gameInProgress = true;
         }
 
@@ -723,7 +681,7 @@ namespace ClientGUI
 
             if (CnCNetData.Games.Count == 0 && !isClosed)
             {
-                if (gameId == myGame && !ProgramConstants.IsInGame)
+                if (gameId == myGame.ToLower() && !ProgramConstants.IsInGame)
                     sndGameCreated.Play();
                 CnCNetData.Games.Add(game);
             }
@@ -1371,7 +1329,6 @@ namespace ClientGUI
             }
 
             Logger.Log("Welcome message received.");
-            welcomeMessageReceived = true;
 
             CnCNetData.ConnectionBridge.SendMessage("MODE " + ProgramConstants.CNCNET_PLAYERNAME + " +x");
 
@@ -1450,11 +1407,10 @@ namespace ClientGUI
                 return;
             }
 
-            MessageInfos[0].Add(new MessageInfo(Color.White, message));
-            MessageInfos[1].Add(new MessageInfo(Color.White, message));
-            MessageInfos[2].Add(new MessageInfo(Color.White, message));
-            MessageInfos[3].Add(new MessageInfo(Color.White, message));
-            MessageInfos[4].Add(new MessageInfo(Color.White, message));
+            foreach (List<MessageInfo> msgList in MessageInfos)
+            {
+                msgList.Add(new MessageInfo(Color.White, message));
+            }
 
             AddChannelMessageToListBox(currentChannelId);
         }
@@ -1502,6 +1458,7 @@ namespace ClientGUI
         {
             Logger.Log("Saving settings.");
 
+            DomainController.Instance().SaveLobbyPosition(this.Location.X, this.Location.Y);
             DomainController.Instance().SaveChannelSettings();
             DomainController.Instance().SaveCnCNetSettings();
             DomainController.Instance().SaveCnCNetColorSetting(cmbMessageColor.SelectedIndex);
@@ -1720,14 +1677,8 @@ namespace ClientGUI
             {
                 string channel = GameCollection.Instance.GetGameChatChannelNameFromIndex(currentChannelId);
                 int colorId = cmbMessageColor.SelectedIndex + 2;
-                string colorString = Convert.ToString((char)03);
-                if (colorId < 10)
-                    colorString = colorString + "0" + Convert.ToString(colorId);
-                else
-                    colorString = colorString + Convert.ToString(colorId);
 
-                string messageToSend = "PRIVMSG " + channel + " " + colorString + tbChatInput.Text;
-                CnCNetData.ConnectionBridge.SendMessage(messageToSend);
+                CnCNetData.ConnectionBridge.SendChatMessage(channel, colorId, tbChatInput.Text);
                 MessageInfos[currentChannelId].Add(new MessageInfo(ChatColors[colorId], ProgramConstants.CNCNET_PLAYERNAME + ": " + tbChatInput.Text));
                 AddChannelMessageToListBox(currentChannelId);
                 tbChatInput.Text = String.Empty;
@@ -1907,7 +1858,7 @@ namespace ClientGUI
             if (gc.GetGameChatChannelNameFromIndex(currentChannelId) != "#cncnet")
             {
                 // Broadcast to #cncnet as well if we're not looking there right now
-                CnCNetData.ConnectionBridge.SendMessage("PRIVMSG " + gc.GetGameChatChannelNameFromIndex(currentChannelId) + " " + weirdChar1 + weirdChar2 + "ACTION has hosted a new " + gameName + " game." + weirdChar2);
+                CnCNetData.ConnectionBridge.SendMessage("PRIVMSG #cncnet " + " " + weirdChar1 + weirdChar2 + "ACTION has hosted a new " + gameName + " game." + weirdChar2);
                 MessageInfos[gc.GetGameIndexFromChatChannelName("#cncnet")].Add(new MessageInfo(cDefaultChatColor, "====> " + ProgramConstants.CNCNET_PLAYERNAME + " has hosted a new " + gameName + " game."));
             }
 
@@ -2029,7 +1980,7 @@ namespace ClientGUI
                 return;
             }
 
-            if (game.GameIdentifier != myGame)
+            if (game.GameIdentifier != myGame.ToLower())
             {
                 // If the game we're trying to join is for a different game, let's
                 // check if the other game is installed and if yes, then launch that
@@ -2087,7 +2038,7 @@ namespace ClientGUI
             Logger.Log(string.Format("Detecting whether {0} is installed.", gameId));
 
             Microsoft.Win32.RegistryKey key;
-            switch (gameId)
+            switch (gameId.ToUpper())
             {
                 case "DTA":
                     key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("SOFTWARE\\TheDawnOfTheTiberiumAge");
@@ -2131,7 +2082,7 @@ namespace ClientGUI
             string fullName = String.Empty;
             string executableName = String.Empty;
 
-            switch (gameId)
+            switch (gameId.ToUpper())
             {
                 case "DTA":
                     fullName = "The Dawn of the Tiberium Age";
@@ -2191,7 +2142,7 @@ namespace ClientGUI
             string fullName = String.Empty;
             string pageUrl = String.Empty;
 
-            switch (gameId)
+            switch (gameId.ToUpper())
             {
                 case "DTA":
                     fullName = "The Dawn of the Tiberium Age";
@@ -2219,7 +2170,7 @@ namespace ClientGUI
 
             DialogResult dr = MessageBox.Show(string.Format("The selected game room is for {0}." +
                 Environment.NewLine + Environment.NewLine +
-                "Would you like to visit the home page of {0} where you can download and install the it?", fullName),
+                "Would you like to visit the home page of {0} where you can download and install it?", fullName),
                 string.Format("{0} game", fullName), MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
             if (dr == DialogResult.No)
@@ -2278,20 +2229,7 @@ namespace ClientGUI
         /// <param name="e"></param>
         private void btnMusicToggle_Click(object sender, EventArgs e)
         {
-            if (wmPlayer.playState == WMPPlayState.wmppsPlaying)
-            {
-                wmPlayer.controls.stop();
-                DomainController.Instance().SaveLobbyMusicSettings(false);
-                btnMusicToggle.Text = "Music OFF";
-            }
-            else
-            {
-                wmPlayer.URL = ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "lobbymusic.wav";
-                wmPlayer.settings.setMode("loop", true);
-                wmPlayer.controls.play();
-                DomainController.Instance().SaveLobbyMusicSettings(true);
-                btnMusicToggle.Text = "Music ON";
-            }
+            btnMusicToggle.Text = musicPlayer.ToggleMusic();
         }
 
         /// <summary>
@@ -2518,11 +2456,22 @@ namespace ClientGUI
         /// Called when the user clicks on the "Followed Games..." button.
         /// Shows the Followed Games dialog.
         /// </summary>
-        private void btnConfigure_Click(object sender, EventArgs e)
+        private void btnFollowedGames_Click(object sender, EventArgs e)
         {
             GameSelectionForm gsf = new GameSelectionForm();
             gsf.ShowDialog();
             gsf.Dispose();
+        }
+
+        private void btnFollowedGames_MouseEnter(object sender, EventArgs e)
+        {
+            btnFollowedGames.BackgroundImage = btn142px_c;
+            sp.Play();
+        }
+
+        private void btnFollowedGames_MouseLeave(object sender, EventArgs e)
+        {
+            btnFollowedGames.BackgroundImage = btn142px;
         }
     }
 }

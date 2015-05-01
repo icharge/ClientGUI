@@ -1,6 +1,6 @@
 ﻿/// @author Rampastring
 /// http://www.moddb.com/members/rampastring
-/// @version 3. 3. 2015
+/// @version 27. 4. 2015
 
 using System;
 using System.Collections.Generic;
@@ -19,6 +19,7 @@ using System.Runtime.InteropServices;
 using System.Reflection;
 using ClientCore;
 using ClientCore.CnCNet5;
+using ClientCore.Statistics;
 
 namespace ClientGUI
 {
@@ -239,6 +240,8 @@ namespace ClientGUI
         Color coopBriefingForeColor;
         Timer gameOptionRefreshTimer;
 
+        MatchStatistics ms;
+
 
         /// <summary>
         /// Sets up the theme of the game lobby and performs initialization.
@@ -251,24 +254,19 @@ namespace ClientGUI
             CnCNetData.ConnectionBridge.PrivmsgParsed += new RConnectionBridge.PrivmsgParsedEventHandler(Instance_PrivmsgParsed);
             CnCNetData.ConnectionBridge.OnCtcpParsed += new RConnectionBridge.CTCPParsedEventHandler(Instance_OnCtcpParsed);
             CnCNetData.ConnectionBridge.OnUserKicked += new RConnectionBridge.UserKickedEventHandler(Instance_OnUserKicked);
+            SharedUILogic.GameProcessExited += GameProcessExited;
 
             MapSharer.OnMapDownloadFailed += MapSharer_OnMapDownloadFailed;
             MapSharer.OnMapDownloadComplete += MapSharer_OnMapDownloadComplete;
             MapSharer.OnMapUploadFailed += MapSharer_OnMapUploadFailed;
             MapSharer.OnMapUploadComplete += MapSharer_OnMapUploadComplete;
 
+            defaultGame = DomainController.Instance().getDefaultGame().ToLower();
+
             this.Font = SharedLogic.getCommonFont();
             lbChatBox.Font = SharedLogic.getListBoxFont();
 
-            startingLocationIndicators = new Image[8];
-            startingLocationIndicators[0] = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "slocindicator1.png");
-            startingLocationIndicators[1] = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "slocindicator2.png");
-            startingLocationIndicators[2] = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "slocindicator3.png");
-            startingLocationIndicators[3] = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "slocindicator4.png");
-            startingLocationIndicators[4] = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "slocindicator5.png");
-            startingLocationIndicators[5] = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "slocindicator6.png");
-            startingLocationIndicators[6] = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "slocindicator7.png");
-            startingLocationIndicators[7] = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "slocindicator8.png");
+            startingLocationIndicators = SharedUILogic.LoadStartingLocationIndicators();
 
             enemyStartingLocationIndicator = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "enemyslocindicator.png");
 
@@ -282,11 +280,7 @@ namespace ClientGUI
 
             coopBriefingFont = new System.Drawing.Font("Segoe UI", 11.25f, FontStyle.Regular);
             playerNameOnPlayerLocationFont = new Font("Segoe UI", 8.25f, FontStyle.Regular);
-            TeamIdentifiers = new string[4];
-            TeamIdentifiers[0] = "[A] ";
-            TeamIdentifiers[1] = "[B] ";
-            TeamIdentifiers[2] = "[C] ";
-            TeamIdentifiers[3] = "[D] ";
+            TeamIdentifiers = SharedUILogic.GetTeamIdentifiers();
 
             this.Icon = Icon.ExtractAssociatedIcon(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "clienticon.ico");
             this.BackgroundImage = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "gamelobbybg.png");
@@ -306,23 +300,7 @@ namespace ClientGUI
             btnLeaveGame.BackgroundImage = btn133px;
             btnChangeMap.BackgroundImage = btn133px;
 
-            string backgroundImageLayout = DomainController.Instance().getGameLobbyBackgroundImageLayout();
-            switch (backgroundImageLayout)
-            {
-                case "Center":
-                    this.BackgroundImageLayout = ImageLayout.Center;
-                    break;
-                case "Stretch":
-                    this.BackgroundImageLayout = ImageLayout.Stretch;
-                    break;
-                case "Zoom":
-                    this.BackgroundImageLayout = ImageLayout.Zoom;
-                    break;
-                default:
-                case "Tile":
-                    this.BackgroundImageLayout = ImageLayout.Tile;
-                    break;
-            }
+            SharedUILogic.SetBackgroundImageLayout(this);
 
             sndButtonSound = new SoundPlayer(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "button.wav");
             sndJoinSound = new SoundPlayer(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "joingame.wav");
@@ -337,15 +315,9 @@ namespace ClientGUI
                 getPlayerColorCMBFromId(cmbId).AddItem("Random", Color.White);
             }
 
-            MPColors.Add(Color.White);
-            MPColors.Add(getColorFromStringArray(DomainController.Instance().getMPColorOne().Split(',')));
-            MPColors.Add(getColorFromStringArray(DomainController.Instance().getMPColorTwo().Split(',')));
-            MPColors.Add(getColorFromStringArray(DomainController.Instance().getMPColorThree().Split(',')));
-            MPColors.Add(getColorFromStringArray(DomainController.Instance().getMPColorFour().Split(',')));
-            MPColors.Add(getColorFromStringArray(DomainController.Instance().getMPColorFive().Split(',')));
-            MPColors.Add(getColorFromStringArray(DomainController.Instance().getMPColorSix().Split(',')));
-            MPColors.Add(getColorFromStringArray(DomainController.Instance().getMPColorSeven().Split(',')));
-            MPColors.Add(getColorFromStringArray(DomainController.Instance().getMPColorEight().Split(',')));
+            MPColors = SharedUILogic.GetMPColors();
+
+            cListBoxFocusColor = SharedUILogic.GetColorFromString(DomainController.Instance().getListBoxFocusColor());
 
             for (int colorId = 1; colorId < 9; colorId++)
             {
@@ -362,149 +334,58 @@ namespace ClientGUI
             for (int sideId = 0; sideId < sides.Length; sideId++)
                 SideComboboxPrerequisites.Add(new SideComboboxPrerequisite());
 
+            Image[] sideImages = SharedUILogic.LoadSideImages();
+
             for (int pId = 1; pId < 9; pId++)
             {
-                getPlayerSideCMBFromId(pId).Items.Add("Random");
+                LimitedComboBox cmb = getPlayerSideCMBFromId(pId);
+                cmb.Items.Add(new DropDownItem("Random", sideImages[0]));
+                cmb.FocusColor = cListBoxFocusColor;
             }
+            int i = 1;
             foreach (string sideName in sides)
             {
                 for (int pId = 1; pId < 9; pId++)
                 {
-                    getPlayerSideCMBFromId(pId).Items.Add(sideName);
+                    getPlayerSideCMBFromId(pId).Items.Add(new DropDownItem(sideName, sideImages[i]));
                 }
+
+                i++;
             }
             for (int pId = 1; pId < 9; pId++)
             {
-                getPlayerSideCMBFromId(pId).Items.Add("Spectator");
+                getPlayerSideCMBFromId(pId).Items.Add(new DropDownItem("Spectator", sideImages[i]));
             }
-
 
             string panelBorderStyle = DomainController.Instance().getPanelBorderStyle();
             if (panelBorderStyle == "FixedSingle")
+            {
                 panel1.BorderStyle = BorderStyle.FixedSingle;
-            else if (panelBorderStyle == "Fixed3D")
-                panel1.BorderStyle = BorderStyle.Fixed3D;
-            else
-                panel1.BorderStyle = BorderStyle.None;
-
-            string optionsPanelBorderStyle = DomainController.Instance().getPanelBorderStyle();
-            if (optionsPanelBorderStyle == "FixedSingle")
                 panel2.BorderStyle = BorderStyle.FixedSingle;
-            else if (optionsPanelBorderStyle == "Fixed3D")
+            }
+            else if (panelBorderStyle == "Fixed3D")
+            {
+                panel1.BorderStyle = BorderStyle.Fixed3D;
                 panel2.BorderStyle = BorderStyle.Fixed3D;
+            }
             else
+            {
+                panel1.BorderStyle = BorderStyle.None;
                 panel2.BorderStyle = BorderStyle.None;
+            }
 
             IniFile clIni = new IniFile(ProgramConstants.gamepath + "Resources\\GameOptions.ini");
 
-            string[] labelColor = DomainController.Instance().getUILabelColor().Split(',');
-            Color cLabelColor = Color.FromArgb(Convert.ToByte(labelColor[0]), Convert.ToByte(labelColor[1]), Convert.ToByte(labelColor[2]));
-            lblChat.ForeColor = cLabelColor;
-            lblGameMode.ForeColor = cLabelColor;
-            lblMapAuthor.ForeColor = cLabelColor;
-            lblMapName.ForeColor = cLabelColor;
-            lblPlayerColor.ForeColor = cLabelColor;
-            lblPlayerName.ForeColor = cLabelColor;
-            lblPlayerSide.ForeColor = cLabelColor;
-            lblPlayerTeam.ForeColor = cLabelColor;
-            lblStart.ForeColor = cLabelColor;
+            Color cLabelColor = SharedUILogic.GetColorFromString(DomainController.Instance().getUILabelColor());
+
+            Color cAltUiColor = SharedUILogic.GetColorFromString(DomainController.Instance().getUIAltColor());
+
+            Color cBackColor = SharedUILogic.GetColorFromString(DomainController.Instance().getUIAltBackgroundColor());
+
+            toolTip1.BackColor = cBackColor;
             toolTip1.ForeColor = cLabelColor;
 
-            string[] altUiColor = DomainController.Instance().getUIAltColor().Split(',');
-            Color cAltUiColor = Color.FromArgb(Convert.ToByte(altUiColor[0]), Convert.ToByte(altUiColor[1]), Convert.ToByte(altUiColor[2]));
-            cmbP1Name.ForeColor = cAltUiColor;
-            cmbP1Side.ForeColor = cAltUiColor;
-            cmbP1Start.ForeColor = cAltUiColor;
-            cmbP1Team.ForeColor = cAltUiColor;
-            cmbP2Name.ForeColor = cAltUiColor;
-            cmbP2Side.ForeColor = cAltUiColor;
-            cmbP2Start.ForeColor = cAltUiColor;
-            cmbP2Team.ForeColor = cAltUiColor;
-            cmbP3Name.ForeColor = cAltUiColor;
-            cmbP3Side.ForeColor = cAltUiColor;
-            cmbP3Start.ForeColor = cAltUiColor;
-            cmbP3Team.ForeColor = cAltUiColor;
-            cmbP4Name.ForeColor = cAltUiColor;
-            cmbP4Side.ForeColor = cAltUiColor;
-            cmbP4Start.ForeColor = cAltUiColor;
-            cmbP4Team.ForeColor = cAltUiColor;
-            cmbP5Name.ForeColor = cAltUiColor;
-            cmbP5Side.ForeColor = cAltUiColor;
-            cmbP5Start.ForeColor = cAltUiColor;
-            cmbP5Team.ForeColor = cAltUiColor;
-            cmbP6Name.ForeColor = cAltUiColor;
-            cmbP6Side.ForeColor = cAltUiColor;
-            cmbP6Start.ForeColor = cAltUiColor;
-            cmbP6Team.ForeColor = cAltUiColor;
-            cmbP7Name.ForeColor = cAltUiColor;
-            cmbP7Side.ForeColor = cAltUiColor;
-            cmbP7Start.ForeColor = cAltUiColor;
-            cmbP7Team.ForeColor = cAltUiColor;
-            cmbP8Name.ForeColor = cAltUiColor;
-            cmbP8Side.ForeColor = cAltUiColor;
-            cmbP8Start.ForeColor = cAltUiColor;
-            cmbP8Team.ForeColor = cAltUiColor;
-            btnChangeMap.ForeColor = cAltUiColor;
-            btnLaunchGame.ForeColor = cAltUiColor;
-            btnLockGame.ForeColor = cAltUiColor;
-            btnLeaveGame.ForeColor = cAltUiColor;
-            tbChatInputBox.ForeColor = cAltUiColor;
-
-            string[] backgroundColor = DomainController.Instance().getUIAltBackgroundColor().Split(',');
-            Color cBackColor = Color.FromArgb(Convert.ToByte(backgroundColor[0]), Convert.ToByte(backgroundColor[1]), Convert.ToByte(backgroundColor[2]));
-            cmbP1Name.BackColor = cBackColor;
-            cmbP1Side.BackColor = cBackColor;
-            cmbP1Start.BackColor = cBackColor;
-            cmbP1Team.BackColor = cBackColor;
-            cmbP1Color.BackColor = cBackColor;
-            cmbP2Name.BackColor = cBackColor;
-            cmbP2Side.BackColor = cBackColor;
-            cmbP2Start.BackColor = cBackColor;
-            cmbP2Team.BackColor = cBackColor;
-            cmbP2Color.BackColor = cBackColor;
-            cmbP3Name.BackColor = cBackColor;
-            cmbP3Side.BackColor = cBackColor;
-            cmbP3Start.BackColor = cBackColor;
-            cmbP3Team.BackColor = cBackColor;
-            cmbP3Color.BackColor = cBackColor;
-            cmbP4Name.BackColor = cBackColor;
-            cmbP4Side.BackColor = cBackColor;
-            cmbP4Start.BackColor = cBackColor;
-            cmbP4Team.BackColor = cBackColor;
-            cmbP4Color.BackColor = cBackColor;
-            cmbP5Name.BackColor = cBackColor;
-            cmbP5Side.BackColor = cBackColor;
-            cmbP5Start.BackColor = cBackColor;
-            cmbP5Team.BackColor = cBackColor;
-            cmbP5Color.BackColor = cBackColor;
-            cmbP6Name.BackColor = cBackColor;
-            cmbP6Side.BackColor = cBackColor;
-            cmbP6Start.BackColor = cBackColor;
-            cmbP6Team.BackColor = cBackColor;
-            cmbP6Color.BackColor = cBackColor;
-            cmbP7Name.BackColor = cBackColor;
-            cmbP7Side.BackColor = cBackColor;
-            cmbP7Start.BackColor = cBackColor;
-            cmbP7Team.BackColor = cBackColor;
-            cmbP7Color.BackColor = cBackColor;
-            cmbP8Name.BackColor = cBackColor;
-            cmbP8Side.BackColor = cBackColor;
-            cmbP8Start.BackColor = cBackColor;
-            cmbP8Team.BackColor = cBackColor;
-            cmbP8Color.BackColor = cBackColor;
-            lbChatBox.BackColor = cBackColor;
-            btnChangeMap.BackColor = cBackColor;
-            btnLaunchGame.BackColor = cBackColor;
-            btnLockGame.BackColor = cBackColor;
-            btnLeaveGame.BackColor = cBackColor;
-            toolTip1.BackColor = cBackColor;
-
-            string[] briefingForeColor = DomainController.Instance().getBriefingForeColor().Split(',');
-            coopBriefingForeColor = Color.FromArgb(255, Convert.ToInt32(briefingForeColor[0]),
-                Convert.ToInt32(briefingForeColor[1]), Convert.ToInt32(briefingForeColor[2]));
-
-            string[] listBoxFocusColor = DomainController.Instance().getListBoxFocusColor().Split(',');
-            cListBoxFocusColor = Color.FromArgb(Convert.ToByte(listBoxFocusColor[0]), Convert.ToByte(listBoxFocusColor[1]), Convert.ToByte(listBoxFocusColor[2]));
+            coopBriefingForeColor = SharedUILogic.GetColorFromString(DomainController.Instance().getBriefingForeColor());
 
             int displayedItems = lbChatBox.DisplayRectangle.Height / lbChatBox.ItemHeight;
 
@@ -626,12 +507,11 @@ namespace ClientGUI
                     throw new Exception("No data exists for CheckBox " + checkBoxName + "!");
             }
 
-            Color comboBoxNondefaultColor = getColorFromStringArray(
-                DomainController.Instance().getComboBoxNondefaultColor().Split(','));
+            Color comboBoxNondefaultColor = SharedUILogic.GetColorFromString(DomainController.Instance().getComboBoxNondefaultColor());
 
-            if (comboBoxNondefaultColor.R == 0 &&
+            if ((comboBoxNondefaultColor.R == 0 &&
                 comboBoxNondefaultColor.G == 0 &&
-                comboBoxNondefaultColor.B == 0)
+                comboBoxNondefaultColor.B == 0) || isHost)
                 comboBoxNondefaultColor = cAltUiColor;
 
             string[] comboBoxes = clIni.GetStringValue("GameLobby", "ComboBoxes", "none").Split(',');
@@ -639,61 +519,28 @@ namespace ClientGUI
             {
                 if (clIni.SectionExists(comboBoxName))
                 {
+                    LimitedComboBox cmbBox = SharedUILogic.SetUpComboBoxFromIni(comboBoxName, clIni, toolTip1,
+                        cmbP1Name.Font, cAltUiColor, comboBoxNondefaultColor);
                     string sideErrorSetDescr = clIni.GetStringValue(comboBoxName, "SideErrorSetDescr", "none");
-                    string[] items = clIni.GetStringValue(comboBoxName, "Items", "give me items, noob!").Split(',');
-                    int defaultIndex = clIni.GetIntValue(comboBoxName, "DefaultIndex", 0);
                     string associateSpawnIniOption = clIni.GetStringValue(comboBoxName, "AssociateSpawnIniOption", "none");
-                    string _dataWriteMode = clIni.GetStringValue(comboBoxName, "DataWriteMode", "Boolean");
-                    DataWriteMode dwMode;
-                    if (_dataWriteMode == "Boolean")
-                        dwMode = DataWriteMode.BOOLEAN;
-                    else if (_dataWriteMode == "Index")
-                        dwMode = DataWriteMode.INDEX;
-                    else
-                        dwMode = DataWriteMode.STRING;
-                    string[] location = clIni.GetStringValue(comboBoxName, "Location", "0,0").Split(',');
-                    Point pLocation = new Point(Convert.ToInt32(location[0]), Convert.ToInt32(location[1]));
-                    string[] size = clIni.GetStringValue(comboBoxName, "Size", "83,21").Split(',');
-                    Size sSize = new Size(Convert.ToInt32(size[0]), Convert.ToInt32(size[1]));
-                    string toolTip = clIni.GetStringValue(comboBoxName, "ToolTip", String.Empty);
 
-                    LimitedComboBox cmbBox = new LimitedComboBox();
-                    cmbBox.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-                    cmbBox.FlatStyle = FlatStyle.Flat;
-                    cmbBox.DropDownStyle = ComboBoxStyle.DropDownList;
-                    cmbBox.Font = cmbP1Name.Font;
-                    cmbBox.Name = comboBoxName;
-                    cmbBox.BackColor = cBackColor;
-                    cmbBox.ForeColor = cAltUiColor;
-                    for (int itemId = 0; itemId < items.Length; itemId++)
-                    {
-                        if (itemId == defaultIndex || isHost)
-                            cmbBox.AddItem(items[itemId], cAltUiColor);
-                        else
-                            cmbBox.AddItem(items[itemId], comboBoxNondefaultColor);
-                    }
-                    cmbBox.SelectedIndex = defaultIndex;
-                    cmbBox.Location = pLocation;
                     if (!isHost)
+                    {
                         cmbBox.CanDropDown = false;
-                    cmbBox.SelectedIndexChanged += new EventHandler(GenericGameOptionChanged);
-                    cmbBox.Size = sSize;
-                    cmbBox.DrawMode = DrawMode.OwnerDrawFixed;
+                    }
+
                     cmbBox.DrawItem += cmbGeneric_DrawItem;
 
-                    if (!String.IsNullOrEmpty(toolTip))
-                    {
-                        toolTip1.SetToolTip(cmbBox, toolTip);
-                    }
+                    cmbBox.SelectedIndexChanged += new EventHandler(GenericGameOptionChanged);
 
                     ComboBoxes.Add(cmbBox);
-                    if (pLocation.X < 436 && pLocation.Y < 237)
-                        this.panel2.Controls.Add(ComboBoxes[ComboBoxes.Count - 1]);
+                    if (cmbBox.Location.X < 436 && cmbBox.Location.Y < 237)
+                        this.panel2.Controls.Add(cmbBox);
                     else
-                        this.Controls.Add(ComboBoxes[ComboBoxes.Count - 1]);
+                        this.Controls.Add(cmbBox);
                     AssociatedComboBoxSpawnIniOptions.Add(associateSpawnIniOption);
                     ComboBoxSidePrereqErrorDescriptions.Add(sideErrorSetDescr);
-                    ComboBoxDataWriteModes.Add(dwMode);
+                    ComboBoxDataWriteModes.Add((DataWriteMode)cmbBox.Tag);
                 }
                 else
                     throw new Exception("No data exists for ComboBox " + comboBoxName + "!");
@@ -758,6 +605,8 @@ namespace ClientGUI
 
             InitReadyBoxes(cLabelColor, cAltUiColor);
 
+            SharedUILogic.SetControlColor(cLabelColor, cBackColor, cAltUiColor, cListBoxFocusColor, this);
+
             DisableSoundsBox = new UserCheckBox(cLabelColor, cAltUiColor, "Disable sounds");
             DisableSoundsBox.Location = new Point(325, 243);
             DisableSoundsBox.Anchor = AnchorStyles.Top | AnchorStyles.Left;
@@ -773,25 +622,23 @@ namespace ClientGUI
             lblMapAuthor.Text = "By " + currentMap.Author;
             LoadPreview();
 
-            defaultGame = DomainController.Instance().getDefaultGame().ToLower();
+            btnP1Ban.BackgroundImage = imgBan;
+            btnP2Ban.BackgroundImage = imgBan;
+            btnP3Ban.BackgroundImage = imgBan;
+            btnP4Ban.BackgroundImage = imgBan;
+            btnP5Ban.BackgroundImage = imgBan;
+            btnP6Ban.BackgroundImage = imgBan;
+            btnP7Ban.BackgroundImage = imgBan;
+            btnP8Ban.BackgroundImage = imgBan;
 
-            btnP1Ban.BackgroundImage = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "ban.png");
-            btnP2Ban.BackgroundImage = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "ban.png");
-            btnP3Ban.BackgroundImage = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "ban.png");
-            btnP4Ban.BackgroundImage = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "ban.png");
-            btnP5Ban.BackgroundImage = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "ban.png");
-            btnP6Ban.BackgroundImage = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "ban.png");
-            btnP7Ban.BackgroundImage = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "ban.png");
-            btnP8Ban.BackgroundImage = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "ban.png");
-
-            btnP1Kick.BackgroundImage = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "kick.png");
-            btnP2Kick.BackgroundImage = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "kick.png");
-            btnP3Kick.BackgroundImage = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "kick.png");
-            btnP4Kick.BackgroundImage = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "kick.png");
-            btnP5Kick.BackgroundImage = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "kick.png");
-            btnP6Kick.BackgroundImage = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "kick.png");
-            btnP7Kick.BackgroundImage = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "kick.png");
-            btnP8Kick.BackgroundImage = Image.FromFile(ProgramConstants.gamepath + ProgramConstants.RESOURCES_DIR + "kick.png");
+            btnP1Kick.BackgroundImage = imgKick;
+            btnP2Kick.BackgroundImage = imgKick;
+            btnP3Kick.BackgroundImage = imgKick;
+            btnP4Kick.BackgroundImage = imgKick;
+            btnP5Kick.BackgroundImage = imgKick;
+            btnP6Kick.BackgroundImage = imgKick;
+            btnP7Kick.BackgroundImage = imgKick;
+            btnP8Kick.BackgroundImage = imgKick;
 
             if (isHost)
             {
@@ -940,6 +787,10 @@ namespace ClientGUI
             }
         }
 
+        /// <summary>
+        /// Called when the map sharer encounters an error when attempting to download a map.
+        /// </summary>
+        /// <param name="sha1">The SHA1 of the failed map.</param>
         private void MapSharer_OnMapDownloadFailed(string sha1)
         {
             if (lbChatBox.InvokeRequired)
@@ -1484,9 +1335,7 @@ namespace ClientGUI
                         pPorts.Add(port);
                     }
                     isHostInGame = true;
-                    lbChatBox.Enabled = false;
                     btnLaunchGame.Enabled = false;
-                    tbChatInputBox.Enabled = false;
                     StartGame(pPorts);
                 }
                 else if (message.StartsWith("GETREADY"))
@@ -1691,7 +1540,7 @@ namespace ClientGUI
                 else
                     foreColor = defaultChatColor;
 
-                if (!DisableSoundsBox.Checked)
+                if (!DisableSoundsBox.Checked && !ProgramConstants.IsInGame)
                     sndMessageSound.Play();
 
                 MessageColors.Add(foreColor);
@@ -2094,11 +1943,6 @@ namespace ClientGUI
                 e.Graphics.DrawString(comboBox.Items[e.Index].ToString(), e.Font,
                     new SolidBrush(itemColor), e.Bounds);
             }
-        }
-
-        private Color getColorFromStringArray(string[] stringArray)
-        {
-            return Color.FromArgb(Convert.ToInt32(stringArray[0]), Convert.ToInt32(stringArray[1]), Convert.ToInt32(stringArray[2]));
         }
 
         /// <summary>
@@ -2970,106 +2814,102 @@ namespace ClientGUI
         /// </summary>
         private void tbChatInputBox_KeyUp(object sender, KeyEventArgs e)
         {
-            if (e.KeyData == Keys.Return)
+            if (e.KeyData != Keys.Return)
             {
-                e.Handled = true;
+                return;
+            }
 
-                if (string.IsNullOrEmpty(tbChatInputBox.Text))
-                {
-                    return;
-                }
+            e.Handled = true;
 
-                if (tbChatInputBox.Text[0] == '/')
+            if (string.IsNullOrEmpty(tbChatInputBox.Text))
+            {
+                return;
+            }
+
+            if (tbChatInputBox.Text[0] == '/')
+            {
+                try
                 {
-                    try
+                    string commandToParse = tbChatInputBox.Text.Substring(1).ToUpper();
+
+                    // Some quick, hacky text commands just for the fun of it
+                    if (commandToParse == "UNLOCK" && Locked && isHost)
                     {
-                        string commandToParse = tbChatInputBox.Text.Substring(1).ToUpper();
+                        AddNotice("You've unlocked the game room.");
+                        UnlockGame(false);
+                    }
+                    else if (commandToParse == "LOCK" && !Locked && isHost)
+                    {
+                        AddNotice("You've locked the game room.");
+                        LockGame(false);
+                    }
+                    else if (commandToParse == "PRIVMSG")
+                    {
+                        string[] messageParts = commandToParse.Split(' ');
+                        string receiver = messageParts[1];
+                        int index = receiver.IndexOf(',');
+                        if (index > -1)
+                            receiver = receiver.Substring(0, index);
 
-                        // Some quick, hacky text commands just for the fun of it
-                        if (commandToParse == "UNLOCK" && Locked && isHost)
-                        {
-                            AddNotice("You've unlocked the game room.");
-                            UnlockGame(false);
-                        }
-                        else if (commandToParse == "LOCK" && !Locked && isHost)
-                        {
-                            AddNotice("You've locked the game room.");
-                            LockGame(false);
-                        }
-                        else if (commandToParse == "PRIVMSG")
-                        {
-                            string[] messageParts = commandToParse.Split(' ');
-                            string receiver = messageParts[1];
-                            int index = receiver.IndexOf(',');
-                            if (index > -1)
-                                receiver = receiver.Substring(0, index);
-
-                            int pIndex = CnCNetData.players.FindIndex(c => c == receiver);
-                            if (pIndex > -1)
-                                CnCNetData.ConnectionBridge.SendMessage("PRIVMSG " + receiver + " " + messageParts[2]);
-                        }
-                        else if (commandToParse == "EXIT")
-                        {
-                            btnLeaveGame.PerformClick();
-                        }
-                        else if (commandToParse == "QUIT")
-                        {
-                            Environment.Exit(0);
-                        }
-                        else if (commandToParse.StartsWith("SECRETCOLOR"))
-                        {
-                            if (ProgramConstants.CNCNET_PLAYERNAME != "Rampastring")
-                                AddNotice("Tsk, wrong identity given. No extra colors for you.");
-                            else
-                            {
-                                if (isHost)
-                                {
-                                    int index = Players.FindIndex(c => c.Name == "Rampastring");
-                                    if (index > -1)
-                                        Players[index].ForcedColor = Convert.ToInt32(commandToParse.Substring(12));
-                                }
-
-                                StringBuilder sb = new StringBuilder("NOTICE " + ChannelName + " " + CTCPChar1 + CTCPChar2 + "SECRETCOLOR ");
-                                sb.Append(commandToParse.Substring(12));
-                                sb.Append(CTCPChar2);
-                                CnCNetData.ConnectionBridge.SendMessage(sb.ToString());
-                                AddNotice("Transferring secret color.");
-                            }
-                        }
+                        int pIndex = CnCNetData.players.FindIndex(c => c == receiver);
+                        if (pIndex > -1)
+                            CnCNetData.ConnectionBridge.SendMessage("PRIVMSG " + receiver + " " + messageParts[2]);
+                    }
+                    else if (commandToParse == "EXIT")
+                    {
+                        btnLeaveGame.PerformClick();
+                    }
+                    else if (commandToParse == "QUIT")
+                    {
+                        Environment.Exit(0);
+                    }
+                    else if (commandToParse.StartsWith("SECRETCOLOR"))
+                    {
+                        if (ProgramConstants.CNCNET_PLAYERNAME != "Rampastring")
+                            AddNotice("Tsk, wrong identity given. No extra colors for you.");
                         else
                         {
-                            AddNotice("Unknown command " + commandToParse);
+                            if (isHost)
+                            {
+                                int index = Players.FindIndex(c => c.Name == "Rampastring");
+                                if (index > -1)
+                                    Players[index].ForcedColor = Convert.ToInt32(commandToParse.Substring(12));
+                            }
+
+                            StringBuilder sb = new StringBuilder("NOTICE " + ChannelName + " " + CTCPChar1 + CTCPChar2 + "SECRETCOLOR ");
+                            sb.Append(commandToParse.Substring(12));
+                            sb.Append(CTCPChar2);
+                            CnCNetData.ConnectionBridge.SendMessage(sb.ToString());
+                            AddNotice("Transferring secret color.");
                         }
-
-                        tbChatInputBox.Clear();
-
-                        return;
                     }
-                    catch
+                    else
                     {
-                        AddNotice("Syntax error: an error occured while attempting to parse the given command.");
-                        tbChatInputBox.Clear();
-                        return;
+                        AddNotice("Unknown command " + commandToParse);
                     }
+
+                    tbChatInputBox.Clear();
+
+                    return;
                 }
-
-                string colorString = Convert.ToString((char)03);
-                if (myChatColorId < 10)
-                    colorString = colorString + "0" + Convert.ToString(myChatColorId);
-                else
-                    colorString = colorString + Convert.ToString(myChatColorId);
-
-                string messageToSend = "PRIVMSG " + ChannelName + " " + colorString + tbChatInputBox.Text;
-                CnCNetData.ConnectionBridge.SendMessage(messageToSend);
-                MessageColors.Add(ChatColors[myChatColorId]);
-                DateTime now = DateTime.Now;
-                lbChatBox.Items.Add("[" + now.ToShortTimeString() + "] " + ProgramConstants.CNCNET_PLAYERNAME + ": " + tbChatInputBox.Text);
-                tbChatInputBox.Clear();
-                ScrollListbox();
-
-                if (!DisableSoundsBox.Checked)
-                    sndMessageSound.Play();
+                catch
+                {
+                    AddNotice("Syntax error: an error occured while attempting to parse the given command.");
+                    tbChatInputBox.Clear();
+                    return;
+                }
             }
+
+            CnCNetData.ConnectionBridge.SendChatMessage(ChannelName, myChatColorId, tbChatInputBox.Text);
+
+            MessageColors.Add(ChatColors[myChatColorId]);
+            DateTime now = DateTime.Now;
+            lbChatBox.Items.Add("[" + now.ToShortTimeString() + "] " + ProgramConstants.CNCNET_PLAYERNAME + ": " + tbChatInputBox.Text);
+            tbChatInputBox.Clear();
+            ScrollListbox();
+
+            if (!DisableSoundsBox.Checked)
+                sndMessageSound.Play();
         }
 
         /// <summary>
@@ -3421,6 +3261,7 @@ namespace ClientGUI
                 MessageBox.Show("Unable to locate scenario map!" + Environment.NewLine + mapPath,
                     "Cannot read scenario", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 btnLeaveGame.PerformClick();
+                return;
             }
 
             // 28. 12. 2014 No editing the map after accepting on it!
@@ -3470,9 +3311,37 @@ namespace ClientGUI
 
             SharedLogic.WriteMap(currentGameMode, isCheckBoxChecked, IsCheckBoxReversed, AssociatedCheckBoxCustomInis, mapIni);
 
+            ms = new MatchStatistics(ProgramConstants.GAME_VERSION, currentMap.Name, currentGameMode, Players.Count);
+            int id = 0;
+            foreach (PlayerInfo p in Players)
+            {
+                if (p.Name == ProgramConstants.CNCNET_PLAYERNAME)
+                    ms.AddPlayer(p.Name, true, false, p.SideId == SideComboboxPrerequisites.Count + 1, playerSides[id], p.TeamId, 10);
+                else
+                    ms.AddPlayer(p.Name, false, false, p.SideId == SideComboboxPrerequisites.Count + 1, playerSides[id], p.TeamId, 10);
+
+                id++;
+            }
+
+            foreach (PlayerInfo ai in AIPlayers)
+            {
+                ms.AddPlayer("Computer", false, true, false, playerSides[id], ai.TeamId, GetAILevel(ai));
+                id++;
+            }
+
             Logger.Log("About to launch main executable.");
 
             StartGameProcess();
+        }
+
+        private int GetAILevel(PlayerInfo aiInfo)
+        {
+            if (aiInfo.Name == "Hard AI")
+                return 2;
+            if (aiInfo.Name == "Medium AI")
+                return 1;
+
+            return 0;
         }
 
         /// <summary>
@@ -3482,35 +3351,7 @@ namespace ClientGUI
         {
             ProgramConstants.IsInGame = true;
 
-            if (DomainController.Instance().getWindowedStatus())
-            {
-                Logger.Log("Windowed mode is enabled - using QRes.");
-                Process QResProcess = new Process();
-                QResProcess.StartInfo.FileName = ProgramConstants.QRES_EXECUTABLE;
-                QResProcess.StartInfo.UseShellExecute = false;
-                QResProcess.StartInfo.Arguments = "c=16 /R " + "\"" + ProgramConstants.gamepath + ProgramConstants.MAIN_EXECUTABLE + "\"" + " -SPAWN";
-                QResProcess.EnableRaisingEvents = true;
-                QResProcess.Exited += new EventHandler(QResProcess_Exited);
-                QResProcess.Start();
-
-                if (Environment.ProcessorCount > 1)
-                    QResProcess.ProcessorAffinity = (IntPtr)2;
-            }
-            else
-            {
-                Process DtaProcess = new Process();
-                DtaProcess.StartInfo.FileName = ProgramConstants.MAIN_EXECUTABLE;
-                DtaProcess.StartInfo.UseShellExecute = false;
-                DtaProcess.StartInfo.Arguments = "-SPAWN";
-                DtaProcess.EnableRaisingEvents = true;
-                DtaProcess.Exited += new EventHandler(DtaProcess_Exited);
-                DtaProcess.Start();
-
-                if (Environment.ProcessorCount > 1)
-                    DtaProcess.ProcessorAffinity = (System.IntPtr)2;
-            }
-
-            Logger.Log("Waiting for qres.dat or " + ProgramConstants.MAIN_EXECUTABLE + " to exit.");
+            SharedUILogic.StartGameProcess(0);
 
             if (isHost)
             {
@@ -3527,30 +3368,17 @@ namespace ClientGUI
         }
 
         /// <summary>
-        /// Executed when game.dat has exited.
-        /// </summary>
-        private void DtaProcess_Exited(object sender, EventArgs e)
-        {
-            Generic_GameProcessExited();
-        }
-
-        /// <summary>
-        /// Executed when qres.dat has exited.
-        /// </summary>
-        private void QResProcess_Exited(object sender, EventArgs e)
-        {
-            Generic_GameProcessExited();
-        }
-
-        /// <summary>
         /// Executed when the 'game process' (game.dat in fullscreen mode, qres.dat in windowed) has exited.
         /// </summary>
-        private void Generic_GameProcessExited()
+        private void GameProcessExited()
         {
             if (cmbP1Name.InvokeRequired)
             {
-                NoParamCallback d = new NoParamCallback(Generic_GameProcessExited);
-                this.Invoke(d, null);
+                ms.ParseStatistics(ProgramConstants.gamepath, defaultGame);
+                StatisticsManager.Instance.AddMatchAndSaveDatabase(ms);
+
+                NoParamCallback d = new NoParamCallback(GameProcessExited);
+                this.BeginInvoke(d, null);
                 return;
             }
 
@@ -3622,7 +3450,6 @@ namespace ClientGUI
             }
 
             AddNotice("The game host is still playing the game you previously started. " +
-                "Lobby chat is disabled until the host has returned from the game." +
                 "You can either wait for the host to return or leave the game room " +
                 "by clicking Leave Game.");
         }

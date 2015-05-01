@@ -53,6 +53,8 @@ namespace ClientGUI
 
         Color outlineColor;
 
+        Color focusColor;
+
         Image comboBoxArrow;
         Image openedComboBoxArrow;
 
@@ -65,6 +67,8 @@ namespace ClientGUI
 
         public LimitedComboBox()
         {
+            focusColor = BackColor;
+            this.DoubleBuffered = true;
             this.SetStyle(ControlStyles.UserPaint, true);
             UseCustomDrawingCode = true;
 
@@ -113,6 +117,8 @@ namespace ClientGUI
             get { return hoveredIndex; }
             set { hoveredIndex = value; }
         }
+
+        public Color FocusColor { get { return focusColor; } set { focusColor = value; } }
 
         public void AddItem(string text, Color color)
         {
@@ -200,24 +206,42 @@ namespace ClientGUI
                     new Rectangle(ClientRectangle.X + 1, ClientRectangle.Y + 1,
                         ClientRectangle.Width - 2, ClientRectangle.Height - 2));
 
+                Color foreColor = this.ForeColor;
+
+                int selectedIndex = this.SelectedIndex;
+
                 if (ItemColors.Count == 0)
                 {
-                    if (this.Enabled)
+                    if (!this.Enabled)
                     {
-                        graphics.DrawString(this.Text, this.Font, new SolidBrush(this.ForeColor),
-                            new PointF(this.ClientRectangle.X + 3, this.ClientRectangle.Y + 3));
-                    }
-                    else
-                    {
-                        graphics.DrawString(this.Text, this.Font, new SolidBrush(Color.DarkGray),
-                            new PointF(this.ClientRectangle.X + 3, this.ClientRectangle.Y + 3));
+                        foreColor = Color.DarkGray;
                     }
                 }
-                else if (this.SelectedIndex > -1)
+                else if (selectedIndex > -1)
                 {
-                    graphics.DrawString(this.Text, this.Font, new SolidBrush(ItemColors[this.SelectedIndex]),
-                        new PointF(this.ClientRectangle.X + 3, this.ClientRectangle.Y + 3));
+                    foreColor = ItemColors[this.SelectedIndex];
                 }
+
+                PointF textDrawingPoint = new PointF(this.ClientRectangle.X + 3, this.ClientRectangle.Y + 3);
+
+                if (selectedIndex > -1)
+                {
+                    Object oItem = this.Items[selectedIndex];
+
+                    if (oItem is DropDownItem)
+                    {
+                        DropDownItem item = (DropDownItem)oItem;
+
+                        if (item.Image != null)
+                        {
+                            graphics.DrawImage(item.Image, new Rectangle(this.ClientRectangle.X + 2, this.ClientRectangle.Y + 3,
+                                item.Image.Width, item.Image.Height));
+                            textDrawingPoint = new PointF(textDrawingPoint.X + item.Image.Width, textDrawingPoint.Y);
+                        }
+                    }
+                }
+
+                graphics.DrawString(this.Text, this.Font, new SolidBrush(foreColor), textDrawingPoint);
 
                 if (comboBoxArrow != null && Enabled)
                 {
@@ -236,6 +260,59 @@ namespace ClientGUI
             else
                 base.OnPaint(e);
         }
+
+        /// <summary>
+        /// Hacky drawing code override. I hate Windows Forms.
+        /// </summary>
+        /// <param name="e"></param>
+        protected override void OnDrawItem(DrawItemEventArgs e)
+        {
+            Color backColor = this.BackColor;
+
+            if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
+            {
+                e = new DrawItemEventArgs(e.Graphics,
+                                          e.Font,
+                                          e.Bounds,
+                                          e.Index,
+                                          e.State ^ DrawItemState.Selected,
+                                          e.ForeColor,
+                                          focusColor);
+                backColor = focusColor;
+                e.Graphics.FillRectangle(new SolidBrush(backColor), e.Bounds);
+            }
+
+            if (e.Index < 0)
+                return;
+
+            Object oItem = Items[e.Index];
+
+            if (oItem is DropDownItem)
+            {
+                e.DrawBackground();
+                e.DrawFocusRectangle();
+
+                Color foreColor = this.ForeColor;
+
+                if (this.ItemColors.Count > 0)
+                    foreColor = ItemColors[e.Index];
+
+                DropDownItem item = (DropDownItem)Items[e.Index];
+                if (item.Image != null)
+                {
+                    e.Graphics.DrawImage(item.Image, new Rectangle(e.Bounds.Left, e.Bounds.Top, item.Image.Width, item.Image.Height));
+                    e.Graphics.DrawString(item.Text, e.Font, new
+                            SolidBrush(foreColor), e.Bounds.Left + item.Image.Width, e.Bounds.Top + 2);
+                }
+                else
+                {
+                    e.Graphics.DrawString(item.Text, e.Font, new
+                        SolidBrush(foreColor), e.Bounds.Left, e.Bounds.Top + 2);
+                }
+            }
+            else
+                base.OnDrawItem(e);
+        }
     }
 
     public class HoverEventArgs : EventArgs
@@ -251,6 +328,29 @@ namespace ClientGUI
             {
                 _itemIndex = value;
             }
+        }
+    }
+
+    public class DropDownItem
+    {
+        public DropDownItem(String text)
+        {
+            Text = text;
+        }
+
+        public DropDownItem(String text, Image image)
+        {
+            Text = text;
+            Image = image;
+        }
+
+        public string Text { get; set; }
+
+        public Image Image { get; set; }
+
+        public override string ToString()
+        {
+            return Text;
         }
     }
 }

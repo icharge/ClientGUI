@@ -70,6 +70,7 @@
     <Compile Include="MapSelectionForm.Designer.cs">
       <DependentUpon>MapSelectionForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="MusicPlayer.cs" />
     <Compile Include="NCnCNetLobby.cs">
       <SubType>Form</SubType>
     </Compile>

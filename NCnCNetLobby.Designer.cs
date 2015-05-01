@@ -61,7 +61,7 @@
             this.lbChatMessages = new ClientGUI.ScrollbarlessListBox();
             this.lbPlayerList = new ClientGUI.ScrollbarlessListBox();
             this.lbGameList = new ClientGUI.ScrollbarlessListBox();
-            this.btnConfigure = new System.Windows.Forms.Button();
+            this.btnFollowedGames = new System.Windows.Forms.Button();
             this.panel2.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -344,6 +344,7 @@
             // 
             // lblChannel
             // 
+            this.lblChannel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lblChannel.AutoSize = true;
             this.lblChannel.BackColor = System.Drawing.Color.Transparent;
             this.lblChannel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
@@ -372,7 +373,7 @@
             this.btnMusicToggle.Name = "btnMusicToggle";
             this.btnMusicToggle.Size = new System.Drawing.Size(92, 23);
             this.btnMusicToggle.TabIndex = 21;
-            this.btnMusicToggle.Text = "Music ON";
+            this.btnMusicToggle.Text = "Music OFF";
             this.btnMusicToggle.UseVisualStyleBackColor = true;
             this.btnMusicToggle.Click += new System.EventHandler(this.btnMusicToggle_Click);
             this.btnMusicToggle.MouseEnter += new System.EventHandler(this.btnMusicToggle_MouseEnter);
@@ -429,6 +430,7 @@
             this.cmbMessageColor.CanDropDown = true;
             this.cmbMessageColor.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
             this.cmbMessageColor.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbMessageColor.FocusColor = System.Drawing.SystemColors.Window;
             this.cmbMessageColor.FormattingEnabled = true;
             this.cmbMessageColor.HoveredIndex = -1;
             this.cmbMessageColor.Location = new System.Drawing.Point(294, 6);
@@ -442,9 +444,11 @@
             // 
             // cmbCurrentChannel
             // 
+            this.cmbCurrentChannel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.cmbCurrentChannel.CanDropDown = true;
             this.cmbCurrentChannel.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbCurrentChannel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbCurrentChannel.FocusColor = System.Drawing.SystemColors.Window;
             this.cmbCurrentChannel.FormattingEnabled = true;
             this.cmbCurrentChannel.HoveredIndex = -1;
             this.cmbCurrentChannel.Location = new System.Drawing.Point(605, 6);
@@ -478,7 +482,8 @@
             // 
             // lbPlayerList
             // 
-            this.lbPlayerList.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lbPlayerList.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.lbPlayerList.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.lbPlayerList.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
             this.lbPlayerList.FormattingEnabled = true;
@@ -511,23 +516,26 @@
             this.lbGameList.SelectedIndexChanged += new System.EventHandler(this.lbGameList_SelectedIndexChanged);
             this.lbGameList.DoubleClick += new System.EventHandler(this.lbGameList_DoubleClick);
             // 
-            // btnConfigure
+            // btnFollowedGames
             // 
-            this.btnConfigure.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnConfigure.Location = new System.Drawing.Point(838, 5);
-            this.btnConfigure.Name = "btnConfigure";
-            this.btnConfigure.Size = new System.Drawing.Size(142, 23);
-            this.btnConfigure.TabIndex = 24;
-            this.btnConfigure.Text = "Followed Games...";
-            this.btnConfigure.UseVisualStyleBackColor = true;
-            this.btnConfigure.Click += new System.EventHandler(this.btnConfigure_Click);
+            this.btnFollowedGames.FlatAppearance.BorderSize = 0;
+            this.btnFollowedGames.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnFollowedGames.Location = new System.Drawing.Point(838, 5);
+            this.btnFollowedGames.Name = "btnFollowedGames";
+            this.btnFollowedGames.Size = new System.Drawing.Size(142, 23);
+            this.btnFollowedGames.TabIndex = 24;
+            this.btnFollowedGames.Text = "Followed Games...";
+            this.btnFollowedGames.UseVisualStyleBackColor = true;
+            this.btnFollowedGames.Click += new System.EventHandler(this.btnFollowedGames_Click);
+            this.btnFollowedGames.MouseEnter += new System.EventHandler(this.btnFollowedGames_MouseEnter);
+            this.btnFollowedGames.MouseLeave += new System.EventHandler(this.btnFollowedGames_MouseLeave);
             // 
             // NCnCNetLobby
             // 
             this.AcceptButton = this.btnSend;
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(985, 544);
-            this.Controls.Add(this.btnConfigure);
+            this.Controls.Add(this.btnFollowedGames);
             this.Controls.Add(this.sbPlayers);
             this.Controls.Add(this.sbChat);
             this.Controls.Add(this.btnMusicToggle);
@@ -597,6 +605,6 @@
         private System.Windows.Forms.Label lblPlayer3;
         private System.Windows.Forms.Label lblPlayer2;
         private System.Windows.Forms.Label lblPlayer1;
-        private System.Windows.Forms.Button btnConfigure;
+        private System.Windows.Forms.Button btnFollowedGames;
     }
 }

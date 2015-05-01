@@ -325,7 +325,7 @@ namespace ClientGUI
             }
 
             string recipient = cmbPMRecipients.Items[cmbPMRecipients.SelectedIndex].ToString();
-            CnCNetData.ConnectionBridge.SendMessage("PRIVMSG " + recipient + " " + tbChatMessage.Text);
+            CnCNetData.ConnectionBridge.SendChatMessage(recipient, -1, tbChatMessage.Text);
             lbChatMessages.Items.Add("[" + DateTime.Now.ToShortTimeString() + "] " + ProgramConstants.CNCNET_PLAYERNAME + ": " + tbChatMessage.Text);
             MessageColors.Add(lbChatMessages.ForeColor);
 
